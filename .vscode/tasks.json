@@ -1,0 +1,24 @@
+{ 
+   "version": "2.0.0",
+   "tasks": [
+     {
+     
+       "label": "MXSPyCOM execute Script",
+       "type": "shell",
+       // Add MXSPyCOM.exe to PATH or use file root, i.e: "C:/MXSPyCOM/MXSPyCOM.exe"
+       "command":"C:\\Users\\patgr\\AppData\\Local\\Autodesk\\3dsMax\\2022 - 64bit\\ENU\\scripts\\BTLC\\MXSPyCOM.exe",
+       "args": [
+           "-f",
+          "C:\\Users\\patgr\\AppData\\Local\\Autodesk\\3dsMax\\2022 - 64bit\\ENU\\scripts\\BTLC\\${relativeFile}"
+       ],
+       
+       "group": "test",
+       "presentation": {
+           "echo": true,
+           "reveal": "silent",
+           "focus": false,
+           "panel": "shared"
+       }
+   }
+ ]
+}
