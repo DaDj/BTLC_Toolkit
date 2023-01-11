@@ -1,9 +1,12 @@
 # BTLC_Toolkit
 
+## About
+
 Conversion toolkit for the BTLC prpject which allows 
 highly automated conversion of IV maps to GTA SA.
 This toolkit is a used in 3dsmax.
 
+## Features
 - Convert Models with prelights
   - prelight using iv material shaders
   - prelight using 2dfx light(radiosity)
@@ -18,19 +21,19 @@ This toolkit is a used in 3dsmax.
 - Automated toolchain for all above
   - comverts whole city parts automatically
 
-Wip:
+## Wip:
 - export of breakable to models
 - automatic col creation for dynamic models
 - automatic map animation conversion
 
 - path conversion and path creation tools
 
-Planned:
+## Planned:
 - small toolkit for vehicle conversion
 - toolkit for player anim conversion
 
 
-Credits:
+## Credits:
 - Uses a modified version of ofio.
 - collision export plugin by cj2000
 - img builder by silent
