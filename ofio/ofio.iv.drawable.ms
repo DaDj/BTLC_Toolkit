@@ -1730,7 +1730,7 @@ struct ofio_iv_odr (
 	),
 	
 
-	fn build skinned_as_chunked:false = (
+	fn build skinned_as_chunked:false Load_Mesh:true = (
 		descriptor = dummy boxsize:[0.3, 0.3, 0.3]
 		descriptor.name = "dr_" + descName
 		setUserProp descriptor "type" "drawable"		
@@ -1782,97 +1782,102 @@ struct ofio_iv_odr (
 		append group_arr #(med_obj, "med")
 		append group_arr #(low_obj, "low")
 		append group_arr #(vlow_obj, "vlow")
-		for j = 1 to group_arr.count do
+
+		if Load_Mesh == true then 
 		(
-			local group = group_arr[j][1]
-			if group == undefined then continue			
-			local lod = group_arr[j][2]
-			i = 0
-
-			for obj in group do
-			(	
-				if not skinned_as_chunked then
-				(
-					if i == 0 then 
+			for j = 1 to group_arr.count do
+			(
+				local group = group_arr[j][1]
+				if group == undefined then continue			
+				local lod = group_arr[j][2]
+				i = 0
+	
+				for obj in group do
+				(	
+					if not skinned_as_chunked then
 					(
-						if descName.count >  19 do descName = substring descName 1 19 
-						build_mesh obj mtls (descName )
-					) 
-					else 
-					(
-						local tmpName =  (descName + "_" + (i as string) )
-						if tmpName.count >  19 do tmpName = substring tmpName 1 19 
-						build_mesh obj mtls (tmpName )
-					)
-					
-
-					if bone_using_id.count > 0 then
-					(
-						-- using lodgroup_high, binded bones are the same for every lod group
-						-- set positions right and delete the annoying bones directly
-						if obj != undefined do (
-							local bone_obj = bone_using_id[lodgroup_high[i+1].boneid+1].boneObject
-							obj.objs[1].position = bone_obj.position
-							if obj.Skinned != 1 then
-							(
-								obj.objs[1].transform = bone_obj.transform 					
-							) 
-							delete bone_obj
+						if i == 0 then 
+						(
+							if descName.count >  19 do descName = substring descName 1 19 
+							build_mesh obj mtls (descName )
 						) 
+						else 
+						(
+							local tmpName =  (descName + "_" + (i as string) )
+							if tmpName.count >  19 do tmpName = substring tmpName 1 19 
+							build_mesh obj mtls (tmpName )
+						)
+						
+	
+						if bone_using_id.count > 0 then
+						(
+							-- using lodgroup_high, binded bones are the same for every lod group
+							-- set positions right and delete the annoying bones directly
+							if obj != undefined do (
+								local bone_obj = bone_using_id[lodgroup_high[i+1].boneid+1].boneObject
+								obj.objs[1].position = bone_obj.position
+								if obj.Skinned != 1 then
+								(
+									obj.objs[1].transform = bone_obj.transform 					
+								) 
+								delete bone_obj
+							) 
+						
+						) else
+						(
+							--obj.objs[1].parent = descriptor
+						)
+						
+						i += 1
+						if obj != undefined do 
+						(
+						btlcMaterial.ReshuffleByShader obj.objs[1]
+						btlcVertexPaint.PrelightModel obj.objs[1]
+						btlcVertexPaint.MoveAlphaChannel obj.objs[1]
+						)
 					
 					) else
 					(
-						--obj.objs[1].parent = descriptor
-					)
-					
-					i += 1
-					if obj != undefined do 
-					(
-					btlcMaterial.ReshuffleByShader obj.objs[1]
-					btlcVertexPaint.PrelightModel obj.objs[1]
-					btlcVertexPaint.MoveAlphaChannel obj.objs[1]
-					)
-				
-				) else
-				(
-					if obj.Skinned == 0 then
-					(
-						--delete descriptor
-						skel_obj.cleanup()
-						throw "FRAGMENT ERROR\n\nOnly fragments with skinned meshes can be handled by OFIO\n"
-					)
-					build_skinned_mesh_as_chunked obj mtls	
-					local k
-					if obj != undefined do 
-					(
-						for k = 1 to obj.objs.count do
+						if obj.Skinned == 0 then
 						(
-							if obj.objs[k] == undefined then continue
-							local _obj = obj.objs[k][1][1]
-							local _lod = ""
-							_obj.parent = bone_using_id[k].boneObject	
-							
-							if lod != undefined then
-							(
-								_lod = "_" + lod
-								setUserProp _obj "lod" lod										
-							)
-							_obj.name = "cm_" + _obj.parent.name + _lod					
+							--delete descriptor
+							skel_obj.cleanup()
+							throw "FRAGMENT ERROR\n\nOnly fragments with skinned meshes can be handled by OFIO\n"
 						)
+						build_skinned_mesh_as_chunked obj mtls	
+						local k
+						if obj != undefined do 
+						(
+							for k = 1 to obj.objs.count do
+							(
+								if obj.objs[k] == undefined then continue
+								local _obj = obj.objs[k][1][1]
+								local _lod = ""
+								_obj.parent = bone_using_id[k].boneObject	
+								
+								if lod != undefined then
+								(
+									_lod = "_" + lod
+									setUserProp _obj "lod" lod										
+								)
+								_obj.name = "cm_" + _obj.parent.name + _lod					
+							)
+						)
+					
+					)	
+	
+					if obj != undefined and  obj.objs[1] != undefined do 
+					(
+						if i > 1  do obj.objs[1].parent = group[1].objs[1]
+						
 					)
 				
-				)	
-
-				if obj != undefined and  obj.objs[1] != undefined do 
-				(
-					if i > 1  do obj.objs[1].parent = group[1].objs[1]
 					
 				)
-			
 				
 			)
-			
 		)
+		
 		delete descriptor -- kill the useless descriptor nonesense
 		-- build lights
 		light_root = undefined
@@ -1881,7 +1886,17 @@ struct ofio_iv_odr (
 		(
 			ofioLog.print "building lights"
 			
-			light_root = group_arr[1][1][1].objs[1]	
+			if Load_Mesh == true then 
+			(
+				light_root = group_arr[1][1][1].objs[1]
+			)
+			else 
+			(
+				light_root =  dummy boxsize:[0.3, 0.3, 0.3]
+				light_root.name = descName
+			)
+
+				
 			--light_root.name = "lights_" + descName
 			--setUserProp light_root "type" "lights_root"		
 			--light_root.parent = group_arr[1][1][1].objs[1]	
@@ -1907,11 +1922,11 @@ struct ofio_iv_odr (
 				)				
 				
 				light.color = lights[i].Color
-				light.farattenend = lights[i].Distance / 2
-				light.multiplier = lights[i].Range / 10
+				light.farattenend = lights[i].Distance / 1 --> org: /2
+				light.multiplier = lights[i].Range  --org: /10
 				light.falloff = lights[i].Falloff
 				
-				/*local type = ofutils.lowercase(lights[i].Type)
+				local type = ofutils.lowercase(lights[i].Type)
 				if type == "omni" then
 				(
 					light.type = #omni
@@ -1919,8 +1934,8 @@ struct ofio_iv_odr (
 				(
 					light.type = #freeSpot
 					light.hotspot = lights[i].HotSpot
-				)*/
-				light.type = #omni
+				)
+				--light.type = #omni
 				setUserProp light "type" "light"
 				setUserProp light "typeflags" lights[i].TypeFlags					
 				setUserProp light "coronasize" lights[i].CoronaSize

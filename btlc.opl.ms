@@ -178,7 +178,7 @@ struct ofio_BTLC_MassOPL
                 (
                   OPL.Build() -- Loading Main Models
                 )
-
+                btlcWorldLightPaint.PaintWorld() -- paint lights of lightsources on main models
                 BuildLodModels() -- Load the corresponding LOds
             )
         )

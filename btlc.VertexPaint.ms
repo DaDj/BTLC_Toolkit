@@ -37,6 +37,19 @@ struct btlc_VertexPaint
         
      
     ),
+    
+    fn PaintWorldLights Obj = 
+    ( -- Renders the lights onto the night prelight
+        converttomesh  Obj	  
+        v = PaintLayerMod()
+        addModifier Obj v
+       -- Obj.showVertexColors = on
+        v.layerMode = "Lighten"
+        v.mapChannel = -1
+        try (	AssignVertexColors.ApplyNodes Obj vertexPaint:v) catch()
+        converttomesh  Obj	
+        update Obj  
+    ),
     -- Prelights Model with respect for Emissives = white
     fn PrelightModel Obj= 
     (
@@ -47,7 +60,7 @@ struct btlc_VertexPaint
         
 
         bPrelight = getUserProp  Obj  "BTLC_PrelightApplied" 
-        
+        print bPrelight
         meshop.setMapSupport Obj ch_Night true
         vcnum = meshop.getNumMapVerts Obj ch_Day 
         meshop.setNumMapVerts Obj ch_Night vcnum
@@ -59,6 +72,7 @@ struct btlc_VertexPaint
         Makes the Color little bit dark in general and creates the Night VC*/
         if (bPrelight == undefined) then
         (
+            print "should work"
             for i = 1 to vcnum do 
             (
                 my_color = meshop.getMapVert Obj ch_Day  i 
@@ -67,6 +81,7 @@ struct btlc_VertexPaint
                 my_color_Night = (my_color2*0.1)
                 meshop.setMapVert Obj ch_Day  i (my_color2/255)
                 meshop.setMapVert Obj ch_Night i (my_color_Night/255)
+               
             )
             for i = 1 to vcfaces do 
             (
@@ -74,7 +89,6 @@ struct btlc_VertexPaint
             )
             /* Read the shader of the texture and paints the night vertex bright if emissive */
             SetEmmissivePrelight Obj
-
             setuserprop Obj  "BTLC_PrelightApplied" 1
         )
 

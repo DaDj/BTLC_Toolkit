@@ -72,11 +72,8 @@ function btlc_GUICityConvert =
 	)
 
 	rollout CityConvert "CityConvert" width:210 height:400
-	(
-		button btn_ConvertCity "Import City Part" width:150 height:35 align:#center tooltip:"Imports the selected city part" across:3
-		--button btn_ConvertIDE "Convert an IDE" width:150 height:25 align:#center tooltip:"Converts an Ide File" across:2 enabled: false
-
-		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8]
+	(	
+		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
 
 		on strtid changed val  do 
 		(
@@ -84,6 +81,7 @@ function btlc_GUICityConvert =
 			btlcConfig.Save() 
 		)
 
+		button btn_ConvertCity "Import City Part" width:120 height:35 align:#center tooltip:"Imports the selected city part" across:4
 		on btn_ConvertCity pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -94,7 +92,7 @@ function btlc_GUICityConvert =
 			strtid.value = btlcConfig.CurrentID;
 		)
 
-		button btn_ExportCity "Export City Part" width:150 height:35 align:#center tooltip:"Exports the selected city part" across:3
+		button btn_ExportCity "Gen/Export Files" width:120 height:35 align:#center tooltip:"Exports the selected city part" 
 		on btn_ExportCity pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -102,11 +100,34 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
 			BTLCCityConvert.Export();
 		)
+
+		button btn_OpenCol "Open .Col" width:120 height:35 align:#center tooltip:"Opens the .COl File to generate facegroups" 
+		on btn_OpenCol pressed do 
+		(
+			OutputPath = btlcConfig.CurrentExpoSaPAth  + "\\img";
+			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
+			Command = OutputPath + "\\" + MapPartName + ".col";
+			scriptPath = (GetDir #userScripts )
+       		
+			Program =  scriptPath + "\\BTLC\\Tools\\CollEditor2.exe"
+        	ShellLaunch Program Command
+		)
+
+		button btn_GenerateIMG "Generate IMG" width:120 height:35 align:#center tooltip:"Builds the final Img File" 
+		on btn_GenerateIMG pressed do 
+		(
+			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
+			/* Build final .img*/
+			IniPath = btlcConfig.CurrentExpoSaPAth + "\\" + MapPartName + ".ini"
+			OutPath = (pathConfig.removePathLeaf btlcConfig.CurrentExpoSaPAth) 
+
+			btlcImgBuild.BuildImg IniPath OutPath
+		)
 	)
 
 	rollout Map_Utils "Map Utils" width:210 height:400
 	(
-		button btn_ExportCollision "ExportCollision" width:120 height:35 align:#center tooltip:"Imports the selected city part" across:4
+		button btn_ExportCollision "ExportCollision" width:120 height:35 align:#center tooltip:"Export the Collision models" across:4
 		on btn_ExportCollision pressed do 
 		(
 			-- Collision Export
@@ -122,7 +143,7 @@ function btlc_GUICityConvert =
 			gc();
 		)
 
-		button btn_ExportModels "Export Models" width:120 height:35 align:#center tooltip:"Imports the selected city part" 
+		button btn_ExportModels "Export Models" width:120 height:35 align:#center tooltip:"Export the models" 
 		on btn_ExportModels pressed do 
 		(
 			-- Export Models
@@ -136,7 +157,7 @@ function btlc_GUICityConvert =
 			gc();	
 		)
 
-		button btn_GenerateTxds "GenerateTXDs" width:120 height:35 align:#center tooltip:"Imports the selected city part" 
+		button btn_GenerateTxds "GenerateTXDs" width:120 height:35 align:#center tooltip:"Generate the .txds" 
 		on btn_GenerateTxds pressed do 
 		(
 			/* Generate .txds */
@@ -145,7 +166,7 @@ function btlc_GUICityConvert =
 			btlcMagicTxd.GenerateTxds TxdPath OutPath
 		)
 
-		button btn_GenerateIMG "Generate IMG" width:120 height:35 align:#center tooltip:"Imports the selected city part" 
+		button btn_GenerateIMG "Generate IMG" width:120 height:35 align:#center tooltip:"Generate the Img file" 
 		on btn_GenerateIMG pressed do 
 		(
 			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
@@ -191,7 +212,7 @@ rollout btlcUtility  "BTLC Toolkit"
 	button btn_VertexAlphA "Alpha1" width:50 align:#center across:2
 	button btn_VertexAlphaday "Alpha2" width:50 align:#center across:2
 
-	checkbutton btn_map "Map" width:100 align:#center across:3
+	checkbutton btn_map "Map" width:100 align:#center across:1
 
 	on btn_ShowCollision pressed do 
 	(

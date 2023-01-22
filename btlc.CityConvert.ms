@@ -47,8 +47,8 @@ struct Btlc_ConvertCity
             close theFile
             gc()
             free theFile
-        -- delte object not listed
-        for obj in objects as array do 
+            -- dele te object not listed
+            for obj in objects as array do 
             (
                 theobjname = toLower (obj.name)
                 IsUsed = finditem UsedObjs  theobjname
@@ -179,7 +179,7 @@ struct Btlc_ConvertCity
         end = timeStamp();
         format "Build Txds: Processing took % seconds\n" ((end - start) / 1000.0)  
 
-        -- Build Final Img
+       /* -- Build Final Img
         start = timeStamp();
         MapPartName =  filenameFromPath ExportCityPath
         IniPath = ExportCityPath + "\\" + MapPartName + ".ini"
@@ -187,7 +187,7 @@ struct Btlc_ConvertCity
         btlcImgBuild.BuildImg IniPath OutPath       
         end = timeStamp();
         format "Build Img: Processing took % seconds\n" ((end - start) / 1000.0)  
-
+        */
         gc();
     )
 )
