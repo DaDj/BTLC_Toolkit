@@ -60,7 +60,6 @@ struct btlc_VertexPaint
         
 
         bPrelight = getUserProp  Obj  "BTLC_PrelightApplied" 
-        print bPrelight
         meshop.setMapSupport Obj ch_Night true
         vcnum = meshop.getNumMapVerts Obj ch_Day 
         meshop.setNumMapVerts Obj ch_Night vcnum
@@ -72,7 +71,6 @@ struct btlc_VertexPaint
         Makes the Color little bit dark in general and creates the Night VC*/
         if (bPrelight == undefined) then
         (
-            print "should work"
             for i = 1 to vcnum do 
             (
                 my_color = meshop.getMapVert Obj ch_Day  i 

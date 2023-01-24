@@ -40,7 +40,10 @@ struct Btlc_Modelexport
     function ExportAllModels OutputPath = 
     (
         local MyObjs = #()
-        for i in objects as array do if (btlcCol.isCol i) == false do append MyObjs i
+        for i in objects as array  do 
+        (
+            if (btlcCol.isCol i) == false and (i.parent == undefined) do append MyObjs i
+        ) 
         MyObjs =  makeUniqueArray MyObjs
         ExportModels OutputPath MyObjs
     )

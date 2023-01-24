@@ -54,6 +54,8 @@ BtlcTextDB = Btlc_TextureDB();
 
 struct Btlc_Material 
 (
+  EnableReflections = true,
+
   fn FindEnvTexId Shadername= 
   (
     Shader = getFilenameFile Shadername
@@ -94,7 +96,11 @@ struct Btlc_Material
 
     /* Reflection map */
     envId = -1
-    if ((findstring shader[1] "reflect") != undefined) do envId = FindEnvTexId shader[1]
+    if btlcMaterial.EnableReflections == true do 
+    (
+      if ((findstring shader[1] "reflect") != undefined) do envId = FindEnvTexId shader[1]
+    )
+  
     if envId != -1 do 
     (
       TheTexName = getFilenameFile shader[envId + 1]

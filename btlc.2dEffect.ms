@@ -149,6 +149,19 @@ struct Btlc_2dEffect
 	
 	fn Exportsection TheSec Filename =  
 	(
+		--effect types
+		local effectlight = 0x00 --light info
+		local effectparticle = 0x01 --particle system name
+		--0x02 n/a
+		local effectcard = 0x03 --for playing cards? also photo op places?
+		--0x04 n/a
+		--0x05 n/a
+		local effect_6 = 0x06 --unknown
+		local effecttext = 0x07 --2d sign text
+		local effect_8 = 0x08 --used by slot machine wheels/scripted objects?
+		local effect_9 = 0x09 --unknown, used alot (carter-column, stadium_sfse)
+		local effectescalator = 0x0a --seems to be used only on escalators
+		
 		--objects have been collected, time to start the export process
 		effectstream=fopen Filename "wb"
 		--write file header info here

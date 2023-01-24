@@ -72,7 +72,7 @@ struct Btlc_ConvertCity
         deleteFile  (ExportCityPath + "\\" + MapPartName + ".ide")
 
         /* Move ipls into img folder */
-        files = getFiles (Pathup + "\\*stream*.ipl") 
+        files = getFiles (Pathup + "\\" + MapPartName + "_stream*.ipl")  --maybe try to only find mapartname_stream*
         for f in files do 
         (
             Filename = filenameFromPath f
@@ -142,6 +142,7 @@ struct Btlc_ConvertCity
         GenerateData(); -- generate data ipl,ide , copy txd etc
         InitTexDb();    -- Run Texture Database to get correct textures
         BuildMap();      -- Build Map --
+        CleanupFiles();
 
         freeSceneBitmaps();
         gc();
@@ -149,8 +150,7 @@ struct Btlc_ConvertCity
 
     fn Export = 
     (
-        CleanupFiles();
-
+        
         -- Export Models
         start = timeStamp();
         OutputPath = ExportCityPath + "\\img";

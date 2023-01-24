@@ -1922,8 +1922,8 @@ struct ofio_iv_odr (
 				)				
 				
 				light.color = lights[i].Color
-				light.farattenend = lights[i].Distance / 1 --> org: /2
-				light.multiplier = lights[i].Range  --org: /10
+				light.farattenend = lights[i].Distance / 2 
+				light.multiplier = lights[i].Range / 6 --originally divided by 10. but its kind weak at times. 
 				light.falloff = lights[i].Falloff
 				
 				local type = ofutils.lowercase(lights[i].Type)

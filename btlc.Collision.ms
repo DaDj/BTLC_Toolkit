@@ -31,7 +31,7 @@ struct Btlc_Collision
 				if i == COL_MATERIALS[5] do  MyID =  DIRT_ID--dirt
 				if i == COL_MATERIALS[6] do  MyID =  GLASS_ID--glass
 				if i == COL_MATERIALS[7] do  MyID =  PATH_ID--path
-				if i == COL_MATERIALS[8] do MyID = urn WATER_ID --water
+				if i == COL_MATERIALS[8] do MyID =  WATER_ID --water
 				if i == COL_MATERIALS[9] do MyID = GLASS_ID --window
 				if i == COL_MATERIALS[10] do MyID = WOOD_ID --wood
 				if i == COL_MATERIALS[11] do MyID = METAL_ID--metal	
@@ -125,8 +125,8 @@ struct Btlc_Collision
 	(
 		optimizer = optimize()
 		addModifier obj optimizer
-		optimizer.facethreshold1 = 16.0
-		optimizer.edgethreshold1 = 8.0
+		optimizer.facethreshold1 = 5.0
+		optimizer.edgethreshold1 = 3.0
 		maxOps.CollapseNode obj 1
 	),
 	-- for Clean Col Mesh
