@@ -1738,13 +1738,15 @@ struct ofio_iv_odr (
 		ofioLog.print ("building drawable " + descName)
 		local mtls = #()
 		local shader
+		mat_i = 1
 		for shader in shadinggroup_shaders do
 		(
-			local mtl = btlcMaterial.SetMaterialData shader 
+			local mtl = btlcMaterial.SetMaterialData shader MatId:mat_i
 			--mtl = Btlc_GetShaderMaterials mtl shader cur_path TexDir
 			--mtl.setInfo shader cur_path
 			--mtl.delegate.diffusecolor = random black white
 			append mtls mtl
+			mat_i = mat_i + 1
 		)
 		_mtls = mtls
 
@@ -1923,7 +1925,7 @@ struct ofio_iv_odr (
 				
 				light.color = lights[i].Color
 				light.farattenend = lights[i].Distance / 2 
-				light.multiplier = lights[i].Range / 6 --originally divided by 10. but its kind weak at times. 
+				light.multiplier = lights[i].Range / 8 --originally divided by 10. but its kind weak at times. 
 				light.falloff = lights[i].Falloff
 				
 				local type = ofutils.lowercase(lights[i].Type)

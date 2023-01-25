@@ -1101,6 +1101,71 @@ struct ofio_iv_anim (
 		)
 		close fInput
 		if ofio_iv_opened_blocks != 0 then throw "file parsing error"		
-	)
+	),
+
+	fn ApplyAnimtoMaterial TheMat = 
+    (
+        local texture
+        texture = TheMat.texmap_texture
+
+        local block, i, j
+        frameRate = Frames / Duration
+        animationRange = Interval 0 (Frames - 1)
+        
+        for i = 1 to Frames do
+        (
+            for block in Animation do
+            (
+                local seq, seq_id = 1, seq_start = 1
+                for seq in block.sequences do
+                (
+                    if (i >= seq_start) and (i < seq_start + Sequences[seq_id]) then exit
+                    seq_start += Sequences[seq_id]
+                    seq_id += 1
+                )
+                local seq = block.sequences[seq_id]
+                local value = #()
+                if seq.multich then
+                (
+                    for j = 1 to seq.channels.count do
+                    (
+                        if seq.channels[j].static 
+                            then append value seq.channels[j].values[1]
+                            else append value seq.channels[j].values[i - seq_start + 1]
+                    )
+                ) else
+                (
+                    if seq.static 
+                        then value = seq.values[1]
+                        else value = seq.values[i - seq_start + 1]	
+                )
+                
+                if classof value == array then
+                (
+                    for j = 1 to value.count do
+                        if value[j] == undefined then throw "undefined array element"
+                    
+                    case value.count of
+                    (
+                        3: value = Point3 value[1] value[2] value[3]
+                        default: throw "array size mismatch"
+                    )
+                ) else
+                (
+                    throw "value is not an array"
+                )
+                    
+                with animate on at time (i - 1)
+                (
+                    case ofutils.lowercase(block.name) of
+                    (	
+                        "uv0": texture.coords.u_offset = value[3]
+                        "uv1": texture.coords.v_offset = value[3]
+                        default: throw ("uknown uv block " + block.name)
+                    )
+                )					
+            )
+        )
+    )
 )
 

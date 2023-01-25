@@ -147,6 +147,30 @@ struct Btlc_ConvertCity
         freeSceneBitmaps();
         gc();
     ),
+    
+    fn BuildTxd = 
+    (
+     -- Build Txd with Magictxd
+        start = timeStamp();
+        TxdPath = ExportCityPath + "\\txd"
+        Outpath = ExportCityPath + "\\img"
+        btlcMagicTxd.RunMagicTxd TxdPath OutPath
+        end = timeStamp();
+        format "Build Txds: Processing took % seconds\n" ((end - start) / 1000.0)  
+        gc();
+    ),
+
+    fn BuildImg = 
+    (
+        start = timeStamp();
+        MapPartName =  filenameFromPath ExportCityPath
+        IniPath = ExportCityPath + "\\" + MapPartName + ".ini"
+        OutPath = (pathConfig.removePathLeaf ExportCityPath) 
+        btlcImgBuild.BuildImg IniPath OutPath       
+        end = timeStamp();
+        format "Build Img: Processing took % seconds\n" ((end - start) / 1000.0)  
+        gc();
+    ),
 
     fn Export = 
     (
@@ -171,24 +195,6 @@ struct Btlc_ConvertCity
         freeSceneBitmaps() ; -- trying to free up memory
         gc();
 
-        -- Build Txd
-        start = timeStamp();
-		TxdPath = ExportCityPath + "\\txd"
-		Outpath = ExportCityPath + "\\img"
-		btlcMagicTxd.GenerateTxds TxdPath OutPath
-        end = timeStamp();
-        format "Build Txds: Processing took % seconds\n" ((end - start) / 1000.0)  
-
-       /* -- Build Final Img
-        start = timeStamp();
-        MapPartName =  filenameFromPath ExportCityPath
-        IniPath = ExportCityPath + "\\" + MapPartName + ".ini"
-        OutPath = (pathConfig.removePathLeaf ExportCityPath) 
-        btlcImgBuild.BuildImg IniPath OutPath       
-        end = timeStamp();
-        format "Build Img: Processing took % seconds\n" ((end - start) / 1000.0)  
-        */
-        gc();
     )
 )
 

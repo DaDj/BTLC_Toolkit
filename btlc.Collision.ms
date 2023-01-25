@@ -125,8 +125,8 @@ struct Btlc_Collision
 	(
 		optimizer = optimize()
 		addModifier obj optimizer
-		optimizer.facethreshold1 = 5.0
-		optimizer.edgethreshold1 = 3.0
+		optimizer.facethreshold1 = 4.0
+		optimizer.edgethreshold1 = 1.0
 		maxOps.CollapseNode obj 1
 	),
 	-- for Clean Col Mesh

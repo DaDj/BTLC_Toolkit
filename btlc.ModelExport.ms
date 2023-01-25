@@ -24,7 +24,7 @@ struct Btlc_Modelexport
 
             for Child in TheChilds do 
             (
-                if (btlcCol.isCol Child) == false do  Child.parent = undefined  -- unparent Collsions for export
+                if (btlcCol.isCol Child) == true do  Child.parent = undefined  -- unparent Collsions for export
             ) 
                 select obj
             -- print dir

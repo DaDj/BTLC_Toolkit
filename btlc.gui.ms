@@ -81,7 +81,7 @@ function btlc_GUICityConvert =
 			btlcConfig.Save() 
 		)
 
-		button btn_ConvertCity "Import City Part" width:120 height:35 align:#center tooltip:"Imports the selected city part" across:4
+		button btn_ConvertCity "Import City Part" width:110 height:35 align:#center tooltip:"Imports the selected city part" across:5
 		on btn_ConvertCity pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -92,7 +92,7 @@ function btlc_GUICityConvert =
 			strtid.value = btlcConfig.CurrentID;
 		)
 
-		button btn_ExportCity "Gen/Export Files" width:120 height:35 align:#center tooltip:"Exports the selected city part" 
+		button btn_ExportCity "Gen/Export Files" width:110 height:35 align:#center tooltip:"Exports .dff Models & Collision" 
 		on btn_ExportCity pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -101,7 +101,16 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.Export();
 		)
 
-		button btn_OpenCol "Open .Col" width:120 height:35 align:#center tooltip:"Opens the .COl File to generate facegroups" 
+		button btn_GenTxd "Build .Txds" width:110 height:35 align:#center tooltip:"Generates Txds" 
+		on btn_GenTxd pressed do 
+		(
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
+			BTLCCityConvert.BuildTxd();
+		)
+
+		button btn_OpenCol "Open .Col" width:110 height:35 align:#center tooltip:"Opens the .COl File to generate facegroups" 
 		on btn_OpenCol pressed do 
 		(
 			OutputPath = btlcConfig.CurrentExpoSaPAth  + "\\img";
@@ -113,7 +122,7 @@ function btlc_GUICityConvert =
         	ShellLaunch Program Command
 		)
 
-		button btn_GenerateIMG "Generate IMG" width:120 height:35 align:#center tooltip:"Builds the final Img File" 
+		button btn_GenerateIMG "Build IMG" width:110 height:35 align:#center tooltip:"Builds the final Img File" 
 		on btn_GenerateIMG pressed do 
 		(
 			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
@@ -127,7 +136,7 @@ function btlc_GUICityConvert =
 
 	rollout Map_Utils "Map Utils" width:210 height:400
 	(
-		button btn_ExportCollision "ExportCollision" width:120 height:35 align:#center tooltip:"Export the Collision models" across:4
+		button btn_ExportCollision "ExportCollision" width:110 height:35 align:#center tooltip:"Export the Collision models" across:4
 		on btn_ExportCollision pressed do 
 		(
 			-- Collision Export
@@ -143,7 +152,7 @@ function btlc_GUICityConvert =
 			gc();
 		)
 
-		button btn_ExportModels "Export Models" width:120 height:35 align:#center tooltip:"Export the models" 
+		button btn_ExportModels "Export Models" width:110 height:35 align:#center tooltip:"Export the models" 
 		on btn_ExportModels pressed do 
 		(
 			-- Export Models
@@ -157,10 +166,21 @@ function btlc_GUICityConvert =
 			gc();	
 		)
 
+		
+		button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:35 align:#center tooltip:"Export the models" 
+		on btn_ReinitTxdDb pressed do 
+		(
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
+			BTLCCityConvert.InitTexDb()
+			gc();	
+		)
+		/*
 		button btn_GenerateTxds "GenerateTXDs" width:120 height:35 align:#center tooltip:"Generate the .txds" 
 		on btn_GenerateTxds pressed do 
 		(
-			/* Generate .txds */
+			
 			TxdPath = btlcConfig.CurrentExpoSaPAth + "\\txd"
 			Outpath = btlcConfig.CurrentExpoSaPAth + "\\img"
 			btlcMagicTxd.GenerateTxds TxdPath OutPath
@@ -170,19 +190,19 @@ function btlc_GUICityConvert =
 		on btn_GenerateIMG pressed do 
 		(
 			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
-			/* Build final .img*/
+		
 			IniPath = btlcConfig.CurrentExpoSaPAth + "\\" + MapPartName + ".ini"
 			OutPath = (pathConfig.removePathLeaf btlcConfig.CurrentExpoSaPAth) 
 
 			btlcImgBuild.BuildImg IniPath OutPath
 		)
-		
+		*/
 	)
 
 	try (closeRolloutFloater btlcCityFloater) catch ()
 	Pos = getMaxWindowSize() 	
 	PosX = Pos[1]/2 - 300
-	btlcCityFloater  = newRolloutFloater  "BTLC Main" 600 450 PosX 250
+	btlcCityFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
 	addRollout DirSettings btlcCityFloater
 	addRollout CityConvert btlcCityFloater
 	addRollout Map_Utils btlcCityFloater

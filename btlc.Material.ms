@@ -7,18 +7,21 @@ BTLC_MatShader = attributes "BTLC_MatShader"  attribID:#(0x3c0e6f, 0xb139b19)
 		MYShaderID type:#integer default:0;
 		MyShaderType type:#integer default:0;
 		MyShaderName type:#string	default:"";
+    MyShaderOrgMatId type:#integer default:0
 	)
 	rollout params "BTLC MaterialData"
 	(
 		spinner lblShaderID  "ShaderID" type:#integer
 		spinner lnlShaderType  "ShaderType"  type:#integer
 		edittext lnShaderName  "ShaderName" 
+    spinner lblOrgMatID "OrgMatId" type:#integer
 
 		on params open do 
 		(
 			lblShaderID.value = MYShaderID
 			lnlShaderType.value = MyShaderType
 			lnShaderName.text = MyShaderName
+      lblOrgMatID.value = MyShaderOrgMatId
 		)
 	)
 )
@@ -64,7 +67,7 @@ struct Btlc_Material
     idx2
   ),
 
-  fn SetMaterialData  shader =
+  fn SetMaterialData  shader MatId:0 =
   (
     TheName =  toLower (shader[2]) 
     TheName = getFilenameFile TheName
@@ -131,6 +134,7 @@ struct Btlc_Material
     rw.MyShaderID = 0
     rw.MyShaderType = 2
     rw.MyShaderName = shader[1]
+    rw.MyShaderOrgMatId = MatId
     rw.showInViewport = true
     rw
   ),

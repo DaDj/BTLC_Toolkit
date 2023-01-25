@@ -29,6 +29,13 @@ struct btlc_MagicTxd
 		ShellLaunch  Program ""
 	),
 
+	function RunMagicTxd TxdPath OutPath = 
+	(
+		GenTXD_PrepareIniFile TxdPath OutPath
+		scriptPath = (GetDir #userScripts )
+		Program =  scriptPath + "\\BTLC\\Tools\\Magic.TxdBuilder.exe"
+		ShellLaunch  Program ""
+	),
 
 	function GenerateTxds TxdPath OutPath =
 	(
