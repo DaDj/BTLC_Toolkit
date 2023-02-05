@@ -209,6 +209,15 @@ function btlc_GUICityConvert =
 )
 
 
+function btlc_GUIModelConvert =
+(
+	try (closeRolloutFloater btlcIdeModelsFloater) catch ()
+	Pos = getMaxWindowSize() 	
+	PosX = Pos[1]/2 - 300
+	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
+)
+
+
 
 rollout btlcUtility  "BTLC Toolkit"
 (

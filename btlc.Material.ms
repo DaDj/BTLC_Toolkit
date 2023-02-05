@@ -8,20 +8,22 @@ BTLC_MatShader = attributes "BTLC_MatShader"  attribID:#(0x3c0e6f, 0xb139b19)
 		MyShaderType type:#integer default:0;
 		MyShaderName type:#string	default:"";
     MyShaderOrgMatId type:#integer default:0
+    MyShaderIsAnim type:#integer default:0
 	)
 	rollout params "BTLC MaterialData"
 	(
 		spinner lblShaderID  "ShaderID" type:#integer
 		spinner lnlShaderType  "ShaderType"  type:#integer
-		edittext lnShaderName  "ShaderName" 
+		edittext lnShaderName  "ShaderName" type:#string
     spinner lblOrgMatID "OrgMatId" type:#integer
-
+    spinner lblisANim "Is Animated" type:#integer
 		on params open do 
 		(
 			lblShaderID.value = MYShaderID
 			lnlShaderType.value = MyShaderType
 			lnShaderName.text = MyShaderName
       lblOrgMatID.value = MyShaderOrgMatId
+      lblisANim.value = MyShaderIsAnim
 		)
 	)
 )
@@ -53,12 +55,51 @@ struct Btlc_TextureDB  --Setup after OPL reader read all used files
     )
   )
 )
-BtlcTextDB = Btlc_TextureDB();
+ = Btlc_TextureDB();
 
 struct Btlc_Material 
 (
   EnableReflections = true,
 
+  fn CondenseMaterialIds obj =(
+    mat = obj.material
+
+    if mat != undefined and isKindOf mat Multimaterial and isKindOf obj editable_mesh do (
+
+        subs = mat.materiallist
+        count = subs.count
+        sub_materials = #() 
+        sub_material_names = #()
+        old_ids = #()
+
+        for i = 1 to subs.count where subs[i] != undefined do (
+            sub_mat = subs[i]
+            append sub_materials sub_mat
+            append sub_material_names sub_mat.name
+            append old_ids i
+        )
+
+        new_count = sub_materials.count
+
+        for f = 1 to obj.numfaces do (
+            old_f_mat_id = getFaceMatID obj f
+            
+            index = findItem old_ids old_f_mat_id
+
+            if index > 0 then (
+                new_f_mat_id = index
+            )
+            else (
+                new_f_mat_id = new_count
+            )
+
+            setFaceMatID obj f new_f_mat_id
+        )
+
+        new_mat = MultiMaterial numsubs:new_count materiallist:sub_materials names:sub_material_names
+        obj.material = new_mat
+    )
+  ),
   fn FindEnvTexId Shadername= 
   (
     Shader = getFilenameFile Shadername
@@ -113,10 +154,10 @@ struct Btlc_Material
       (
         FilePath = BtlcTextDB.TexturesList[idxEnv]
         rw.enEnv = true
-        rw.shininess = 0.25
+        rw.shininess = 0.5
         rw.matfxeffect = 3
         rw.texmap_envmap = bitmaptexture filename:Filepath
-        rw.envmap_amount = 0.5
+        rw.envmap_amount = 0.65
       )
     ) 
 
@@ -153,7 +194,8 @@ struct Btlc_Material
       obj.Material.MaterialList.Count = obj.Material.MaterialList.Count +1
       obj.Material.MaterialList[obj.Material.MaterialList.Count] =  copy obj.Material.MaterialList[MtlID]
       SetMeshFace_MatID obj MtlID obj.Material.MaterialList.Count
-      --obj.Material.MaterialList[MtlID]  = undefined	
+      obj.Material.MaterialList[MtlID]  = undefined
+      --obj.Material.MaterialList[MtlID].name = "Useless"
     )
   ),
 
@@ -168,10 +210,15 @@ struct Btlc_Material
         try
         (
           Shader = custAttributes.get obj.Material.MaterialList[MtlID] BTLC_MatShader 
-          if ((findstring Shader.MyShaderName "decal") != undefined) or ((findstring Shader.MyShaderName "alpha")  != undefined) or ((findstring Shader.MyShaderName "glass")  != undefined) then
-          (					
-            ShuffleThisMaterial obj MtlID
+        
+          if Shader != undefined do
+          (
+            if ((findstring Shader.MyShaderName "decal") != undefined) or ((findstring Shader.MyShaderName "alpha")  != undefined) or ((findstring Shader.MyShaderName "glass")  != undefined) then
+            (					
+              ShuffleThisMaterial obj MtlID
+            )
           )
+      
         )
         catch
         (
@@ -179,6 +226,10 @@ struct Btlc_Material
         )
       )
     )
+
+    CondenseMaterialIds obj;
   )
+
+
 )
 btlcMaterial = Btlc_Material();

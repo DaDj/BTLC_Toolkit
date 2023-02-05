@@ -1730,11 +1730,10 @@ struct ofio_iv_odr (
 	),
 	
 
-	fn build skinned_as_chunked:false Load_Mesh:true = (
+	fn build skinned_as_chunked:false Load_Mesh:true Load_Bones:false = (
 		descriptor = dummy boxsize:[0.3, 0.3, 0.3]
 		descriptor.name = "dr_" + descName
 		setUserProp descriptor "type" "drawable"		
-		
 		ofioLog.print ("building drawable " + descName)
 		local mtls = #()
 		local shader
@@ -1754,27 +1753,32 @@ struct ofio_iv_odr (
 		if skel_obj != undefined then
 		(
 			ofioLog.print "building skel"
-			--skel_obj.build descriptor
-			--bone_using_id = add_bone_object skel_obj.rootBone #()
-			-- if mesh is skinned then skel must be rotated to the default pos
-		/*	if (high_obj.count > 0) and (high_obj[1].Skinned == 1) then
+
+			if Load_Bones == true then 
 			(
-				local bone
-				for bone in bone_using_id do 
+				skel_obj.build descriptor	
+				bone_using_id = add_bone_object skel_obj.rootBone #()
+				--if mesh is skinned then skel must be rotated to the default pos
+				if (high_obj.count > 0) and (high_obj[1].Skinned == 1) then
 				(
-					if bone != undefined and bone.boneObject != undefined then
+					local bone
+					for bone in bone_using_id do 
 					(
-						in coordsys bone.boneObject.parent 
+						if bone != undefined and bone.boneObject != undefined then
 						(
-							local bone_pos = bone.boneObject.pos
-							--local r = bone.boneObject.rotation * -1
-							--r.w *= -1
-							bone.boneObject.rotation = bone.RotationQuaternion
-							bone.boneObject.pos = bone_pos
+							in coordsys bone.boneObject.parent 
+							(
+								local bone_pos = bone.boneObject.pos
+								--local r = bone.boneObject.rotation * -1
+								--r.w *= -1
+								bone.boneObject.rotation = bone.RotationQuaternion
+								bone.boneObject.pos = bone_pos
+							)
 						)
-					)
-				)			
-			)*/
+					)			
+				)
+			)
+			
 		)
 		-- build meshes
 		local i, j, obj
@@ -1793,43 +1797,59 @@ struct ofio_iv_odr (
 				if group == undefined then continue			
 				local lod = group_arr[j][2]
 				i = 0
-	
 				for obj in group do
 				(	
 					if not skinned_as_chunked then
 					(
-						if i == 0 then 
+					
+						if Load_Bones == false then
 						(
-							if descName.count >  19 do descName = substring descName 1 19 
-							build_mesh obj mtls (descName )
-						) 
+							if i == 0 then 
+							(
+								if descName.count >  19 do descName = substring descName 1 19 
+								build_mesh obj mtls (descName )
+							) 
+							else 
+							(
+								local tmpName =  (descName + "_" + (i as string) )
+								if tmpName.count >  19 do tmpName = substring tmpName 1 19 
+								build_mesh obj mtls (tmpName )
+							)
+						)
 						else 
 						(
-							local tmpName =  (descName + "_" + (i as string) )
-							if tmpName.count >  19 do tmpName = substring tmpName 1 19 
-							build_mesh obj mtls (tmpName )
-						)
 						
-	
+							build_mesh obj mtls (descName + "_" + i as String)
+						)
+					
 						if bone_using_id.count > 0 then
 						(
+						
 							-- using lodgroup_high, binded bones are the same for every lod group
 							-- set positions right and delete the annoying bones directly
 							if obj != undefined do (
 								local bone_obj = bone_using_id[lodgroup_high[i+1].boneid+1].boneObject
-								obj.objs[1].position = bone_obj.position
+								if Load_Bones == false then 
+								(
+									obj.objs[1].position = bone_obj.position
+								)
+								else 
+								(
+									obj.objs[1].parent = bone_obj
+								)
+								
 								if obj.Skinned != 1 then
 								(
 									obj.objs[1].transform = bone_obj.transform 					
 								) 
-								delete bone_obj
+								if Load_Bones == false do delete bone_obj 
 							) 
-						
 						) else
 						(
-							--obj.objs[1].parent = descriptor
+							if Load_Bones == true do obj.objs[1].parent = descriptor
 						)
-						
+						if lod != undefined then
+						setUserProp obj.objs[1] "lod" lod
 						i += 1
 						if obj != undefined do 
 						(
@@ -1840,9 +1860,10 @@ struct ofio_iv_odr (
 					
 					) else
 					(
+						
 						if obj.Skinned == 0 then
 						(
-							--delete descriptor
+							if Load_Bones == true do delete descriptor
 							skel_obj.cleanup()
 							throw "FRAGMENT ERROR\n\nOnly fragments with skinned meshes can be handled by OFIO\n"
 						)
@@ -1867,7 +1888,7 @@ struct ofio_iv_odr (
 						)
 					
 					)	
-	
+		
 					if obj != undefined and  obj.objs[1] != undefined do 
 					(
 						if i > 1  do obj.objs[1].parent = group[1].objs[1]
@@ -1880,7 +1901,8 @@ struct ofio_iv_odr (
 			)
 		)
 		
-		delete descriptor -- kill the useless descriptor nonesense
+		if Load_Bones == false do delete descriptor -- kill the useless descriptor nonesense
+		
 		-- build lights
 		light_root = undefined
 		--lights.count = 0;
@@ -1888,14 +1910,16 @@ struct ofio_iv_odr (
 		(
 			ofioLog.print "building lights"
 			
-			if Load_Mesh == true then 
+			if Load_Mesh == true and Load_Bones == false then 
 			(
 				light_root = group_arr[1][1][1].objs[1]
 			)
 			else 
 			(
-				light_root =  dummy boxsize:[0.3, 0.3, 0.3]
-				light_root.name = descName
+				light_root = dummy boxsize:[0.25, 0.25, 0.25]
+				light_root.name = "lights_" + descName
+				setUserProp light_root "type" "lights_root"		
+				light_root.parent = descriptor	
 			)
 
 				
@@ -1924,7 +1948,7 @@ struct ofio_iv_odr (
 				)				
 				
 				light.color = lights[i].Color
-				light.farattenend = lights[i].Distance / 2 
+				light.farattenend = lights[i].Distance / 1.5
 				light.multiplier = lights[i].Range / 8 --originally divided by 10. but its kind weak at times. 
 				light.falloff = lights[i].Falloff
 				

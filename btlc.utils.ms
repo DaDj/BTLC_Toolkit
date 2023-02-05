@@ -27,3 +27,17 @@ struct btlc_utils
  )
 )
 btlcUtil = btlc_utils();
+
+
+fn get_all_nodes nodes =
+(
+	allnodes = #()
+	
+	for n in nodes do
+	(
+		append allnodes n
+		join allnodes (get_all_nodes (n.children))
+	)
+	
+	allnodes
+)

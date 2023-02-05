@@ -57,3 +57,6 @@ struct BTLC_UVAnim
     )
 )
 BtlcUVAnim = BTLC_UVAnim()
+
+-- Check if aniamtion is there.
+--selection[1].material.diffuseMap.coords.U_Offset.isAnimated

@@ -72,7 +72,7 @@ struct ofio_iv_ft_child (
 			name = names[mesh_index]
 		)
 		if name == undefined then throw ""	
-		format "searching for bone name %\n" name
+		--format "searching for bone name %\n" name
 		return g_ft_skel.boneObjUsingName g_ft_skel.rootBone name
 	),
 	
@@ -1053,7 +1053,8 @@ struct ofio_iv_oft (
 	),
 	
 	fn build = (	
-		drawable.build skinned_as_chunked:true
+		print "aha"
+		drawable.build skinned_as_chunked:true Load_Bones:true
 		print "mm"
 		g_ft_skel = drawable.skel_obj
 		

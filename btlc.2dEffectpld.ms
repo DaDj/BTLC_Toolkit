@@ -1,148 +1,3 @@
-fileIn "RW_Material.ms"
-
-struct Btlc_Effect2D
-(
-	fx_numimages,
-	fx_numpsystems,
- 	fx_images = #(),
- 	fx_psystems = #(),
-
-	fn LoadIni = 
-	(
-		scriptPath = (GetDir #userScripts )
-		inipath = scriptPath + "\\BTLC\\data\\saparticle.ini"
-		inisetup = "particlesetup"
-		--load the 2dfx info from the ini file, read ini string, to tell how many textures to be loaded
-		gettexcount = getINISetting inipath inisetup "numtextures"
-		getpsysount = getINISetting inipath inisetup "numparticlesys"
-		numimages = gettexcount as integer
-		numpsys = getpsysount as integer
-		imgstring = "texture" --look for this string, the number will be appended automatically.
-		psysstring = "psys"
-		initexname = "texturenames"
-		inipssytems = "particlesystems"
-		
-		--read texturename and add to array, then increment. repeat until reached limit defined above
-		for texcounter=1 to numimages do
-		(
-			imagename = imgstring + (texcounter as string)
-			texname = getINISetting inipath initexname imagename
-			append fx_images texname
-		--	format "Read particle texture %: %\n" texcounter texname
-			texcounter=texcounter+1
-		)
-		--...and do it again, for particle systems
-		for pcounter=1 to numpsys do
-		(
-			imagename = psysstring + (pcounter as string)
-			parname = getINISetting inipath inipssytems imagename
-			append fx_psystems parname
-		--	format "Read particle system %: %\n" pcounter parname
-			pcounter=pcounter+1
-		)
-	)
-)
-
-btlcEffect2D = Btlc_Effect2D()
-btlcEffect2D.LoadIni()
-
-
-Btlc_2dfxLight =  attributes "Effect2d_Light"  attribID:#(0x4b285f86, 0x18daf1df)
-(
-	parameters main rollout:params
-	(
-		coronaFarClip  type:#float ui:spcoronaFarClip default:120
-		pointlightRange type:#float ui:sppointlightRange default:8
-		coronaSize  type:#float ui:spcoronaSize default:0.5
-		shadowSize  type:#float ui:spshadowSize default:12
-		coronaShowMode  type:#integer ui:spcoronaShowMode default:0
-		coronaEnableReflection  type:#integer ui:spcoronaEnableReflection default:1
-		coronaFlareType  type:#float ui:spcoronaFlareType default:1
-
-		CHECK_OBSTACLES type:#boolean default:true ui:chCORONA_CHECK_OBSTACLE --CORONA_CHECK_OBSTACLES
-		FOG_TYPE type:#boolean default:false ui:chFOG_TYPE --FOG_TYPE1
-		FOG_TYPE2 type:#boolean default:false ui:chFOG_TYPE2 --FOG_TYPE2
-		WITHOUT_CORONA type:#boolean default:false ui:chWITHOUT_CORONA --WITHOUT_CORONA
-		CORONALONG_DISTANCE type:#boolean default:false ui:chCORONALONG_DISTANCE --CORONA_ONLY_AT_LONG_DISTANCE
-		AT_DAY type:#boolean default:false ui:chAT_DAY --AT_DAY
-		AT_NIGHT type:#boolean default:true ui:chAT_NIGHT --AT_NIGHT
-		BLINKING1 type:#boolean default:false ui:chBLINKING1 --BLINKING1 
-
-		coronaTexName type:#string default:"coronastar" ui:spcoronaTexName
-		shadowTexName type:#string default:"shad_exp" ui:spshadowTexName
-
-		shadowZDistance	type:#integer default:0 ui:spDistance
-
-		CORONA_ONLY_FROM_BELOW type:#boolean default:false ui:chCORONA_FROM_BELOW --CORONA_ONLY_FROM_BELOW
-		BLINKING2 type:#boolean default:false ui:chBLINKING2 --BLINKING2
-		UDPDATE_HEIGHT type:#boolean default:true ui:chUDPDATE_HEIGHTGROUND --UDPDATE_HEIGHT_ABOVE_GROUND
-		CHECK_DIRECTION type:#boolean default:false ui:chCHECK_DIRECTION--CHECK_DIRECTION
-		BLINKING3 type:#boolean default:false ui:chBLINKING3 --BLINKING3
-	)
-	
-	rollout params "GTA Light Parameters"
-	(
-		spinner spcoronaFarClip "coronaFarClip" type: #float
-		spinner sppointlightRange "pointlightRange" type: #float
-		spinner spcoronaSize "coronaSize" type: #float
-		spinner spshadowSize "shadowSize" type: #float
-		
-		spinner spcoronaFlareType "coronaFlareType" type: #integer range:[0,1,0]
-		spinner spDistance "shadowZDistance" type: #float
-		dropdownlist spcoronaTexName "coronaTexName" selection:25 items:btlcEffect2D.fx_images
-		dropdownlist spshadowTexName "shadowTexName" selection:11 items:btlcEffect2D.fx_images
-
-		dropdownlist spcoronaShowMode "coronaShowMode" \ 
-		items:#("DEFAULT","RANDOM_FLASHING","RANDOM_FLASHIN_ALWAYS_AT_WET_WEATHER", \
-		"LIGHTS_ANIM_SPEED_4X","LIGHTS_ANIM_SPEED_2X","LIGHTS_ANIM_SPEED_1X", \
-		"not supported","TRAFFICLIGHT","TRAINCROSSLIGHT", \ 
-		"not supported", "AT_RAIN_ONLY", "BlINK_5S", "BlINK_6SON_4SOFF","BlINK_6SON_4SOFF" )
-
-		checkbox  spcoronaEnableReflection "coronaEnableReflection"
-		group "Flags1" 
-		(
-			checkbox  chCORONA_CHECK_OBSTACLE "CHECK_OBSTACLES" tooltip:"CORONA_CHECK_OBSTACLES"
-			checkbox  chFOG_TYPE "FOG_TYPE" tooltip:"FOG_TYPE"
-			checkbox  chFOG_TYPE2 "FOG_TYPE2" tooltip:"Also just a FOG_TYPE"
-			checkbox  chWITHOUT_CORONA "WITHOUT_CORONA" tooltip:"Don't display Corona"
-			checkbox  chCORONALONG_DISTANCE "ONLY_LONG_DISTANCE" tooltip:"CORONA_ONLY_AT_LONG_DISTANCE"
-			checkbox  chAT_DAY "AT_DAY" tooltip:"AT_DAY"
-			checkbox  chAT_NIGHT "AT_NIGHT" tooltip:"AT_NIGHT"
-			checkbox  chBLINKING1 "BLINKING1" tooltip:"BLINKING1"
-		)
-
-		group "Flags2" 
-		(
-			checkbox  chCORONA_FROM_BELOW "ONLY_FROM_BELOW" tooltip:"CORONA_ONLY_FROM_BELOW"
-			checkbox  chBLINKING2 "BLINKING2" tooltip:"BLINKING2"
-			checkbox  chUDPDATE_HEIGHTGROUND "UDPDATE_HEIGHT" tooltip:"UDPDATE_HEIGHT_ABOVE_GROUND "
-			checkbox  chCHECK_DIRECTION "CHECK_DIRECTION" tooltip:"CHECK_DIRECTION"
-			checkbox  chBLINKING3 "BLINKING3" tooltip:"BLINKING3"
-		)
-		
-
-		on params open do 
-		(
-			spcoronaShowMode.selection = coronaEnableReflection 
-			spcoronaTexName.selection = finditem btlcEffect2D.fx_images coronaTexName
-			spshadowTexName.selection = finditem btlcEffect2D.fx_images shadowTexName
-		)
-
-		on spcoronaTexName selected i do
-		(
-			coronaTexName = btlcEffect2D.fx_images[i] as string			
-		)
-
-		on spshadowTexName selected i do
-		(
-			shadowTexName = btlcEffect2D.fx_images[i] as string
-		)		
-
-	)
-)
-
-
-
 struct Btlc_2dEffect 
 (   
 	inipath = "",
@@ -152,6 +7,94 @@ struct Btlc_2dEffect
 		scriptPath = (GetDir #userScripts )
 		inipath = scriptPath + "\\data\\saparticle.ini"
 	),
+
+	fn SetupLightAttr obj = 
+	(
+		if superclassof(obj) == light then
+		(
+			--add 2dfx light info
+			fxinfo = attributes fxdata_light
+			(
+				parameters main rollout:params
+				(
+					sdfxdrawdis type:#float ui:spn_drawdis default:100
+					sdfxouterrange type:#float ui:spn_outrng default:0
+					sdfxsize type:#float ui:spn_size default:0 --align:#right
+					sdfxinnerrange type:#float ui:spn_inrng default:0
+					sdfx_corona type:#string ui:edit_corona --default:0
+					sdfx_shad type:#string ui:edit_shad --default:0
+					sdfx_lighttype type:#integer ui:spn_type default:1
+					sdfx_color4 type:#integer default:200 --default should be 200
+				)
+				
+				rollout params "SA Light" width:160 height:400
+				(
+					spinner spn_drawdis "" pos:[88,4] width:64 height:16 range:[0,300,0]
+					spinner spn_outrng "" pos:[88,64] width:64 height:16 range:[0,300,0]
+					spinner spn_size "" pos:[88,24] width:64 height:16 range:[0,300,0]
+					spinner spn_inrng "" pos:[88,44] width:64 height:16 range:[0,300,0]
+					edittext edit_corona "" pos:[64,104] width:89 height:16 --enabled:false
+					edittext edit_shad "" pos:[64,124] width:89 height:16 --enabled:false
+					label lbl5 "Draw Distance" pos:[8,8] width:76 height:12
+					label lbl6 "Outer Range" pos:[8,68] width:76 height:12
+					label lbl7 "Size" pos:[8,27] width:76 height:12
+					label lbl8 "Inner Range" pos:[8,48] width:76 height:12
+					label lbl9 "Corona" pos:[8,104] width:48 height:12
+					label lbl10 "Shad" pos:[8,124] width:48 height:12
+					label lbl11 "Light Type" pos:[8,88] width:80 height:16
+					spinner spn_type "" pos:[88,84] width:64 height:16 range:[0,300,0] type:#integer scale:1 enabled:false
+				)
+				
+			)--end custom attribute
+			
+			
+			custAttributes.add obj fxinfo --add the new set of data
+			--obj.sdfxent = 1 --initialize attributes
+			obj.sdfxdrawdis = 100.0
+			obj.sdfxouterrange = 1.0
+			obj.sdfxsize = 1.0
+			obj.sdfxinnerrange = 1.0
+			obj.sdfx_corona = "coronastar"
+			obj.sdfx_shad = "shad_exp"
+			obj.sdfx_lighttype = 1						
+			--print any info
+			format "Added GTA Light info to %\n" obj.name			
+		)
+	),
+
+	fn SetupParticleAttr obj=
+	(
+		--restrict object type to Dummy, not any type of helper obj
+		if classof(obj) == Dummy then
+		(
+			--print obj.name
+			--add 2dfx particle info				
+			fxinfop = attributes fxdata_particle
+			(
+				parameters main rollout:params
+				(
+					sdfx_psys type:#string ui:edit_psys --default:0
+				)--end parameters
+				
+				rollout params "SA Particle" width:160 height:400
+				(
+					edittext edit_psys "" pos:[48,4] width:109 height:16 --enabled:false
+					label lbl10 "System" pos:[4,4] width:36 height:12
+				)					
+			)--end fxdata_particle
+			(
+				custAttributes.add obj fxinfop --add the new set of data
+				--obj.sdfx_psys = "default"
+				temppsys = getINISetting inipath "lastpsys" "system" as integer
+				obj.sdfx_psys = fx_psystems[temppsys] as string
+				--print any info
+				format "Added GTA Particle system info to %\n" obj.name
+			)
+			
+		)--end classcheck
+
+	), 
+	
 	fn IsEffect obj = 
 	(
 		Is2dfx = false;
@@ -374,11 +317,6 @@ struct Btlc_2dEffect
 	),
 
 	fn Exportall DirName = 
-	(
-
-	),
-
-	fn dfxRollout = 
 	(
 
 	)

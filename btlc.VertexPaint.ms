@@ -24,14 +24,14 @@ struct btlc_VertexPaint
                     if Obj.Material.MaterialList[MtlID] != undefined then
                     (   
                         Shader = custAttributes.get Obj.Material.MaterialList[MtlID] BTLC_MatShader 
-                        if ((findstring Shader.MyShaderName "emissive")  != undefined) do  SetEmmissePrelightMaterial Obj MtlID				
+                        if (Shader != undefined and (findstring Shader.MyShaderName "emissive")  != undefined) do  SetEmmissePrelightMaterial Obj MtlID				
                     )
                 )
             )
             if (classof obj.Material) == RW_Mtl do 
             (
                 Shader = custAttributes.get Obj.Material BTLC_MatShader 
-                if ((findstring Shader.MyShaderName "emissive")  != undefined) do  SetEmmissePrelightMaterial Obj 1
+                if (Shader != undefined and (findstring Shader.MyShaderName "emissive")  != undefined) do  SetEmmissePrelightMaterial Obj 1
             ) 
     
         
