@@ -93,7 +93,7 @@ struct Btlc_Collision
 		COL_Material
 	),
 
-	-- Convert Standard Materials to CollisionMaterial
+	-- Convert  Materials to CollisionMaterial
 	fn StdMattoColMat TheObj = 
 	(
 		if 	(IsKindOf TheObj Editable_Mesh) and (((custattributes.get TheObj ColMesh)!=undefined) or (isProperty TheObj #isShadow) != undefined)  then 
@@ -184,13 +184,13 @@ struct Btlc_Collision
 			
 		)
 		/*
-    if IsKindOf Obj Editable_Poly then 
-    (
-        obj.weldThreshold = 0.015 -- set weld threshold value
-        allVerts = #{1..(polyop.getNumVerts obj)} -- get all verts list
-        polyop.weldVertsByThreshold obj allVerts -- Weld
-            Obj.EditablePoly.deleteIsoVerts ()
-    ) */
+		if IsKindOf Obj Editable_Poly then 
+		(
+			obj.weldThreshold = 0.015 -- set weld threshold value
+			allVerts = #{1..(polyop.getNumVerts obj)} -- get all verts list
+			polyop.weldVertsByThreshold obj allVerts -- Weld
+				Obj.EditablePoly.deleteIsoVerts ()
+		) */
 
 	),
 
@@ -277,3 +277,94 @@ struct Btlc_Collision
 
 )
 btlcCol = Btlc_Collision();
+
+
+struct btlc_IvBoundtoCol
+(
+	-- Converts all Materials of current IV Collision
+	fn ConvertIVMatToColMaterial TheMat = 
+	(
+		Mtlgrp = TheMat.iv_col_getmtlselection (TheMat.mtlid)  mtl:false
+		Mtl = TheMat.iv_col_getmtlselection (TheMat.mtlid)  mtl:true
+		TheMat.name = iv_col_material_mtlgrp[3][Mtlgrp][Mtl]
+		TheMat = btlcCol.ConvertMaterialtoCol TheMat
+		--print	iv_col_material_mtlgrp[3][Mtlgrp][Mtl]
+		TheMat
+	),
+
+
+	-- for example: capsuels/cylinder and rotated boxes will be mesh
+	-- spheres / no rotates boxes wil be GTA sphere/boxes
+	fn ConvertColType = 
+	(
+
+	),
+
+	-- Gets all geoemtry parts and converts them into Gta SA formats
+	-- calls material conversion
+	fn ConvertColGeometry Obj= 
+	(
+		if (classof Obj.Material) != Multimaterial do
+		(
+			Obj.Material = ConvertIVMatToColMaterial Obj.Material
+		)
+
+		if (classof Obj.Material) == Multimaterial do
+		(
+			for MtlID= 1 to Obj.Material.MaterialList.Count do
+			(
+			  if Obj.Material.MaterialList[MtlID] != undefined then
+			  (   
+				Obj.Material.MaterialList[MtlID] = ConvertIVMatToColMaterial Obj.Material.MaterialList[MtlID] 
+			  )
+			)
+		)
+	),
+
+	-- Starts general conversion
+	fn ConvertObd TheObj = 
+	(
+		MakeAsMesh = #() --which parts shall be connected to mesh
+
+		BoundType = getUserProp theobj "type"
+		BoundType = ofutils.lowercase(BoundType)
+
+		if BoundType == undefined do return()
+
+		if BoundType == "boundcomposite" then 
+		(
+			for Child in TheObj.children do 
+			(
+				ConvertObd Child
+			)
+		)
+
+		if 	BoundType == "boundbvh" or \
+			BoundType == "boundgeometry" or  \
+		  	BoundType == "boundcurvedgeometry" or \
+			BoundType == "boundbox" or  \
+		  	BoundType == "boundsphere" or \
+			BoundType == "boundcapsule" then 
+		( 
+			ConvertColGeometry TheObj 
+		)
+
+	)
+)
+btlcIVColConvert = btlc_IvBoundtoCol();
+
+
+
+
+
+/* Testscript
+Objs = selection[1].children
+
+for TheObj in Objs do 
+( 
+	print TheObj.name
+	btlcIVColConvert.ConvertObd TheObj;
+	print "________"
+) 
+
+*/

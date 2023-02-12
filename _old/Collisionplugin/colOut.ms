@@ -39,14 +39,14 @@ fn hasPadding m =
 
 fn writeColMesh f m isShadow = (
 	--for vert in m.verts do writeFixPointVertex f 128 (vert.pos)
----	for vert in V = in coordsys local (getVert m i) do writeFixPointVertex f 128 (vert.pos)
+	---	for vert in V = in coordsys local (getVert m i) do writeFixPointVertex f 128 (vert.pos)
 	
- NVerts =  m.NumVerts
- for i = 1 to NVerts do (
-  V = in coordsys local (getVert m i)
-  writeFixPointVertex f 128 (V)
- )
- 
+	NVerts =  m.NumVerts
+	for i = 1 to NVerts do (
+		V = in coordsys local (getVert m i)
+		writeFixPointVertex f 128 (V)
+	)
+	
 	
 	if (hasPadding m) then writeShort f 0
 	m2=snapshotasmesh m
@@ -58,20 +58,20 @@ fn writeColMesh f m isShadow = (
 		if isShadow then writeShort f 0xff00 
 		else(
 			--writeShortIndex f (getFaceMatID m2 i)
-				mmm = getFaceMatID m2 i
-				  if objmat!=undefined then
-					if isKindOf objmat MultiMaterial then
-					  if isKindOf objmat[getFaceMatID m i] GTA_COLSurface then mat = objmat[getFaceMatID m i].surface
-					  else mat = (mmm-1)-- (getFaceMatID obj i) - 1
-					else
-					  if isKindOf m GTA_COLSurface then mat = objmat.surface
-					  else mat = (mmm-1)  -- ((getFaceMatID obj i) -1)
-				  else 
-				   mat = 0
-				  
-				WriteByte f mat
-				WriteByte f 254
-			)
+			mmm = getFaceMatID m2 i
+			if objmat!=undefined then
+			if isKindOf objmat MultiMaterial then
+			if isKindOf objmat[getFaceMatID m i] GTA_COLSurface then mat = objmat[getFaceMatID m i].surface
+			else mat = (mmm-1)-- (getFaceMatID obj i) - 1
+			else
+			if isKindOf m GTA_COLSurface then mat = objmat.surface
+			else mat = (mmm-1)  -- ((getFaceMatID obj i) -1)
+			else 
+			mat = 0
+			
+			WriteByte f mat
+			WriteByte f 254
+		)
 	)
 )
 
@@ -184,7 +184,7 @@ fn writeCol f col version =
 	sm=undefined
 	clearSelection()
 	
-   	objRotation = col.rotation
+	objRotation = col.rotation
 	col.rotation = quat 0 0 0 1
 	for c in col.children do
 	(

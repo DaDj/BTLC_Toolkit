@@ -209,13 +209,6 @@ function btlc_GUICityConvert =
 )
 
 
-function btlc_GUIModelConvert =
-(
-	try (closeRolloutFloater btlcIdeModelsFloater) catch ()
-	Pos = getMaxWindowSize() 	
-	PosX = Pos[1]/2 - 300
-	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
-)
 
 
 
@@ -226,7 +219,8 @@ rollout btlcUtility  "BTLC Toolkit"
 	on btn_ConvertCity pressed do  btlc_GUICityConvert()
 
 	button btn_ModelConvert "Convert Models menu" width:150 align:#center enabled:false
-
+	on btn_ModelConvert pressed do  btlc_GUIModelConvert()
+	
 	button btn_PathTool "Path Tools" width:150 align:#center enabled:false
 
 

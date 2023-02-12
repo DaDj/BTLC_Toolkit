@@ -55,7 +55,7 @@ struct Btlc_TextureDB  --Setup after OPL reader read all used files
     )
   )
 )
- = Btlc_TextureDB();
+BtlcTextDB = Btlc_TextureDB();
 
 struct Btlc_Material 
 (

@@ -3,7 +3,7 @@ fileIn ("utils.ms") quiet:true
 fileIn ("colOut.ms") quiet:true
 fileIn ("collision.ms") quiet:true
 
-fn computeConvexHull theNode maxVerts:64 pushAmt:-10.0 cleanup:true = 
+fn computeConvexHull theNode maxVerts:64 pushAmt:-19.0 cleanup:true = 
 (
     with redraw off (
         local rb = MassFX_RBody()
@@ -28,9 +28,9 @@ fn computeConvexHull theNode maxVerts:64 pushAmt:-10.0 cleanup:true =
     hull
 )
 
-fn CreatDynamicCol ObjectMesh = 
+fn CreatDynamicCol ObjectMesh maxVert:8 push:-10.0 = 
 (
-   TheHull =  computeConvexHull ObjectMesh maxVerts:15 pushAmt:-15.0
+   TheHull =  computeConvexHull ObjectMesh maxVerts:maxVert pushAmt:push
    TheHull.parent = ObjectMesh
    custattributes.add TheHull ColMesh
    convertToMesh  TheHull
@@ -39,13 +39,19 @@ fn CreatDynamicCol ObjectMesh =
    (
     Thepos = meshop.getVert TheHull idx_vert
     s= Collision_Sphere  pos:Thepos
-    s.delegate.radius = 0.1
+    s.delegate.radius = 0.05
     s.name = TheHull.name+"_sp" 
     s.wirecolor =  color 50 210 250
     s.parent = ObjectMesh
    )
-   delete TheHull
+    delete TheHull
 )
 
-
-for obj in selection do CreatDynamicCol obj 
+if selection.count != 0 do with redraw off
+	(
+		selObjsArr = selection as array
+        for obj in selObjsArr do 
+        (
+            CreatDynamicCol obj 
+        )
+    )

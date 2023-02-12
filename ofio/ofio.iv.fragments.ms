@@ -145,6 +145,13 @@ struct ofio_iv_ft_child (
 					setUserProp obj.objs[1] "priority" i
 					if damaged then setUserProp obj.objs[1] "damaged" true
 				)
+				-- Prelight Model
+				if obj != undefined do 
+				(
+					btlcMaterial.ReshuffleByShader obj.objs[1]
+					btlcVertexPaint.PrelightModel obj.objs[1]
+					btlcVertexPaint.MoveAlphaChannel obj.objs[1]
+				)
 			
 			)
 		)	
@@ -845,7 +852,7 @@ struct ofio_iv_oft (
 		drawable = ofio_iv_odr() 
 		g_ft_drawable = drawable
 		drawable.read_dict fInput "common_drawable" cur_path		
-		print "hmm"
+	
 		-- f8
 		elements = scanline fInput
 		if ofutils.lowercase(elements[1]) != "f8" then throw "f8 expected"	
@@ -1053,19 +1060,16 @@ struct ofio_iv_oft (
 	),
 	
 	fn build = (	
-		print "aha"
 		drawable.build skinned_as_chunked:true Load_Bones:true
-		print "mm"
 		g_ft_skel = drawable.skel_obj
 		
 		local root_bone_name = g_ft_skel.rootBone.name
 		g_ft_is_veh = (root_bone_name == "chassis") or (root_bone_name == "bodyshell")
 		g_ft_is_bike = g_ft_is_veh and (g_ft_skel.boneObjExists g_ft_skel.rootBone "wheelmeshbk_r")
-		print "to"
+		
 		local group		
 		for group in groups do
 			group.build()
-			print "jko"
 		local d = drawable.descriptor
 		d.name = "ft_" + descName
 		setUserProp d "type" "fragments"

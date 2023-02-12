@@ -1804,6 +1804,7 @@ struct ofio_iv_odr (
 					
 						if Load_Bones == false then
 						(
+							
 							if i == 0 then 
 							(
 								if descName.count >  19 do descName = substring descName 1 19 
@@ -1818,13 +1819,11 @@ struct ofio_iv_odr (
 						)
 						else 
 						(
-						
 							build_mesh obj mtls (descName + "_" + i as String)
 						)
 					
 						if bone_using_id.count > 0 then
 						(
-						
 							-- using lodgroup_high, binded bones are the same for every lod group
 							-- set positions right and delete the annoying bones directly
 							if obj != undefined do (
@@ -1851,6 +1850,7 @@ struct ofio_iv_odr (
 						if lod != undefined then
 						setUserProp obj.objs[1] "lod" lod
 						i += 1
+
 						if obj != undefined do 
 						(
 						btlcMaterial.ReshuffleByShader obj.objs[1]
