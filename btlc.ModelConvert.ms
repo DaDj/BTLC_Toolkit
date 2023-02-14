@@ -26,19 +26,36 @@ struct  Btlc_ModelConvert
 
 	),
 
-	fn oft_ConvertCol obj = 
+	fn oft_ConvertCol myobj = 
 	(
-		for Child in obj.children do append TheChilds Child
-
-		for Child in TheChilds do 
+		TheChilds = #()
+		MakeAsMesh = undefined;
+		newnodes = #()
+		if (isValidNode myobj) == true do
 		(
-			-- Check type first: Mesh,box,quad etc.
-			-- If mesh add to main mesh
-			--IF box:
-			--Check if rotation is quat 0 0 0 1 (not roatetd)
-			-- if rotated: converttomesh and attach
-			-- else convert to Sa colbox
+			for Child in myobj.children do append TheChilds Child
+
+			for i=1 to TheChilds.count do 
+			(
+				newnodes[i] = btlcIVColConvert.ConvertColGeometry TheChilds[i]
+				newnodes[i].parent = undefined;
+			)
+
+			mynewobj = btlcIVColConvert.ConvertColGeometry myobj
+			if classof mynewobj == Editable_mesh and MakeAsMesh == undefined do  MakeAsMesh = mynewobj
+			mynewobj.name = "COL" + mynewobj.name  
+			for child in newnodes do 
+			(
+				child.parent = mynewobj
+				child.name = "COL" + child.name
+				if classof child == Editable_mesh do 
+				(
+					if MakeAsMesh == undefined then MakeAsMesh = child
+					else meshop.attach MakeAsMesh child attachMat:#IDToMat condenseMat:true
+				)
+			)
 		)
+		mynewobj
 	),
 
 	fn oft_IsDamagable TheMainObj = 
@@ -220,10 +237,23 @@ struct  Btlc_ModelConvert
 				meshop.attach TheMainNode obj  attachMat:#IDToMat condenseMat:true
 			)
 		)
-
 		-- delete dummies.  
 		for theobj in deleteNode do if isValidNode theobj do  delete theobj
 		
+
+		-- Set new colobjects under mainmodel and set pivot of colmesh to mainmodel pos
+		mynewobj = oft_ConvertCol TheMainColNode
+		TheColNodes = get_all_nodes mynewobj
+		for Node in TheColNodes do
+		(
+			Node.parent = TheMainNode
+			if  classof Node == Editable_mesh then 
+			(
+				Node.pivot = TheMainNode.pos
+				resetxform Node
+			)
+		)
+
 
 	),
 

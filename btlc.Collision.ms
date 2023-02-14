@@ -119,7 +119,6 @@ struct Btlc_Collision
 			
 		)
 	),
-	--------------------------
 
 	fn OptimizeColMesh obj = 
 	(
@@ -194,6 +193,15 @@ struct Btlc_Collision
 
 	),
 
+	function ConvertMeshtoCol Obj = 
+	(
+		if (custattributes.get Obj ColMesh)==undefined then 
+		(
+			custattributes.add Obj ColMesh
+			Obj.wirecolor =  color 50 210 250
+		)
+	),
+
 	-- Generates Collisionmeshes from the main Mesh
 	function GenerateColMeshes MyObjs = 
 	(
@@ -207,11 +215,12 @@ struct Btlc_Collision
 					thecopy.name = obj.name + "_COL" 
 					thecopy.parent = obj
 					
-					if (custattributes.get thecopy ColMesh)==undefined then 
+					ConvertMeshtoCol thecopy 
+				/*	if (custattributes.get thecopy ColMesh)==undefined then 
 					(
 						custattributes.add thecopy ColMesh
 						thecopy.wirecolor =  color 50 210 250
-					)
+					) */
 					StdMattoColMat thecopy
 					OptimizeColMesh thecopy 
 					CleanColMesh thecopy 
@@ -292,15 +301,57 @@ struct btlc_IvBoundtoCol
 		TheMat
 	),
 
-
 	-- for example: capsuels/cylinder and rotated boxes will be mesh
-	-- spheres / no rotates boxes wil be GTA sphere/boxes
-	fn ConvertColType = 
+	-- spheres / no rotates boxes wil be GTA SA sphere/boxes
+	fn ConvertColType theobj = 
 	(
-
+		if classof theobj == Editable_Poly and (getUserProp theobj "type") == "BoundGeometry" then 
+		(
+			converttomesh theobj
+			btlcCol.ConvertMeshtoCol theobj 
+		)
+		else if classof theobj == ofio_iv_col_box then 
+		(
+			if theobj.rotation == (quat 0 0 0 1) then 
+			(
+				NewObj = Collision_Box();
+				NewObj.len = theobj.depth;
+				NewObj.width = theobj.width;
+				NewObj.height = theobj.height;
+				NewObj.parent = theobj.parent
+				NewObj.name = theobj.name
+				NewObj.position = theobj.position
+				NewObj.matID = theobj.Material.surface
+				delete theobj
+				theobj = NewObj
+			) 
+			else 
+			(
+				converttomesh theobj
+				btlcCol.ConvertMeshtoCol theobj 
+			)
+		)
+		else if classof theobj == ofio_iv_col_sphere then 
+		(
+			NewObj = Collision_Sphere();
+			NewObj.delegate.radius = theobj.radius;
+			NewObj.parent = theobj.parent
+			NewObj.name = theobj.name
+			NewObj.position = theobj.position
+			NewObj.matID = theobj.Material.surface
+			delete theobj
+			theobj = NewObj
+		)
+		else 
+		(
+			converttomesh theobj
+			btlcCol.ConvertMeshtoCol theobj 
+		)
+		--ofio_iv_col_box    ofio_iv_col_sphere   ofio_iv_col_capsule
+		theobj
 	),
 
-	-- Gets all geoemtry parts and converts them into Gta SA formats
+	-- Gets all geometry parts and converts them into Gta SA formats
 	-- calls material conversion
 	fn ConvertColGeometry Obj= 
 	(
@@ -319,12 +370,14 @@ struct btlc_IvBoundtoCol
 			  )
 			)
 		)
+
+		Obj = ConvertColType Obj
 	),
 
 	-- Starts general conversion
 	fn ConvertObd TheObj = 
 	(
-		MakeAsMesh = #() --which parts shall be connected to mesh
+		MakeAsMesh = undefined--first part to which all meshes shall connect to
 
 		BoundType = getUserProp theobj "type"
 		BoundType = ofutils.lowercase(BoundType)
@@ -337,6 +390,16 @@ struct btlc_IvBoundtoCol
 			(
 				ConvertObd Child
 			)
+
+			-- combine mesh
+			for Child in TheObj.children do 
+			(
+				if classof Child == Editable_mesh do 
+				(
+					if MakeAsMesh == undefined then MakeAsMesh = Child
+					else meshop.attach MakeAsMesh Child attachMat:#IDToMat condenseMat:true
+				)
+			)	
 		)
 
 		if 	BoundType == "boundbvh" or \
@@ -346,16 +409,12 @@ struct btlc_IvBoundtoCol
 		  	BoundType == "boundsphere" or \
 			BoundType == "boundcapsule" then 
 		( 
-			ConvertColGeometry TheObj 
+			TheObj = ConvertColGeometry TheObj 
 		)
-
+		TheObj
 	)
 )
 btlcIVColConvert = btlc_IvBoundtoCol();
-
-
-
-
 
 /* Testscript
 Objs = selection[1].children
