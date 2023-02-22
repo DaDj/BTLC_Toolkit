@@ -1,8 +1,50 @@
+global btlcIdeModelsFloater -- Controls for converting a img/Ide (props and stuff.)
+
+
+struct ObjectDat 
+(
+	Name,
+	Mass = 100.0,
+	TurnMass = 150.0,
+	AirResistance = 0.99,
+	Elasticity = 0.03,
+	PercSubmerged = 50.0,
+	Uproot = 20.0,
+	CDMult = 2.0,
+	CDEff = 0, -- 0: none, 1:changemdl , 20:smash , 21: changthensmash , 200:breakable, 202:breakable ansd remove forever
+	SpCDR = 0, -- 0: none, 1: lampost, 2:smallbox, 3: bigbox, 4:fencepart,5:grenade,6:swingdoor,7:Lockdoor, 8:Hanging, 9:ob_col_poolball
+	CamAv = 1,
+	Expl = 0,
+	FX_TYPE = 0, -- 0 - no FxSystem, 1 - play when hit, 2 - play when destroyed, 3 - play when hit or destroyed
+	FX_OFFSET = [0.0,0.0,0.0],
+	FX_NAME = "none",
+	B_SM = 100.0, --if set to 2.0 then it will take twice the force to smash as opposed to break an object (1.0 - smash only - never break, set very large if it only breaks and never smashes)
+	B_VX = 0.0,
+	B_VY = 0.0,
+	B_VZ = 0.1,
+	B_VR = 0.07,
+	B_GUN = 0, 
+	B_SPK = 1
+)
+
+
+struct btlc_MdlIde 
+(
+	Id = 0,
+	MdlName = undefined,
+	Txd = "none",
+	DrawDist = 100,
+	Flag = 0,
+	ObjectData = ObjectDat()
+)
+
 struct  Btlc_ModelConvert
 (
 	GenericTxdPath,
 	ImportPath,
 	ExportPath,
+	Ide= #(),
+	IdStart = 0,
 
 	fn InitTexDb = 
 	( 
@@ -10,20 +52,93 @@ struct  Btlc_ModelConvert
 		BtlcTextDB.Folders = #() --Main folder to search for textures.
 		BtlcTextDB.TexturesList = #() -- Full Filepaths to all Textures
 		BtlcTextDB.TexNameList = #()-- Names to all Textures in same Order
-
+		
 		append BtlcTextDB.Folders  GenericTxdPath
 		append BtlcTextDB.Folders  (ExportPath + "\\txd")
 		BtlcTextDB.FindAllTextures()
 	),
 
-	fn CopyTxds ObjDef  TxdPath =
+	fn CopyTxds =
 	(
+		TheTxdDir = ExportPath + "\\txd"
+		ImageName =  filenameFromPath ExportPath
+		
 
+		-- Copy normal txd folders first
+		-- delte old txd folder. (gtaconverter hangs up for soemreason if already here.
+		sioDir = dotNetClass "System.IO.Directory"
+		if (SIODir.Exists TheTxdDir) do SIODir.Delete (TheTxdDir) true -- kinda unsafe just deletes stuff.
+		btlcDataConverter.CopyTextures ("\"" + ImportPath + "\\wtd" + "\"") ("\"" + ExportPath + "\\txd" + "\"");
+
+		-- Copy textures of wdr objects to right folders
+		for Itemdef in Ide do 
+		(
+			--if the wdr has no texture archive, give it one (IMg name + txd)
+			if Itemdef.Txd == "null" then  Itemdef.Txd = (substring ImageName  1 10 ) + "txd"
+
+			TheTextures = (getfiles (ImportPath + "\\wdr\\" +  Itemdef.MdlName + "\\" +  "*.dds"))
+			--print TheTextures
+
+			for Texture in TheTextures do 
+			(
+				MyFilename = getFilenameFile Texture 
+				FilenameNew = substring MyFilename 1 26
+				NewPath = TheTxdDir + "\\" +  Itemdef.Txd + "\\" + FilenameNew + ".dds"
+
+				makeDir  (getFilenamePath NewPath)
+				copyFile Texture NewPath
+			)
+			
+
+		)
 	),
 
-	fn ConvertIde Path = 
+	-- Load IdeData
+	fn ConvertIde Path  = 
 	(
+		IdObj= 1
+		IDCurr = IdStart
+		fs = openFile Path
+		while not eof fs do
+		(
+			l = readline fs
+			if l == "objs" do 
+			(
+				while l != "end" do
+				(
+					l = readline fs
+					if l == "end" then exit
+					fl = filterString l  ","
+					Ide[IdObj] = btlc_MdlIde();
+					Ide[IdObj].Id = IDCurr
+					Ide[IdObj].MdlName = toLower  (trimLeft(trimRight fl[1]))
+					Ide[IdObj].Txd =  toLower  (trimLeft(trimRight fl[2])) 
+					Ide[IdObj].DrawDist =  toLower  (trimLeft(trimRight fl[3])) as integer
+					IDCurr = IDCurr + 1 
+					IdObj = IdObj + 1
+				)
+			)
 
+			if l == "anim" do 
+			(
+				while l != "end" do
+				(
+					l = readline fs
+					if l == "end" then exit
+					fl = filterString l  ","
+					Ide[IdObj] = btlc_MdlIde();
+					Ide[IdObj].Id = IDCurr
+					Ide[IdObj].MdlName = toLower  (trimLeft(trimRight fl[1]))
+					Ide[IdObj].Txd =  toLower  (trimLeft(trimRight fl[2])) 
+					Ide[IdObj].DrawDist =  toLower  (trimLeft(trimRight fl[4])) as integer
+					IDCurr = IDCurr + 1 
+					IdObj = IdObj + 1
+				)
+			)
+
+		)
+		close fs
+		IdStart = IDCurr 
 	),
 
 	fn oft_ConvertCol myobj = 
@@ -296,24 +411,307 @@ struct  Btlc_ModelConvert
 		)		
 	),
 
-	fn ImportOdr Path =
-	(
+	fn ImportOdr =
+	(	
+		TheModels = (getfiles (ImportPath + "\\wdr\\" + "*.odr"))
 
+		posX = 0;
+		posY = 0;
+		try 
+		(
+			for AModel in TheModels do 
+			(
+				local dr = ofio_iv_odr()
+				dr.read(AModel)
+				ThisObj =  dr.build()
+
+				ThisObj.pos = [(posX*10), (posY * 10), 0]
+				posX = posX + 1;
+				if posX == 11 do 
+				(
+					posX = 0;
+					posY = posY + 1
+				)
+			)
+		)
+		catch 
+		(
+			print "Error while importing .odr files."
+		)
 	),
 
-	fn ImportModels Folder = 
+	fn ImportObd = 
 	(
+		descriptor = undefined;
+		Filepath = ImportPath +  "\\" +(filenameFromPath ImportPath)
+		try 
+		(
+			ObdFile = (getfiles (Filepath  + ".obd"))
+			local bd = ofio_iv_obd()
+			bd.read(ObdFile[1])
+			descriptor = bd.build()
+		--	for TheObj in descriptor.children do btlcIVColConvert.ConvertObd TheObj;
+		)
+		catch 
+		(
+			print "Error while converting .obd file. Maybe missing?"
+		)
 
+		descriptor
 	),
 
-	function btlc_GUIModelConvert =
+	fn MatchOdrtoCol ColContainer = 
 	(
-		try (closeRolloutFloater btlcIdeModelsFloater) catch ()
-		Pos = getMaxWindowSize() 	
-		PosX = Pos[1]/2 - 300
-		btlcIdeModelsFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
+		Collisions = ColContainer.children
+
+		for Col in Collisions do 
+		(
+			TheModel = getNodeByName Col.name  exact:true ignoreCase:true all:true
+
+			for mdl in TheModel do 
+			(
+				if mdl != Col do 
+				(
+					Col.parent = mdl
+					Col.pos = mdl.pos
+
+				--bb_Mdl = nodeGetBoundingBox TheModel TheModel.transform;
+				--	bb_Col = nodeGetBoundingBox Col Col.transform;
+				--Delta = bb_Mdl[1] - bb_Col[1];
+					--print Delta
+					--Col.pivot =   Col.pivot - Delta
+
+				) 
+			)
+		)
+		 
+	),
+
+	fn StartImport = 
+	(
+		with redraw off
+		(
+			IDEFILE = (getfiles (ImportPath  + ".ide"))
+			print IDEFILE
+			ConvertIde IDEFILE[1] 
+			CopyTxds();
+			InitTexDb();
+			ImportOdr();
+			ColContainer = ImportObd();
+
+			if ColContainer != undefined do 
+			(
+				MatchOdrtoCol ColContainer
+			) 
+		)
+		gc();
+		resumeEditing()
+		redrawviews()
+		freeSceneBitmaps() 	
 	)
+
+
 
 )
 btlcModelConvert = Btlc_ModelConvert();
 --btlcModelConvert.ImportOft ""
+
+function btlc_GUIModelConvert =
+(
+	rollout DirSettings "Directories" width:210 height:400
+	(
+		label lbl_PathGenericTxd "GenericTexDir:" align:#left across:2
+		button btn_PathGenericTxd btlcConfig.GenericTexDir width:400 height:25 align:#right tooltip:""
+		on btn_PathGenericTxd pressed do 
+		(
+			FilePath   = getSavePath caption:"Test path..." initialDir: btlcConfig.IntialDirs
+			if(FilePath != undefined ) do 
+			( 
+				btn_PathGenericTxd.text = btlcConfig.GenericTexDir = FilePath
+				btlcConfig.Save() 
+			)
+		)
+		on btn_PathGenericTxd rightclick do try (shellLaunch btlcConfig.GenericTexDir "") catch()
+		
+		label lbl_MainGamedataDir "Game Data Dir:" align:#left across:2
+		button btn_MainGamedataDir btlcConfig.MainGameDataDir width:400 height:25 align:#right tooltip:"Main game Data Dir (Sa and IV gamedata)"
+		
+		label lbl_CityPartDir "IV Current ModelPath:" align:#left across:2
+		button btn_CityPartDir btlcConfig.CurrentModelConvPath width:400 height:25 align:#right tooltip:""
+		
+		label lbl_SACityPartDir "SA Current Output dir:" align:#left across:2
+		button btn_SACityPartDir btlcConfig.CurrentModelConvPathSA width:400 height:25 align:#right tooltip:"Folder in which the subfoldr for the sa data will be exported."
+		
+		on  btn_MainGamedataDir pressed do 
+		(
+			FilePath   = getSavePath caption:"Test path..." initialDir: btlcConfig.MainGameDataDir
+			if(FilePath != undefined ) do 
+			( 
+				btn_MainGamedataDir.text = btlcConfig.MainGameDataDir = FilePath
+				btlcConfig.Save()
+			)
+		)
+		on  btn_MainGamedataDir rightclick do try (shellLaunch btlcConfig.MainGameDataDir "") catch()a
+		
+		
+		on btn_CityPartDir pressed do 
+		(
+			FilePath   = getSavePath caption:"Test path..." initialDir: btlcConfig.CurrentModelConvPath
+			if(FilePath != undefined ) do 
+			( 
+				btn_CityPartDir.text = btlcConfig.CurrentModelConvPath = FilePath
+				Temp =  substituteString btlcConfig.CurrentModelConvPath  "\IV" "\SA"
+				btn_SACityPartDir.text = btlcConfig.CurrentModelConvPathSA = Temp
+				btlcConfig.Save()
+			)
+		)
+		on btn_CityPartDir rightclick do try (shellLaunch btlcConfig.CurrentModelConvPath "") catch()a
+		
+		
+		on btn_SACityPartDir pressed do 
+		(
+			FilePath   = getSavePath caption:"Test path..." initialDir: btlcConfig.CurrentModelConvPathSA
+			if(FilePath != undefined ) do 
+			( 
+				btn_SACityPartDir.text = btlcConfig.CurrentModelConvPathSA = FilePath
+				btlcConfig.Save()
+				
+			)
+		)
+		on btn_SACityPartDir rightclick do try (shellLaunch btlcConfig.CurrentModelConvPathSA "") catch()
+		
+		
+	)
+
+	rollout ModelConvert "ModelConvert" width:210 height:400
+	(	
+		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
+		
+		on strtid changed val  do 
+		(
+			btlcConfig.CurrentID = strtid.value  = val
+			btlcConfig.Save() 
+		)
+		
+		button btn_ConvertCity "Import" width:110 height:35 align:#center tooltip:"Imports the selected Models iMage an converts IDE" across:5
+		on btn_ConvertCity pressed do 
+		(
+			btlcModelConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			btlcModelConvert.ImportPath =  btlcConfig.CurrentModelConvPath
+			btlcModelConvert.ExportPath =    btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.IdStart = strtid.value;
+			btlcModelConvert.StartImport();
+
+			strtid.value = btlcConfig.CurrentID = btlcModelConvert.IdStart ;
+		)
+		
+		button btn_ExportCity "Gen/Export Files" width:110 height:35 align:#center tooltip:"Exports .dff Models & Collision" 
+		on btn_ExportCity pressed do 
+		(
+		)
+		
+		button btn_GenTxd "Build .Txds" width:110 height:35 align:#center tooltip:"Generates Txds" 
+		on btn_GenTxd pressed do 
+		(
+			
+		)
+		
+		button btn_OpenCol "Open .Col" width:110 height:35 align:#center tooltip:"Opens the .COl File to generate facegroups" 
+		on btn_OpenCol pressed do 
+		(
+			OutputPath = btlcConfig.CurrentModelConvPathSA  + "\\img";
+			MapPartName =  filenameFromPath btlcConfig.CurrentModelConvPathSA 
+			Command = OutputPath + "\\" + MapPartName + ".col";
+			scriptPath = (GetDir #userScripts )
+			
+			Program =  scriptPath + "\\BTLC\\Tools\\CollEditor2.exe"
+			ShellLaunch Program Command
+		)
+		
+		button btn_GenerateIMG "Build IMG" width:110 height:35 align:#center tooltip:"Builds the final Img File" 
+		on btn_GenerateIMG pressed do 
+		(
+			MapPartName =  filenameFromPath btlcConfig.CurrentModelConvPathSA 
+			/* Build final .img*/
+			IniPath = btlcConfig.CurrentModelConvPathSA + "\\" + MapPartName + ".ini"
+			OutPath = (pathConfig.removePathLeaf btlcConfig.CurrentModelConvPathSA) 
+			
+			btlcImgBuild.BuildImg IniPath OutPath
+		)
+	)
+
+	rollout Model_Utils "Map Utils" width:210 height:400
+	(
+		button btn_ExportCollision "ExportCollision" width:110 height:35 align:#center tooltip:"Export the Collision models" across:4
+		on btn_ExportCollision pressed do 
+		(
+			-- Collision Export
+			start = timeStamp();
+			OutputPath = btlcConfig.CurrentModelConvPathSA  + "\\img";
+			MapPartName =  filenameFromPath btlcConfig.CurrentModelConvPathSA 
+			Filepath = OutputPath + "\\" + MapPartName + ".col";
+			btlcCol.ExportAllCollisions(Filepath);
+			
+			end = timeStamp();
+			format "Collision Export: Processing took % seconds\n" ((end - start) / 1000.0)  
+			freeSceneBitmaps() ; -- trying to free up memory
+			gc();
+		)
+
+		button btn_ExportModels "Export Models" width:110 height:35 align:#center tooltip:"Export the models" 
+		on btn_ExportModels pressed do 
+		(
+			-- Export Models
+			start = timeStamp();
+			OutputPath = btlcConfig.CurrentModelConvPathSA + "\\img";
+			makeDir OutputPath
+			btlcModelExport.ExportAllModels(OutputPath);
+			
+			end = timeStamp();
+			format "Model Export: Processing took % seconds\n" ((end - start) / 1000.0)  
+			gc();	
+		)
+
+		
+		button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:35 align:#center tooltip:"Export the models" 
+		on btn_ReinitTxdDb pressed do 
+		(
+			GenericTxdPath =  btlcConfig.GenericTexDir
+			ImportPath =  btlcConfig.CurrentModelConvPath
+			ExportPath =  btlcConfig.CurrentModelConvPathSA
+			InitTexDb()
+			gc();	
+		)
+
+		button btn_DynCol "DynamicColUtil" width:110 height:35 align:#center tooltip:"Tool for Dynmaic Collision creation.(spheres)" 
+		/*
+		button btn_GenerateTxds "GenerateTXDs" width:120 height:35 align:#center tooltip:"Generate the .txds" 
+		on btn_GenerateTxds pressed do 
+		(
+			
+			TxdPath = btlcConfig.CurrentExpoSaPAth + "\\txd"
+			Outpath = btlcConfig.CurrentExpoSaPAth + "\\img"
+			btlcMagicTxd.GenerateTxds TxdPath OutPath
+		)
+
+		button btn_GenerateIMG "Generate IMG" width:120 height:35 align:#center tooltip:"Generate the Img file" 
+		on btn_GenerateIMG pressed do 
+		(
+			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
+		
+			IniPath = btlcConfig.CurrentExpoSaPAth + "\\" + MapPartName + ".ini"
+			OutPath = (pathConfig.removePathLeaf btlcConfig.CurrentExpoSaPAth) 
+
+			btlcImgBuild.BuildImg IniPath OutPath
+		)
+		*/
+	)
+
+	try (closeRolloutFloater btlcIdeModelsFloater) catch ()
+	Pos = getMaxWindowSize() 	
+	PosX = Pos[1]/2 - 300
+	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
+	addRollout  DirSettings btlcIdeModelsFloater
+	addRollout  ModelConvert btlcIdeModelsFloater
+	addRollout  Model_Utils btlcIdeModelsFloater
+)

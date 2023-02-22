@@ -237,6 +237,8 @@ struct ofio_iv_bound_container (
 				)
 				
 				-- world pos
+				boundObject.pivot = 	boundObject.pivot - bound.VertexOffset;
+				print bound.VertexOffset
 				boundObject.pos = bound.VertexOffset
 			)
 			default: throw ("unknown bound type " + type)		
@@ -1178,6 +1180,7 @@ struct ofio_iv_obd (
 			if radius < 1 then radius = 1
 			offset += radius
 		)
+		descriptor
 	),	
 	
 	fn dump obj = (

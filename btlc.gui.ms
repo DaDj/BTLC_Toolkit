@@ -1,6 +1,5 @@
 global btlcCityFloater -- All Controls needed to convert a city part
 global btlcUtilsFloater  -- Utils, mostly what to display/ alphasorting etc.
-global btlcIdeModelsFloater -- Controls for converting a img/Ide (props and stuff.)
 global btlcPathTools -- Tools for path creation
 global gims_maphlpr --mapdisplay
 function btlc_GUICityConvert = 
@@ -218,7 +217,7 @@ rollout btlcUtility  "BTLC Toolkit"
 	button btn_ConvertCity "Convert Map Menu" width:150 align:#center
 	on btn_ConvertCity pressed do  btlc_GUICityConvert()
 
-	button btn_ModelConvert "Convert Models menu" width:150 align:#center enabled:false
+	button btn_ModelConvert "Convert Models menu" width:150 align:#center enabled:true
 	on btn_ModelConvert pressed do  btlc_GUIModelConvert()
 	
 	button btn_PathTool "Path Tools" width:150 align:#center enabled:false
