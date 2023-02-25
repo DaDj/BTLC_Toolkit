@@ -1060,7 +1060,7 @@ struct ofio_iv_oft (
 	),
 	
 	fn build = (	
-		drawable.build skinned_as_chunked:true Load_Bones:true
+		drawable.build skinned_as_chunked:true Load_Bones:true AdvCutName:true
 		g_ft_skel = drawable.skel_obj
 		
 		local root_bone_name = g_ft_skel.rootBone.name

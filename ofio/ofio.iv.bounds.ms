@@ -111,7 +111,7 @@ struct ofio_iv_bound_container (
 			(t == "boundbox"):
 			(
 				boundObject = ofio_iv_col_box width:(AABBMax.x - AABBMin.x) depth:(AABBMax.y - AABBMin.y) height:(AABBMax.z - AABBMin.z)
-				boundObject.name = name	
+				boundObject.name = btlcUtil.CutNameAdv name	
 				--boundObject.pos = bound.VertexOffset
 				if CentroidPresent == 1 then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
@@ -126,7 +126,7 @@ struct ofio_iv_bound_container (
 			(t == "boundsphere"):
 			(
 				boundObject = ofio_iv_col_sphere radius:Radius
-				boundObject.name = name	
+				boundObject.name = btlcUtil.CutNameAdv name	
 				if CentroidPresent == 1 then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
 				-- mtl
@@ -139,7 +139,7 @@ struct ofio_iv_bound_container (
 			(t == "boundcapsule"):
 			(
 				boundObject = ofio_iv_col_capsule radius:bound.CapsuleRadius height:bound.CapsuleHeight
-				boundObject.name = name	
+				boundObject.name = btlcUtil.CutNameAdv name	
 				if CentroidPresent == 1 then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
 				-- mtl
@@ -158,7 +158,7 @@ struct ofio_iv_bound_container (
 				local r = bound.Vertices[1].z * bound.VertexScale.z
 				if r < 0 then r *= -1				
 				boundObject = ofio_iv_col_sphere radius:r
-				boundObject.name = name	
+				boundObject.name = btlcUtil.CutNameAdv name	
 				setUserProp boundObject "type" type	
 				setUserProp boundObject "margin" bound.Margin.z
 				setUserProp boundObject "unk1" bound.CurvedEdges[2].unk_V.x
@@ -172,10 +172,11 @@ struct ofio_iv_bound_container (
 			(t == "boundcomposite"): 
 			(
 				boundObject = dummy boxsize:[0.1, 0.1, 0.1]
-				boundObject.name = name
+				boundObject.name = btlcUtil.CutNameAdv name
 				if compositeIndependent == true then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
 				setUserProp boundObject "margin" bound.Margin
+				setUserProp boundObject "centerofmass" CenterOfMass
 				local i
 				for i = 1 to bound.Children.count do
 				(
@@ -193,10 +194,11 @@ struct ofio_iv_bound_container (
 			)
 			(t == "boundgeometry" or t == "boundbvh"): 
 			(
-				boundObject = Editable_Mesh name:name
+				boundObject = Editable_Mesh name:(btlcUtil.CutNameAdv name)
 				convertTo boundObject (Editable_Poly)
 				setUserProp boundObject "type" type
 				setUserProp boundObject "margin" bound.Margin
+				setUserProp boundObject "centerofmass" CenterOfMass
 				local i, j
 				-- create materials
 				local mmat = multimaterial numsubs:bound.Materials.count

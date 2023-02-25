@@ -88,7 +88,7 @@ struct ofio_iv_mesh (
 	
 	fn detachsg obj = (
 		if classof obj != Editable_Poly then
-			convertToPoly obj
+		convertToPoly obj
 		local fid, i, faces
 		local sg = (for i = 1 to 33 collect #())
 		for fid = 1 to obj.numfaces do
@@ -110,7 +110,7 @@ struct ofio_iv_mesh (
 			)
 		)
 		for faces in sg do
-			polyOp.detachFaces obj faces
+		polyOp.detachFaces obj faces
 		convertToMesh obj
 	),
 	
@@ -155,10 +155,10 @@ struct ofio_iv_mesh (
 			local sdir = [(t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r]
 			local tdir = [(s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r]					
 			
-	        local i1 = cf[1]._meshvertid
-	        local i2 = cf[2]._meshvertid
-	        local i3 = cf[3]._meshvertid
-	
+			local i1 = cf[1]._meshvertid
+			local i2 = cf[2]._meshvertid
+			local i3 = cf[3]._meshvertid
+			
 			normals[i1]	= cf[1].normal
 			normals[i2]	= cf[2].normal
 			normals[i3]	= cf[3].normal
@@ -169,7 +169,7 @@ struct ofio_iv_mesh (
 			tan1[i1] += sdir					
 			tan1[i2] += sdir					
 			tan1[i3] += sdir
-	
+			
 			if tan2[i1] == undefined then tan2[i1] = Point3 0 0 0
 			if tan2[i2] == undefined then tan2[i2] = Point3 0 0 0
 			if tan2[i3] == undefined then tan2[i3] = Point3 0 0 0
@@ -193,8 +193,8 @@ struct ofio_iv_mesh (
 			
 			if (bit.isnan p.x) or (bit.isnan p.y) or (bit.isnan p.z) \
 			or (not (bit.isfinite p.x)) or (not (bit.isfinite p.y)) or (not (bit.isfinite p.z)) then
-	 		(
-			   	tangents[i] = Point4 1 0 0 1					
+			(
+				tangents[i] = Point4 1 0 0 1					
 			) else
 			(
 				local w = if (dot (cross n t) tan2[i]) < 0.0 then -1.0 else 1.0
@@ -203,8 +203,8 @@ struct ofio_iv_mesh (
 		)
 		
 		for i = 1 to verts_processed.count do
-			for j = 1 to verts_processed[i].count do
-				verts_processed[i][j].tangent = tangents[verts_processed[i][j]._meshvertid]
+		for j = 1 to verts_processed[i].count do
+		verts_processed[i][j].tangent = tangents[verts_processed[i][j]._meshvertid]
 		
 		tangents = undefined
 		normals = undefined
@@ -223,27 +223,27 @@ struct ofio_iv_mesh (
 				if use_skinned_verts then
 				(
 					format "% % % / % % % / % % % % / % % % % / % % % % / % % % % / % % / % %" \
-							vert.pos.x vert.pos.y vert.pos.z \
-							vert.normal.x vert.normal.y vert.normal.z \
-							vert.blendweight[1] vert.blendweight[2] vert.blendweight[3] vert.blendweight[4] \
-							vert.blendindicies[1] vert.blendindicies[2] vert.blendindicies[3] vert.blendindicies[4] \
-							vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
-							vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
-							vert.texcoord_0.x vert.texcoord_0.y \
-							vert.texcoord_1.x vert.texcoord_1.y to:ss
+					vert.pos.x vert.pos.y vert.pos.z \
+					vert.normal.x vert.normal.y vert.normal.z \
+					vert.blendweight[1] vert.blendweight[2] vert.blendweight[3] vert.blendweight[4] \
+					vert.blendindicies[1] vert.blendindicies[2] vert.blendindicies[3] vert.blendindicies[4] \
+					vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
+					vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
+					vert.texcoord_0.x vert.texcoord_0.y \
+					vert.texcoord_1.x vert.texcoord_1.y to:ss
 				) else
 				(
 					format "% % % / % % % / % % % % / % % % % / % % / % % / % % / % % / % % / % %" \
-							vert.pos.x vert.pos.y vert.pos.z \
-							vert.normal.x vert.normal.y vert.normal.z \
-							vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
-							vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
-							vert.texcoord_0.x vert.texcoord_0.y \
-							vert.texcoord_1.x vert.texcoord_1.y \
-							vert.texcoord_2.x vert.texcoord_2.y \
-							vert.texcoord_3.x vert.texcoord_3.y \
-							vert.texcoord_4.x vert.texcoord_4.y \
-							vert.texcoord_5.x vert.texcoord_5.y to:ss
+					vert.pos.x vert.pos.y vert.pos.z \
+					vert.normal.x vert.normal.y vert.normal.z \
+					vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
+					vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
+					vert.texcoord_0.x vert.texcoord_0.y \
+					vert.texcoord_1.x vert.texcoord_1.y \
+					vert.texcoord_2.x vert.texcoord_2.y \
+					vert.texcoord_3.x vert.texcoord_3.y \
+					vert.texcoord_4.x vert.texcoord_4.y \
+					vert.texcoord_5.x vert.texcoord_5.y to:ss
 				)
 				vert._uniq = getHashValue (ss as String) 0
 				ss = undefined
@@ -283,15 +283,15 @@ struct ofio_iv_mesh (
 			append arr #(name, index)
 			local child
 			for child in obj.Children do
-				arr = dumpBoneId child arr
+			arr = dumpBoneId child arr
 		)
 		return arr
 	),
 	
 	fn dump obj material_hashes skel:undefined normal_as_skinned:false = (
 		if ofutils.lowercase(getUserProp obj "type") != "mesh" then
-			throw "dumping obj type is not mesh"
-			
+		throw "dumping obj type is not mesh"
+		
 		local cpy_obj = makeclone(obj)
 		obj = cpy_obj		
 		objs = #(obj)
@@ -311,7 +311,7 @@ struct ofio_iv_mesh (
 		) else
 		(
 			if skel == undefined then 
-				throw "undefined skel in skinned mesh"
+			throw "undefined skel in skinned mesh"
 			
 			-- make array for bone names and the corresponding one for their ids
 			local bone_names_ids = dumpBoneId skel #()
@@ -321,21 +321,21 @@ struct ofio_iv_mesh (
 				append skel_bone_names bone[1]
 				append skel_bone_inds bone[2]
 			)
-				
+			
 			select obj
 			max modify mode
 			modPanel.setCurrentObject modskin
 		)	
-			
+		
 		-- convert to mesh
 		if classof obj != Editable_Mesh then
-			convertToMesh obj
-			
+		convertToMesh obj
+		
 		-- collect faces by groups
 		local facegroups = #()
 		local mtl = obj.Material
 		if mtl == undefined then
-			throw "undefined material"			
+		throw "undefined material"			
 		if not (meshop.getMapSupport obj 1) then
 		(
 			meshop.defaultMapFaces obj 1
@@ -351,12 +351,12 @@ struct ofio_iv_mesh (
 			(
 				local matid = getFaceMatID obj i
 				if matid > 0 then
-					if obj.material[matid] == undefined then
-					(
-						local verts = getFace obj i
-						local vert = ((getVert obj verts[1]) + (getVert obj verts[2]) + (getVert obj verts[3])) / 3
-						throw ("MATERIAL ERROR\n\nMesh " + obj.name + " has polys with bad material id " + matid as String + " at " + vert as String)
-					)
+				if obj.material[matid] == undefined then
+				(
+					local verts = getFace obj i
+					local vert = ((getVert obj verts[1]) + (getVert obj verts[2]) + (getVert obj verts[3])) / 3
+					throw ("MATERIAL ERROR\n\nMesh " + obj.name + " has polys with bad material id " + matid as String + " at " + vert as String)
+				)
 			)
 			for i = 1 to mat_list.count do
 			(
@@ -364,7 +364,7 @@ struct ofio_iv_mesh (
 				for j = 1 to obj.numfaces do
 				(
 					if (getFaceMatID obj j) == matid_list[i] then
-						append faces j
+					append faces j
 				)
 				if faces.count > 0 then
 				(
@@ -383,14 +383,14 @@ struct ofio_iv_mesh (
 		(
 			local faces = #()
 			for j = 1 to obj.numfaces do
-				append faces j
+			append faces j
 			local hash = getHashValue (mtl.getInfo()) 0
 			j = findItem material_hashes hash
 			if j == 0 then throw "MATERIAL ERROR\n can't find material hash\n"				
 			append facegroups #(j - 1, faces)
 		)
 		if facegroups.count == 0 then
-			throw "facegroups.count = 0"
+		throw "facegroups.count = 0"
 		-- each group max vertex count is 65536, such groups must be divided
 		local newfacegroups = #()
 		local facegroup
@@ -409,7 +409,7 @@ struct ofio_iv_mesh (
 					local readcount = FACES_ALLOWED
 					if readcount > count then readcount = count
 					for i = 1 to readcount do
-						append faces facegroup[2][cur_face_start + i]
+					append faces facegroup[2][cur_face_start + i]
 					count -= readcount
 					cur_face_start += readcount
 					append newfacegroups #(facegroup[1], faces)
@@ -430,7 +430,7 @@ struct ofio_iv_mesh (
 		local chenabled = #()
 		local i, j
 		for i = 1 to chcount do
-			append chenabled (meshop.getMapSupport obj i)
+		append chenabled (meshop.getMapSupport obj i)
 		--local flip = (dot (cross obj.transform.row1 obj.transform.row2) obj.transform.row3) <= 0	
 		for facegroup in facegroups do
 		(
@@ -443,140 +443,140 @@ struct ofio_iv_mesh (
 				local vcaFace = (if has_alpha then meshOp.getMapFace obj -2 faceId else undefined)
 				local vmaps = #()
 				for i = 1 to chcount do
-					append vmaps (if chenabled[i] then meshop.getMapFace obj i faceId else undefined)
+				append vmaps (if chenabled[i] then meshop.getMapFace obj i faceId else undefined)
 				local vert_ids = #()
 				for i = 1 to 3 do
 				(
-						local vert
+					local vert
 
-						vert = (if Skinned == 1 or normal_as_skinned then ofio_iv_vertex_skinned() else ofio_iv_vertex())
-						vert._meshvertid = face[i]
-						vert.pos = (in coordsys obj (getVert obj face[i]))
-						vert.normal = getNormal obj face[i]
-						vert.color = (if has_color then getVertColor obj vcFace[i] else color 255 255 255 255)
-						vert.color.a = (if has_alpha then (255 * (meshOp.getMapVert obj -2 vcaFace[i]).x) as Integer else 255)
-						vert.color = #(vert.color.b as Integer, vert.color.g as Integer, vert.color.r as Integer, vert.color.a as Integer)
-						vmap = #()
-						-- get UVs
-						for j = 1 to chcount do 
+					vert = (if Skinned == 1 or normal_as_skinned then ofio_iv_vertex_skinned() else ofio_iv_vertex())
+					vert._meshvertid = face[i]
+					vert.pos = (in coordsys obj (getVert obj face[i]))
+					vert.normal = getNormal obj face[i]
+					vert.color = (if has_color then getVertColor obj vcFace[i] else color 255 255 255 255)
+					vert.color.a = (if has_alpha then (255 * (meshOp.getMapVert obj -2 vcaFace[i]).x) as Integer else 255)
+					vert.color = #(vert.color.b as Integer, vert.color.g as Integer, vert.color.r as Integer, vert.color.a as Integer)
+					vmap = #()
+					-- get UVs
+					for j = 1 to chcount do 
+					(
+						if chenabled[j] == true then 
 						(
-							if chenabled[j] == true then 
+							vmap[j] = meshop.getMapVert obj j vmaps[j][i]
+							if bit.isnan vmap[j].x then
 							(
-								vmap[j] = meshop.getMapVert obj j vmaps[j][i]
-								if bit.isnan vmap[j].x then
-								(
-									vmap[j].x = 0.0
-								) else 
-								(
-									if not (bit.isfinite vmap[j].x) then
-										vmap[j].x = 1.0
-								)
-								if bit.isnan vmap[j].y then
-								(
-									vmap[j].y = 0.0
-								) else
-								(
-									if not (bit.isfinite vmap[j].y) then
-										vmap[j].y = 1.0
-								)
-								-- flip V for the first 4 coord pairs
-								if j <= 4 then
-									vmap[j].y *= -1
+								vmap[j].x = 0.0
+							) else 
+							(
+								if not (bit.isfinite vmap[j].x) then
+								vmap[j].x = 1.0
+							)
+							if bit.isnan vmap[j].y then
+							(
+								vmap[j].y = 0.0
 							) else
 							(
-								vmap[j] = [0.0, 0.0]
-							)							
-						)	
-						for j = 1 to vmap.count do
-							vmap[j] = [vmap[j][1], vmap[j][2]]
-						vert.texcoord_0 = vmap[1]
-						vert.texcoord_1 = vmap[2]
-						if normal_as_skinned then
-						(
-							vert.blendweight = #(0.0, 0.0, 1.0, 0.0)
-							vert.blendindicies = #(0, 0, (meshop.getVertWeight obj face[i]) as Integer, 0)
-						) else
-						if Skinned == 1 then
-						(
-							vert.blendweight = #(0.0, 0.0, 0.0, 0.0)
-							vert.blendindicies = #(0, 0, 0, 0)					
-							local vbonecount = skinOps.GetVertexWeightCount modskin face[i]
-							if vbonecount > 0 then
-							(
-								-- weights and indicies
-								for j = 1 to vbonecount do
-								(
-									local vw = skinOps.GetVertexWeight modskin face[i] j
-									if vw > 0.0 then
-									(
-										local vboneid = skinOps.GetVertexWeightBoneID modskin face[i] j
-										local vbonename = ofutils.lowercase(skinOps.GetBoneName modskin vboneid 0)
-										
-										local ind = findItem skel_bone_names vbonename
-										if ind == 0 then
-											throw ("can't find bone in skel " + vbonename)
-										local bone_index = skel_bone_inds[ind]
-										
-										if bone_index == undefined then
-											throw ("can't find bone " + vbonename)
-										vert.blendweight[j] = vw
-										vert.blendindicies[j] = bone_index
-									) else
-									(
-										vert.blendweight[j] = 0.0
-										vert.blendindicies[j] = 0
-									)									
-								)
-								-- sort by weights
-								local v
-								for j = 1 to vert.blendweight.Count do
-									for v = 1 to vert.blendweight.Count - 1 do
-										if vert.blendweight[v] < vert.blendweight[v + 1] then
-										(
-											local temp = vert.blendweight[v + 1]
-											vert.blendweight[v + 1] = vert.blendweight[v]
-											vert.blendweight[v] = temp
-											temp = vert.blendindicies[v + 1]
-											vert.blendindicies[v + 1] = vert.blendindicies[v]
-											vert.blendindicies[v] = temp
-										)
-								-- arr length must be 4
-								local _blendweight = #(0.0, 0.0, 0.0, 0.0), _blendindicies = #(0, 0, 0, 0)
-								for j = 1 to 4 do
-								(
-									if vert.blendweight.count >= j then
-									(
-										_blendweight[j] = vert.blendweight[j]
-										_blendindicies[j] = vert.blendindicies[j]
-									)
-								)
-								-- replace bone id of zero weight with already used id
-								for j = 2 to 4 do
-									if _blendweight[j] == 0.0 then
-										_blendindicies[j] = _blendindicies[1]
-								vert.blendweight = _blendweight
-								vert.blendindicies = _blendindicies	
-							) 
-							if vert.blendweight.count == 0 then
-							(
-								vert.blendweight = #(1.0, 0.0, 0.0, 0.0)
-								vert.blendindicies = #(0, 0, 0, 0)
+								if not (bit.isfinite vmap[j].y) then
+								vmap[j].y = 1.0
 							)
+							-- flip V for the first 4 coord pairs
+							if j <= 4 then
+							vmap[j].y *= -1
 						) else
 						(
-							vert.texcoord_2 = vmap[3]
-							vert.texcoord_3 = vmap[4]						
-							vert.texcoord_4 = vmap[5]
-							vert.texcoord_5 = vmap[6]
+							vmap[j] = [0.0, 0.0]
+						)							
+					)	
+					for j = 1 to vmap.count do
+					vmap[j] = [vmap[j][1], vmap[j][2]]
+					vert.texcoord_0 = vmap[1]
+					vert.texcoord_1 = vmap[2]
+					if normal_as_skinned then
+					(
+						vert.blendweight = #(0.0, 0.0, 1.0, 0.0)
+						vert.blendindicies = #(0, 0, (meshop.getVertWeight obj face[i]) as Integer, 0)
+					) else
+					if Skinned == 1 then
+					(
+						vert.blendweight = #(0.0, 0.0, 0.0, 0.0)
+						vert.blendindicies = #(0, 0, 0, 0)					
+						local vbonecount = skinOps.GetVertexWeightCount modskin face[i]
+						if vbonecount > 0 then
+						(
+							-- weights and indicies
+							for j = 1 to vbonecount do
+							(
+								local vw = skinOps.GetVertexWeight modskin face[i] j
+								if vw > 0.0 then
+								(
+									local vboneid = skinOps.GetVertexWeightBoneID modskin face[i] j
+									local vbonename = ofutils.lowercase(skinOps.GetBoneName modskin vboneid 0)
+									
+									local ind = findItem skel_bone_names vbonename
+									if ind == 0 then
+									throw ("can't find bone in skel " + vbonename)
+									local bone_index = skel_bone_inds[ind]
+									
+									if bone_index == undefined then
+									throw ("can't find bone " + vbonename)
+									vert.blendweight[j] = vw
+									vert.blendindicies[j] = bone_index
+								) else
+								(
+									vert.blendweight[j] = 0.0
+									vert.blendindicies[j] = 0
+								)									
+							)
+							-- sort by weights
+							local v
+							for j = 1 to vert.blendweight.Count do
+							for v = 1 to vert.blendweight.Count - 1 do
+							if vert.blendweight[v] < vert.blendweight[v + 1] then
+							(
+								local temp = vert.blendweight[v + 1]
+								vert.blendweight[v + 1] = vert.blendweight[v]
+								vert.blendweight[v] = temp
+								temp = vert.blendindicies[v + 1]
+								vert.blendindicies[v + 1] = vert.blendindicies[v]
+								vert.blendindicies[v] = temp
+							)
+							-- arr length must be 4
+							local _blendweight = #(0.0, 0.0, 0.0, 0.0), _blendindicies = #(0, 0, 0, 0)
+							for j = 1 to 4 do
+							(
+								if vert.blendweight.count >= j then
+								(
+									_blendweight[j] = vert.blendweight[j]
+									_blendindicies[j] = vert.blendindicies[j]
+								)
+							)
+							-- replace bone id of zero weight with already used id
+							for j = 2 to 4 do
+							if _blendweight[j] == 0.0 then
+							_blendindicies[j] = _blendindicies[1]
+							vert.blendweight = _blendweight
+							vert.blendindicies = _blendindicies	
+						) 
+						if vert.blendweight.count == 0 then
+						(
+							vert.blendweight = #(1.0, 0.0, 0.0, 0.0)
+							vert.blendindicies = #(0, 0, 0, 0)
 						)
-						
-						-- append vertex to vertex arr
-						if verts_processed[faceId] == undefined then
-							verts_processed[faceId] = #()
-						append verts_processed[faceId] vert
+					) else
+					(
+						vert.texcoord_2 = vmap[3]
+						vert.texcoord_3 = vmap[4]						
+						vert.texcoord_4 = vmap[5]
+						vert.texcoord_5 = vmap[6]
+					)
+					
+					-- append vertex to vertex arr
+					if verts_processed[faceId] == undefined then
+					verts_processed[faceId] = #()
+					append verts_processed[faceId] vert
 
 				) -- for verts in face
-					
+				
 			) -- for faceId in facegroup
 		)
 		
@@ -591,8 +591,8 @@ struct ofio_iv_mesh (
 		local vert_coords = #()
 		local vert, verts
 		for verts in verts_processed do
-			for vert in verts do
-				append vert_coords vert.pos
+		for vert in verts do
+		append vert_coords vert.pos
 		Bounds = #(calculate_bounds vert_coords)
 		m_Boundbox = calculate_boundbox vert_coords
 		
@@ -617,16 +617,16 @@ struct ofio_iv_mesh (
 					
 					local uniq_group = bit.and (face_verts[i]._uniq) 0x00000FFF
 					if uniq_group < 0 then uniq_group *= -1 else
-						if uniq_group == 0 then uniq_group = 1
+					if uniq_group == 0 then uniq_group = 1
 					local vert_id = undefined, j
 					local vert_ids = vert_uniq_idents[uniq_group]
 					if vert_ids != undefined then
-						for j = 1 to vert_ids.count do
-							if vert_ids[j][1] == face_verts[i]._uniq then
-							(
-								vert_id = vert_ids[j][2]
-								exit
-							)
+					for j = 1 to vert_ids.count do
+					if vert_ids[j][1] == face_verts[i]._uniq then
+					(
+						vert_id = vert_ids[j][2]
+						exit
+					)
 					
 					if vert_id == undefined then
 					(
@@ -645,20 +645,20 @@ struct ofio_iv_mesh (
 				)
 			)
 			vert_uniq_idents = undefined
-		
+			
 			-- calc bound
 			append Bounds (calculate_bounds vert_coords)			
 			-- append mtl
 			if (findString shader_name "glass") == undefined -- such mtls as glass must be rendered in the end
-				then append Mtls mtl
-				else append late_Mtls mtl
+			then append Mtls mtl
+			else append late_Mtls mtl
 		)
 		join Mtls late_Mtls
 		
 		-- one mtl mesh has only one bound
 		if Mtls.count == 1 then
-			Bounds = #(Bounds[1])
-			
+		Bounds = #(Bounds[1])
+		
 		-- set mesh Skinned flag for normal as skinned dump	
 		if normal_as_skinned then Skinned = 1
 	),
@@ -697,9 +697,9 @@ struct ofio_iv_mesh (
 						boneind = mtl.Verts[i].blendindicies[ind]
 					)
 				)				
-						
+				
 				if weightscount != 1 then throw "common mesh is way too skinned, more than 1 attached bone"	
-						
+				
 				boneind += 1
 				bone_ind_using_vertex_ind[i] = boneind
 				-- group vertexes using boned indexes
@@ -714,15 +714,15 @@ struct ofio_iv_mesh (
 			for i = 1 to faces.count do
 			(
 				local ind1 = bone_ind_using_vertex_ind[faces[i][1]],
-					  ind2 = bone_ind_using_vertex_ind[faces[i][2]],
-					  ind3 = bone_ind_using_vertex_ind[faces[i][3]]
+				ind2 = bone_ind_using_vertex_ind[faces[i][2]],
+				ind3 = bone_ind_using_vertex_ind[faces[i][3]]
 				if (ind1 != ind2) or (ind2 != ind3)
-					then throw ""
-					
+				then throw ""
+				
 				local face = [ vertex_translation[ind1][faces[i][1]], 
-				               vertex_translation[ind1][faces[i][2]], 
-							   vertex_translation[ind1][faces[i][3]] ]
-					
+					vertex_translation[ind1][faces[i][2]], 
+					vertex_translation[ind1][faces[i][3]] ]
+				
 				if chunked_faces[ind1] == undefined then chunked_faces[ind1] = #()				
 				append chunked_faces[ind1] face
 			)
@@ -734,21 +734,21 @@ struct ofio_iv_mesh (
 				local verts = #()				
 				local vert
 				for vert in chunked_verts[i] do
-					append verts vert.pos
+				append verts vert.pos
 				local obj = mesh vertices:verts faces:chunked_faces[i]	
 				if objs_using_bone[i] == undefined then objs_using_bone[i] = #()
 				append objs_using_bone[i] #(obj, mtl.Id)				
-			
+				
 				local j
 				meshop.defaultMapFaces obj 0
 				meshop.defaultMapFaces obj -2
 				for j = 1 to 6 do
-					meshop.defaultMapFaces obj j
+				meshop.defaultMapFaces obj j
 				for j = 1 to verts.count do 
 				(
 					meshop.setMapVert obj 0 j [(chunked_verts[i][j].color[3]) as Float / 255, (chunked_verts[i][j].color[2]) as Float / 255, (chunked_verts[i][j].color[1]) as Float / 255]
 					meshop.setMapVert obj -2 j [(chunked_verts[i][j].color[4]) as Float / 255, (chunked_verts[i][j].color[4]) as Float / 255, (chunked_verts[i][j].color[4]) as Float / 255]	
-	
+					
 					setNormal obj j chunked_verts[i][j].normal
 					
 					meshop.setMapVert obj 1 j [chunked_verts[i][j].texcoord_0[1], chunked_verts[i][j].texcoord_0[2] * -1, 0]
@@ -759,8 +759,8 @@ struct ofio_iv_mesh (
 					meshop.setMapVert obj 6 j [0, 0, 0]
 				)
 				for j = 1 to chunked_faces[i].count do
-					setFaceSmoothGroup obj j smoothing_group
-					
+				setFaceSmoothGroup obj j smoothing_group
+				
 				update obj				
 			)				
 		)		
@@ -778,11 +778,11 @@ struct ofio_iv_mesh (
 		(	
 			ofioLog.print ("building mesh part " + mesh_part as String + " with mtl " + mtl.Id as String)
 			mesh_part += 1
-		
+			
 			smoothing_group_bit += 1
 			if smoothing_group_bit == 32 then smoothing_group_bit = 1
 			smoothing_group = bit.set 0 smoothing_group_bit true
-				
+			
 			local faces = #(), i = 1 
 			do
 			(
@@ -792,13 +792,13 @@ struct ofio_iv_mesh (
 			local verts = #()
 			local vert
 			for vert in mtl.Verts do
-				append verts vert.pos
+			append verts vert.pos
 			local obj = mesh vertices:verts faces:faces
 			
 			meshop.defaultMapFaces obj 0
 			meshop.defaultMapFaces obj -2
 			for i = 1 to 6 do
-				meshop.defaultMapFaces obj i
+			meshop.defaultMapFaces obj i
 			for i = 1 to verts.count do 
 			(
 				meshop.setMapVert obj 0 i [(mtl.Verts[i].color[3]) as Float / 255, (mtl.Verts[i].color[2]) as Float / 255, (mtl.Verts[i].color[1]) as Float / 255]
@@ -823,8 +823,8 @@ struct ofio_iv_mesh (
 				)				
 			)
 			for i = 1 to faces.count do
-				setFaceSmoothGroup obj i smoothing_group
-				
+			setFaceSmoothGroup obj i smoothing_group
+			
 			update obj	
 
 			if Skinned == 1 then
@@ -852,10 +852,10 @@ struct ofio_iv_mesh (
 	
 	fn skin_attached bones = (
 		if Skinned != 1 or bones == undefined or bones.count == 0 
-			then return undefined
-			
+		then return undefined
+		
 		ofioLog.print "skinning mesh"	
-			
+		
 		local i
 		local obj = objs[1]
 		local modskin = Skin()
@@ -874,8 +874,8 @@ struct ofio_iv_mesh (
 		
 		if obj.numverts != bone_ids.count then throw ""		
 		for i = 1 to obj.numverts do
-			skinOps.ReplaceVertexWeights modskin i bone_ids[i] bone_weights[i]
-			
+		skinOps.ReplaceVertexWeights modskin i bone_ids[i] bone_weights[i]
+		
 		forceCompleteRedraw()
 		clearselection()				
 	),
@@ -883,7 +883,7 @@ struct ofio_iv_mesh (
 	fn cleanup = (
 		local obj
 		for obj in objs do
-			if obj != undefined then delete obj
+		if obj != undefined then delete obj
 		objs = #()
 	),	
 	
@@ -896,7 +896,7 @@ struct ofio_iv_mesh (
 			format ("\x09" + "Bounds %\n\x09{\n") Bounds.count to:fOutput
 			local bound
 			for bound in Bounds do
-				format "\x09\x09% % % %\n" bound[1] bound[2] bound[3] bound[4] to:fOutput
+			format "\x09\x09% % % %\n" bound[1] bound[2] bound[3] bound[4] to:fOutput
 			format "\x09}\n" to:fOutput
 		)
 		local mtl
@@ -917,27 +917,27 @@ struct ofio_iv_mesh (
 				if Skinned == 1 then
 				(
 					format "\x09\x09\x09\x09% % % / % % % / % % % % / % % % % / % % % % / % % % % / % % / % %\n" \
-							vert.pos.x vert.pos.y vert.pos.z \
-							vert.normal.x vert.normal.y vert.normal.z \
-							vert.blendweight[1] vert.blendweight[2] vert.blendweight[3] vert.blendweight[4] \
-							vert.blendindicies[1] vert.blendindicies[2] vert.blendindicies[3] vert.blendindicies[4] \
-							vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
-							vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
-							vert.texcoord_0.x vert.texcoord_0.y \
-							vert.texcoord_1.x vert.texcoord_1.y to:fOutput
+					vert.pos.x vert.pos.y vert.pos.z \
+					vert.normal.x vert.normal.y vert.normal.z \
+					vert.blendweight[1] vert.blendweight[2] vert.blendweight[3] vert.blendweight[4] \
+					vert.blendindicies[1] vert.blendindicies[2] vert.blendindicies[3] vert.blendindicies[4] \
+					vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
+					vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
+					vert.texcoord_0.x vert.texcoord_0.y \
+					vert.texcoord_1.x vert.texcoord_1.y to:fOutput
 				) else
 				(
 					format "\x09\x09\x09\x09% % % / % % % / % % % % / % % % % / % % / % % / % % / % % / % % / % %\n" \
-							vert.pos.x vert.pos.y vert.pos.z \
-							vert.normal.x vert.normal.y vert.normal.z \
-							vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
-							vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
-							vert.texcoord_0.x vert.texcoord_0.y \
-							vert.texcoord_1.x vert.texcoord_1.y \
-							vert.texcoord_2.x vert.texcoord_2.y \
-							vert.texcoord_3.x vert.texcoord_3.y \
-							vert.texcoord_4.x vert.texcoord_4.y \
-							vert.texcoord_5.x vert.texcoord_5.y to:fOutput
+					vert.pos.x vert.pos.y vert.pos.z \
+					vert.normal.x vert.normal.y vert.normal.z \
+					vert.color[1] vert.color[2] vert.color[3] vert.color[4] \
+					vert.tangent.x vert.tangent.y vert.tangent.z vert.tangent.w \
+					vert.texcoord_0.x vert.texcoord_0.y \
+					vert.texcoord_1.x vert.texcoord_1.y \
+					vert.texcoord_2.x vert.texcoord_2.y \
+					vert.texcoord_3.x vert.texcoord_3.y \
+					vert.texcoord_4.x vert.texcoord_4.y \
+					vert.texcoord_5.x vert.texcoord_5.y to:fOutput
 				)
 			)
 			format "\x09\x09\x09}\n" to:fOutput			
@@ -955,7 +955,7 @@ struct ofio_iv_mesh (
 			"version":
 			(
 				if (version[2] as Integer != 11) or (version[3] as Integer != 13) then
-					throw "IMPORT ERROR\n\nNot supported mesh, version 11 13 is supported only"	
+				throw "IMPORT ERROR\n\nNot supported mesh, version 11 13 is supported only"	
 			)
 			default: throw "IMPORT ERROR\n\nIncorrect mesh"
 		)
@@ -963,7 +963,7 @@ struct ofio_iv_mesh (
 		if blockstart[1] != "{" then throw "block start expected"	
 		local elements = scanline fInput
 		if ofutils.lowercase(elements[1]) != "skinned" then
-			throw "skinned attribute expected"
+		throw "skinned attribute expected"
 		Skinned = elements[2] as Integer
 		Mtls = #()	
 		elements = scanline fInput
@@ -1009,7 +1009,7 @@ struct ofio_iv_mesh (
 					(	
 						local element
 						for element in elements do 
-							append mtl.Idx (element as Integer)
+						append mtl.Idx (element as Integer)
 						elements = scanline fInput
 					)
 					if mtl.Idx.count != count then throw "idx count mismatch"
@@ -1213,7 +1213,7 @@ struct ofio_iv_additional_lodgroup (
 		(
 			for cur_mesh in high do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append high_obj obj
 				append high_ids cur_mesh.boneid
@@ -1224,7 +1224,7 @@ struct ofio_iv_additional_lodgroup (
 		(
 			for cur_mesh in med do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append med_obj obj
 				append med_ids cur_mesh.boneid
@@ -1235,7 +1235,7 @@ struct ofio_iv_additional_lodgroup (
 		(
 			for cur_mesh in low do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append low_obj obj
 				append low_ids cur_mesh.boneid
@@ -1246,7 +1246,7 @@ struct ofio_iv_additional_lodgroup (
 		(
 			for cur_mesh in vlow do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append vlow_obj obj
 				append vlow_ids cur_mesh.boneid
@@ -1301,7 +1301,7 @@ struct ofio_iv_odr (
 		(
 			local child
 			for child in obj.Children do
-				meshes = get_meshes child meshes
+			meshes = get_meshes child meshes
 		)
 		return meshes
 	),	
@@ -1314,7 +1314,7 @@ struct ofio_iv_odr (
 		(
 			local child
 			for child in obj.Children do
-				meshes = get_common_mesh_chunks child meshes
+			meshes = get_common_mesh_chunks child meshes
 		)
 		return meshes
 	),	
@@ -1341,13 +1341,13 @@ struct ofio_iv_odr (
 		meshop.supportVertWeights obj
 		local i, verts = #()
 		for i = 1 to obj.numverts do
-			append verts i
+		append verts i
 		meshop.setVertWeight obj verts w
 	),
 	
 	fn dump obj chunked_as_skinned:false = (
 		if ofutils.lowercase(getUserProp obj "type") != (if chunked_as_skinned then "fragments" else "drawable") then
-			throw ("MESH ERROR\n\n" + obj.name + " type paramerter is not drawable\n")
+		throw ("MESH ERROR\n\n" + obj.name + " type paramerter is not drawable\n")
 		descName = obj.name
 		-- collect meshes
 		local meshes, meshes_for_mtlsearch
@@ -1355,7 +1355,7 @@ struct ofio_iv_odr (
 		(
 			meshes = get_meshes obj #()
 			if meshes.count == 0 then
-				throw ("MESH ERROR\n\n" + obj.name + " drawable must have atleast one mesh, check type parameter in scene mesh objects\n")
+			throw ("MESH ERROR\n\n" + obj.name + " drawable must have atleast one mesh, check type parameter in scene mesh objects\n")
 			meshes_for_mtlsearch = meshes
 		) else -- chunked common drawable in fragments
 		(
@@ -1372,26 +1372,26 @@ struct ofio_iv_odr (
 		(
 			local mtl = cur_mesh.Material
 			if mtl == undefined then
-				throw ("MATERIAL ERROR\n\n" + obj.name + " has undefined material\n")
+			throw ("MATERIAL ERROR\n\n" + obj.name + " has undefined material\n")
 			if classof mtl == Multimaterial then
 			(
 				local sub_mtl
 				for sub_mtl in mtl.Material do
-					if sub_mtl != undefined then
+				if sub_mtl != undefined then
+				(
+					if classof sub_mtl != iv_drawable_material then
+					throw ("MATERIAL ERROR\n\n" + cur_mesh.name + " mesh multimat sub material isn't iv_drawable_material\n")
+					local hash = getHashValue (sub_mtl.getInfo()) 0
+					if (findItem material_hashes hash) == 0 then
 					(
-						if classof sub_mtl != iv_drawable_material then
-							throw ("MATERIAL ERROR\n\n" + cur_mesh.name + " mesh multimat sub material isn't iv_drawable_material\n")
-						local hash = getHashValue (sub_mtl.getInfo()) 0
-						if (findItem material_hashes hash) == 0 then
-						(
-							append material_hashes hash
-							append materials sub_mtl
-						)
+						append material_hashes hash
+						append materials sub_mtl
 					)
+				)
 			) else
 			(
 				if classof mtl != iv_drawable_material then
-					throw ("MATERIAL ERROR\n\n" + cur_mesh.name + " mesh material isn't iv_drawable_material\n")
+				throw ("MATERIAL ERROR\n\n" + cur_mesh.name + " mesh material isn't iv_drawable_material\n")
 				local hash = getHashValue (mtl.getInfo()) 0
 				if (findItem material_hashes hash) == 0 then
 				(
@@ -1404,8 +1404,8 @@ struct ofio_iv_odr (
 		shadinggroup_shaders = #()
 		local mtl
 		for mtl in materials do
-			append shadinggroup_shaders (mtl.getInfo())
-			
+		append shadinggroup_shaders (mtl.getInfo())
+		
 		print shadinggroup_shaders
 		
 		-- dump skel
@@ -1418,14 +1418,14 @@ struct ofio_iv_odr (
 				if ofutils.lowercase(getUserProp child "type") == "bone" then
 				(
 					if (getUserProp child "id") != 0 then
-						throw ("bad skel root bone " + child.name + " id, must be 0")
+					throw ("bad skel root bone " + child.name + " id, must be 0")
 					skel_obj = ofio_iv_skeleton()
 					skel_obj.dump child
 					exit
 				)
 			)
 			if skel_obj == undefined then
-				throw ("skel is not found but drawable/fragment root " + obj.name + " has skel flags")
+			throw ("skel is not found but drawable/fragment root " + obj.name + " has skel flags")
 		)
 		
 		-- lights
@@ -1477,8 +1477,8 @@ struct ofio_iv_odr (
 						or (attr.LuminescenceHash == undefined) \
 						or (attr.Flags == undefined) \
 						or (attr.BoneId == undefined) then
-							throw ("LIGHTS ERROR\n\nTypeFlags/CoronaSize/CoronaHash/LuminescenceHash/Flags/BoneId isn't set in " + light.name + "object\n")
-							
+						throw ("LIGHTS ERROR\n\nTypeFlags/CoronaSize/CoronaHash/LuminescenceHash/Flags/BoneId isn't set in " + light.name + "object\n")
+						
 						if (attr._f28 == undefined) \
 						or (attr._f2C == undefined) \
 						or (attr._f30 == undefined) \
@@ -1486,13 +1486,13 @@ struct ofio_iv_odr (
 						or (attr._f5C == undefined) \
 						or (attr._f60 == undefined) \
 						or (attr._f66 == undefined) then
-							throw ("LIGHTS ERROR\n\nSome of _fXX params isn't set in " + light.name + "object\n")
-							
+						throw ("LIGHTS ERROR\n\nSome of _fXX params isn't set in " + light.name + "object\n")
+						
 						local light_bone = undefined
 						if skel_obj != undefined then
-							light_bone = skel_obj.boneObjUsingGameId skel_obj.rootBone attr.BoneId
+						light_bone = skel_obj.boneObjUsingGameId skel_obj.rootBone attr.BoneId
 						if light_bone == undefined then
-							light_bone = light_root
+						light_bone = light_root
 						
 						in coordsys light_bone
 						(
@@ -1550,8 +1550,8 @@ struct ofio_iv_odr (
 					-- get parent bone index
 					local m_parent_bone_ind = undefined					
 					if m.parent != undefined then
-						if ofutils.lowercase(getUserProp m.parent "type") == "bone" then
-							m_parent_bone_ind = getUserProp m.parent "_ignore_this_autogenerated_index"
+					if ofutils.lowercase(getUserProp m.parent "type") == "bone" then
+					m_parent_bone_ind = getUserProp m.parent "_ignore_this_autogenerated_index"
 					if m_parent_bone_ind == undefined then throw "common mesh chunk must have parent bone with index\n"
 					-- make clone							
 					local _m = ofio_iv_mesh.makeclone m
@@ -1566,7 +1566,7 @@ struct ofio_iv_odr (
 				(
 					local arr = #(), cur
 					for cur = 2 to _meshgroup.count do
-						append arr _meshgroup[cur]
+					append arr _meshgroup[cur]
 					ofio_iv_mesh.linearAttach _meshgroup[1] arr
 					_meshgroup.count = 1					
 				)
@@ -1595,14 +1595,14 @@ struct ofio_iv_odr (
 					(
 						local bone_id = getUserProp cur_mesh.parent "_ignore_this_autogenerated_index"
 						if bone_id != undefined then
-							mesh_decl.boneid = bone_id
+						mesh_decl.boneid = bone_id
 					)
 				)
 				mesh_decl.path = cur_mesh.name + "_"
 				local ofio_mesh = ofio_iv_mesh()
 				local skel = undefined
 				if skel_obj != undefined then 
-					skel = skel_obj.rootBone.boneObject
+				skel = skel_obj.rootBone.boneObject
 				local e = undefined
 				try (
 					ofio_mesh.dump cur_mesh material_hashes skel:skel normal_as_skinned:chunked_as_skinned
@@ -1612,9 +1612,9 @@ struct ofio_iv_odr (
 					(
 						local _i, _j
 						for _i = 1 to meshgroups.count do
-							if meshgroups[_i].count > 0 then
-								for _j = 1 to meshgroups[_i].count do
-									delete meshgroups[_i][_j]
+						if meshgroups[_i].count > 0 then
+						for _j = 1 to meshgroups[_i].count do
+						delete meshgroups[_i][_j]
 					)					
 				)
 				ofio_mesh.cleanup() -- cleans up mesh scene objects if any
@@ -1654,9 +1654,9 @@ struct ofio_iv_odr (
 		(
 			local i, j
 			for i = 1 to meshgroups.count do
-				if meshgroups[i].count > 0 then
-					for j = 1 to meshgroups[i].count do
-						delete meshgroups[i][j]
+			if meshgroups[i].count > 0 then
+			for j = 1 to meshgroups[i].count do
+			delete meshgroups[i][j]
 		)		
 		
 		-- bounds
@@ -1684,11 +1684,11 @@ struct ofio_iv_odr (
 				if _obj.objs[i] == undefined then continue
 				-- set materials
 				for j = 1 to _obj.objs[i].count do
-					_obj.objs[i][j][1].Material = mtls[_obj.objs[i][j][2] + 1]			
+				_obj.objs[i][j][1].Material = mtls[_obj.objs[i][j][2] + 1]			
 				-- attach same bone related meshes
 				if _obj.objs[i].count > 1 then
-					for j = 2 to _obj.objs[i].count do
-						attach _obj.objs[i][1][1] _obj.objs[i][j][1]
+				for j = 2 to _obj.objs[i].count do
+				attach _obj.objs[i][1][1] _obj.objs[i][j][1]
 				-- props					
 				setUserProp _obj.objs[i][1][1] "type" "common_mesh"
 			)	
@@ -1703,15 +1703,15 @@ struct ofio_iv_odr (
 			ofioLog.print ("building mesh " + name)
 			_obj.build()		
 			for i = 1 to _obj.objs.count do
-				_obj.objs[i].Material = mtls[_obj.Mtls[i].Id + 1]
+			_obj.objs[i].Material = mtls[_obj.Mtls[i].Id + 1]
 			if _obj.objs.count > 1 then
 			(
 				for i = 2 to _obj.objs.count do
-					attach _obj.objs[1] _obj.objs[i]				
+				attach _obj.objs[1] _obj.objs[i]				
 				_obj.objs.count = 1
 			)
 			if _obj.Skinned == 1 then
-				_obj.skin_attached bone_using_id			
+			_obj.skin_attached bone_using_id			
 			_obj.objs[1].name = name
 			setUserProp _obj.objs[1] "type" "mesh"
 		)
@@ -1724,13 +1724,13 @@ struct ofio_iv_odr (
 		(
 			local child
 			for child in root.Children do
-				bone_arr = add_bone_object child bone_arr
+			bone_arr = add_bone_object child bone_arr
 		)
 		return bone_arr
 	),
 	
 
-	fn build skinned_as_chunked:false Load_Mesh:true Load_Bones:false = (
+	fn build skinned_as_chunked:false Load_Mesh:true Load_Bones:false AdvCutName:false = (
 		descriptor = dummy boxsize:[0.3, 0.3, 0.3]
 		descriptor.name = "dr_" + descName
 		setUserProp descriptor "type" "drawable"		
@@ -1801,19 +1801,29 @@ struct ofio_iv_odr (
 				(	
 					if not skinned_as_chunked then
 					(
-					
+						
 						if Load_Bones == false then
 						(
 							
 							if i == 0 then 
 							(
-								if descName.count >  19 do descName = substring descName 1 19 
+								if AdvCutName == false then 
+								(
+									if descName.count >  19 do descName = substring descName 1 19 
+								)
+								else descName =  btlcUtil.CutNameAdv descName
+								
 								build_mesh obj mtls (descName )
 							) 
 							else 
 							(
 								local tmpName =  (descName + "_" + (i as string) )
-								if tmpName.count >  19 do tmpName = substring tmpName 1 19 
+
+								if AdvCutName == false then 
+								(
+									if tmpName.count >  19 do tmpName = substring tmpName 1 19 
+								)
+								else tmpName =  btlcUtil.CutNameAdv tmpName
 								build_mesh obj mtls (tmpName )
 							)
 						)
@@ -1821,7 +1831,7 @@ struct ofio_iv_odr (
 						(
 							build_mesh obj mtls (descName + "_" + i as String)
 						)
-					
+						
 						if bone_using_id.count > 0 then
 						(
 							-- using lodgroup_high, binded bones are the same for every lod group
@@ -1853,11 +1863,11 @@ struct ofio_iv_odr (
 
 						if obj != undefined do 
 						(
-						btlcMaterial.ReshuffleByShader obj.objs[1]
-						btlcVertexPaint.PrelightModel obj.objs[1]
-						btlcVertexPaint.MoveAlphaChannel obj.objs[1]
+							btlcMaterial.ReshuffleByShader obj.objs[1]
+							btlcVertexPaint.PrelightModel obj.objs[1]
+							btlcVertexPaint.MoveAlphaChannel obj.objs[1]
 						)
-					
+						
 					) else
 					(
 						
@@ -1886,15 +1896,15 @@ struct ofio_iv_odr (
 								_obj.name = "cm_" + _obj.parent.name + _lod					
 							)
 						)
-					
+						
 					)	
-		
+					
 					if obj != undefined and  obj.objs[1] != undefined do 
 					(
 						if i > 1  do obj.objs[1].parent = group[1].objs[1]
 						
 					)
-				
+					
 					
 				)
 				
@@ -1922,7 +1932,7 @@ struct ofio_iv_odr (
 				light_root.parent = descriptor	
 			)
 
-				
+			
 			--light_root.name = "lights_" + descName
 			--setUserProp light_root "type" "lights_root"		
 			--light_root.parent = group_arr[1][1][1].objs[1]	
@@ -1937,9 +1947,9 @@ struct ofio_iv_odr (
 				
 				local light_bone = undefined
 				if skel_obj != undefined then
-					light_bone = skel_obj.boneObjUsingGameId skel_obj.rootBone lights[i].BoneID
+				light_bone = skel_obj.boneObjUsingGameId skel_obj.rootBone lights[i].BoneID
 				if light_bone == undefined then
-					light_bone = light_root
+				light_bone = light_root
 				
 				in coordsys light_bone
 				(
@@ -1992,16 +2002,16 @@ struct ofio_iv_odr (
 		local group, obj, light
 		-- clean each lod group
 		for group in #(high_obj, med_obj, low_obj, vlow_obj) do
-			for obj in group do
-				if obj != undefined then 
-					obj.cleanup()
+		for obj in group do
+		if obj != undefined then 
+		obj.cleanup()
 		-- clean skel
 		if skel_obj != undefined then 
-			skel_obj.cleanup()
+		skel_obj.cleanup()
 		-- clean lights
 		for light in lights do
-			if light != undefined then
-				if light.obj != undefined then delete light.obj
+		if light != undefined then
+		if light.obj != undefined then delete light.obj
 		if light_root != undefined then delete light_root
 		-- clean descriptor
 		try(if descriptor != undefined then delete descriptor) catch() 
@@ -2009,7 +2019,7 @@ struct ofio_iv_odr (
 	
 	fn write_lights fOutput padding = (
 		if lights.count == 0 then 
-			return OK
+		return OK
 		local out_path = cur_path + descName
 		local lights_name = descName + ".light"
 		local fLight = CreateFile (out_path + "\\" + lights_name)
@@ -2037,7 +2047,7 @@ struct ofio_iv_odr (
 			format "\x09\x09TypeFlags" to:fLight
 			local flag
 			for flag in light.TypeFlags do
-				format " %" flag to:fLight
+			format " %" flag to:fLight
 			format "\n"	to:fLight
 			format "\x09\x09Type %\n" light.Type to:fLight
 			format "\x09\x09_f58 %\n" light._f58 to:fLight
@@ -2159,7 +2169,7 @@ struct ofio_iv_odr (
 		
 		-- light
 		if (not dict_fragments) and (lights.count > 0) then
-			write_lights fOutput padding	
+		write_lights fOutput padding	
 	),
 	
 	fn read_lights fInput = (
@@ -2178,13 +2188,13 @@ struct ofio_iv_odr (
 					local fLight = openFile fname
 					local version = scanline fLight		
 					if (version[2] as Integer != 1) or (version[3] as Integer != 10) then
-								throw "not supported light, version 1 10 is supported only"								
+					throw "not supported light, version 1 10 is supported only"								
 					local blockstart = scanline fLight
 					elements = scanline fLight
 					while elements[1] != "}" do
 					(
 						if ofutils.lowercase(elements[1]) != "attribute" then
-							throw "light attribute expected"
+						throw "light attribute expected"
 						local light = light_attribute()
 						blockstart = scanline fLight
 						elements = scanline fLight
@@ -2234,10 +2244,10 @@ struct ofio_iv_odr (
 		while True do
 		(
 			if eof fInput then 
-				if not dict
-					then exit
-					else throw ""
-					
+			if not dict
+			then exit
+			else throw ""
+			
 			local elements = scanline fInput
 			if dict then
 			(
@@ -2375,7 +2385,7 @@ struct ofio_iv_odr (
 		(
 			for cur_mesh in lodgroup_high do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append high_obj obj
 			)
@@ -2385,7 +2395,7 @@ struct ofio_iv_odr (
 		(
 			for cur_mesh in lodgroup_med do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append med_obj obj
 			)
@@ -2395,7 +2405,7 @@ struct ofio_iv_odr (
 		(
 			for cur_mesh in lodgroup_low do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append low_obj obj
 			)
@@ -2405,7 +2415,7 @@ struct ofio_iv_odr (
 		(
 			for cur_mesh in lodgroup_vlow do
 			(
- 				local obj = ofio_iv_mesh()
+				local obj = ofio_iv_mesh()
 				obj.read (cur_path + cur_mesh.path)
 				append vlow_obj obj
 			)
@@ -2416,7 +2426,7 @@ struct ofio_iv_odr (
 		local fInput = openFile fInputName
 		local version = scanline fInput		
 		if (version[2] as Integer != 110) or (version[3] as Integer != 12) then
-			throw "not supported odr, version 110 12 is supported only"			
+		throw "not supported odr, version 110 12 is supported only"			
 		descName = ofutils.removeExt(ofutils.extractFileName fInputName)
 		cur_path = ofutils.extractFilePath(fInputName)	
 		read_single fInput 
@@ -2441,12 +2451,12 @@ struct ofio_iv_odr (
 	fn filename_from_scenename objname = (
 		local name_contents = filterString (ofutils.lowercase objname) "_"
 		if (objname.count < 4) or (name_contents.count < 2) then 
-			throw ("NAME ERROR\n\n" + "odr file descriptor has no valid name or descriptor is not selected\n")
+		throw ("NAME ERROR\n\n" + "odr file descriptor has no valid name or descriptor is not selected\n")
 		if name_contents[1] != "dr" then 
-			throw ("NAME ERROR\n\n" + "odr file descriptor name must start with 'dr_'\n")
+		throw ("NAME ERROR\n\n" + "odr file descriptor name must start with 'dr_'\n")
 		local i, filename = ""
 		for i = 4 to objname.count do
-			filename += objname[i]
+		filename += objname[i]
 		filename += ".odr"	
 		return filename
 	)	
@@ -2471,7 +2481,7 @@ struct ofio_iv_odd (
 		local fInput = openFile fInputName
 		local version = scanline fInput		
 		if (version[2] as Integer != 110) or (version[3] as Integer != 12) then
-			throw "not supported odd, version 110 12 is supported only"		
+		throw "not supported odd, version 110 12 is supported only"		
 		descName = ofutils.removeExt(ofutils.extractFileName fInputName)
 		local cur_path = ofutils.extractFilePath(fInputName)	
 		
@@ -2482,7 +2492,7 @@ struct ofio_iv_odd (
 		while elements[1] != "}" do
 		(
 			if ofutils.lowercase(elements[1]) != "gtadrawable" then throw ""
-		
+			
 			local obj = ofio_iv_odr()
 			obj.read_dict fInput elements[2] cur_path
 			
@@ -2512,7 +2522,7 @@ struct ofio_iv_odd (
 	
 	fn dump obj = (
 		if ofutils.lowercase(getUserProp obj "type") != "drawable_dictionary" then
-			throw ("DICTIONARY ERROR\n\n" + obj.name + " type is not drawable_dictionary")	
+		throw ("DICTIONARY ERROR\n\n" + obj.name + " type is not drawable_dictionary")	
 		drawables = #()
 		drawable_names = #()
 		local child
@@ -2522,13 +2532,13 @@ struct ofio_iv_odd (
 			local dr = ofio_iv_odr()
 			local dr_name = ofutils.removeExt(dr.filename_from_scenename child.name)
 			if ofutils.lowercase(getUserProp child "type") != "drawable" then
-				throw ("DICTIONARY ERROR\n\n" + child.name + " type must be drawable")
+			throw ("DICTIONARY ERROR\n\n" + child.name + " type must be drawable")
 			dr.dump child
 			append drawables dr
 			append drawable_names dr_name
 		)
 		if drawables.count == 0 then
-			throw ("DICTIONARY ERROR\n\n" + obj.name + " has no drawable children")
+		throw ("DICTIONARY ERROR\n\n" + obj.name + " has no drawable children")
 	),	
 	
 	fn build = (
@@ -2547,19 +2557,19 @@ struct ofio_iv_odd (
 	fn cleanup = (
 		local obj
 		for obj in drawables do
-			if obj != undefined then obj.cleanup()
+		if obj != undefined then obj.cleanup()
 		if descriptor != undefined then delete descriptor
 	),
 	
 	fn filename_from_scenename objname = (
 		local name_contents = filterString (ofutils.lowercase objname) "_"
 		if (objname.count < 7) or (name_contents.count < 2) then 
-			throw ("NAME ERROR\n\n" + "odd file descriptor has no valid name or descriptor is not selected\n")
+		throw ("NAME ERROR\n\n" + "odd file descriptor has no valid name or descriptor is not selected\n")
 		if name_contents[1] != "ddict" then 
-			throw ("NAME ERROR\n\n" + "odd file descriptor name must start with 'ddict_'\n")
+		throw ("NAME ERROR\n\n" + "odd file descriptor name must start with 'ddict_'\n")
 		local i, filename = ""
 		for i = 7 to objname.count do
-			filename += objname[i]
+		filename += objname[i]
 		filename += ".odd"	
 		return filename
 	)		

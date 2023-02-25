@@ -32,6 +32,8 @@ struct btlc_MdlIde
 (
 	Id = 0,
 	MdlName = undefined,
+	Renamed = false,
+	OrgName = undefined,
 	Txd = "none",
 	DrawDist = 100,
 	Flag = 0,
@@ -76,10 +78,10 @@ struct  Btlc_ModelConvert
 			--if the wdr has no texture archive, give it one (IMg name + txd)
 			if Itemdef.Txd == "null" then  Itemdef.Txd = (substring ImageName  1 10 ) + "txd"
 
-			TheTextures = (getfiles (ImportPath + "\\wdr\\" +  Itemdef.MdlName + "\\" +  "*.dds"))
+			TheTextures = (getfiles (ImportPath + "\\wdr\\" +  Itemdef.OrgName + "\\" +  "*.dds"))
 			--print TheTextures
 
-			for Texture in TheTextures do 
+			for Texture in TheTextures do  
 			(
 				MyFilename = getFilenameFile Texture 
 				FilenameNew = substring MyFilename 1 26
@@ -112,6 +114,12 @@ struct  Btlc_ModelConvert
 					Ide[IdObj] = btlc_MdlIde();
 					Ide[IdObj].Id = IDCurr
 					Ide[IdObj].MdlName = toLower  (trimLeft(trimRight fl[1]))
+					Ide[IdObj].OrgName = Ide[IdObj].MdlName
+					if Ide[IdObj].MdlName.count > 19 do 
+					(
+						Ide[IdObj].MdlName = btlcUtil.CutNameAdv Ide[IdObj].MdlName
+						Ide[IdObj].Renamed = true
+					)  	
 					Ide[IdObj].Txd =  toLower  (trimLeft(trimRight fl[2])) 
 					Ide[IdObj].DrawDist =  toLower  (trimLeft(trimRight fl[3])) as integer
 					IDCurr = IDCurr + 1 
@@ -129,6 +137,12 @@ struct  Btlc_ModelConvert
 					Ide[IdObj] = btlc_MdlIde();
 					Ide[IdObj].Id = IDCurr
 					Ide[IdObj].MdlName = toLower  (trimLeft(trimRight fl[1]))
+					Ide[IdObj].OrgName = Ide[IdObj].MdlName
+					if Ide[IdObj].MdlName.count > 19 do 
+					(
+						Ide[IdObj].MdlName = btlcUtil.CutNameAdv Ide[IdObj].MdlName
+						Ide[IdObj].Renamed = true
+					)  	
 					Ide[IdObj].Txd =  toLower  (trimLeft(trimRight fl[2])) 
 					Ide[IdObj].DrawDist =  toLower  (trimLeft(trimRight fl[4])) as integer
 					IDCurr = IDCurr + 1 
@@ -251,7 +265,7 @@ struct  Btlc_ModelConvert
 
 		TheDmgMain
 	),
-
+ 
 	fn oft_CleanUp TheStructNode = 
 	(
 		AllNodes = get_all_nodes TheStructNode
@@ -423,7 +437,7 @@ struct  Btlc_ModelConvert
 			(
 				local dr = ofio_iv_odr()
 				dr.read(AModel)
-				ThisObj =  dr.build()
+				ThisObj =  dr.build AdvCutName:true
 
 				ThisObj.pos = [(posX*10), (posY * 10), 0]
 				posX = posX + 1;
