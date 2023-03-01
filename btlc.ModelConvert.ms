@@ -265,6 +265,32 @@ struct  Btlc_ModelConvert
 
 		TheDmgMain
 	),
+
+	fn oft_combineMesh TheMainNode = 
+	(
+		BreakNode = copy TheMainNode
+		BreakNode.name = BreakNode.name + "_b"
+		BreakNode.parent = TheMainNode
+		setUserProp BreakNode "breakmdl" "breakable"
+
+		TheMeshNodes = get_all_nodes TheMainNode
+		for obj in TheMeshNodes do 
+		(
+			
+			if (isValidNode obj) != true or  obj == TheMainNode or  obj == BreakNode  then continue 
+			if  classof obj == Editable_mesh then 
+			(
+				objb = copy obj name:(obj.name + "_b")
+				objb.Material = copy objb.Material
+
+				meshop.attach BreakNode objb attachMat:#IDtoMat condenseMat:false
+
+				converttomesh obj
+				meshop.attach TheMainNode obj attachMat:#matToID condenseMat:true
+			)
+		)
+		TheMainNode
+	),
  
 	fn oft_CleanUp TheStructNode = 
 	(
@@ -343,6 +369,7 @@ struct  Btlc_ModelConvert
 		)
 
 		-- Build damage mesh
+		dummyObj = undefined
 		if (oft_IsDamagable TheMainNode) == true then 
 		(
 			TheDmgMain = oft_BuildDamageMdl TheMainNode
@@ -355,17 +382,8 @@ struct  Btlc_ModelConvert
 			TheDmgMain.parent = dummyObj
 		)
 		-- combine into one mesh
-		TheMeshNodes = get_all_nodes TheMainNode
-		for obj in TheMeshNodes do 
-		(
-			if (isValidNode obj) != true or  obj == TheMainNode then continue 
-			if  classof obj == Editable_mesh then 
-			(
-				-- if obj.name[obj.name.count ]  ==  "d" do continue -- do not attach damaged parts. maybe we implement damaged models at SOME point....
-				converttomesh obj
-				meshop.attach TheMainNode obj  attachMat:#IDToMat condenseMat:true
-			)
-		)
+		 oft_combineMesh TheMainNode 
+
 		-- delete dummies.  
 		for theobj in deleteNode do if isValidNode theobj do  delete theobj
 		
@@ -383,6 +401,20 @@ struct  Btlc_ModelConvert
 			)
 		)
 
+		if dummyobj != undefined then 
+		(
+			TopNode =  dummyobj
+		)
+		else
+		(
+			TopNode =  TheMainNode
+		)
+
+		Allnodes = get_all_nodes TopNode
+		for Node in Allnodes do 
+		(
+			Node.name =	btlcUtil.CutNameAdv Node.name
+		)
 
 	),
 
@@ -396,13 +428,14 @@ struct  Btlc_ModelConvert
 				with redraw off
 				(
 					local oft = ofio_iv_oft()
+					OftMainNode = undefined;
 					--ofioLog.start()
 					try ( 
 						local start_time = timeStamp()
 						ofioLog.print "reading input file"
 						oft.read(input_oft_file_name)
 						ofioLog.print "building"
-						oft.build()
+						OftMainNode = oft.build()
 						ofioLog.print ("oft import succeed, elapsed " + ( ( (timeStamp() - start_time) / 1000.0 ) as String ) + " seconds")
 						gc()
 					) catch
@@ -415,10 +448,17 @@ struct  Btlc_ModelConvert
 					oft = undefined
 
 					--Clean up
+					/*
 					TheStructName = getFilenameFile input_oft_file_name
+					TheStructName = btlcUtil.CutNameAdv TheStructName
 					TheStructName = "ft_" + TheStructName
-					TheStructNode = (getNodeByName TheStructName)
-					oft_CleanUp TheStructNode 
+					TheStructNode = (getNodeByName TheStructName) 
+					*/
+					if OftMainNode != undefined do 
+					(
+						oft_CleanUp OftMainNode 
+					)
+					
 
 				)
 			)			
@@ -457,21 +497,33 @@ struct  Btlc_ModelConvert
 	fn ImportObd = 
 	(
 		descriptor = undefined;
-		Filepath = ImportPath +  "\\" +(filenameFromPath ImportPath)
+		dummyObj = undefined;
+		Filepath = ImportPath +  "\\" --+(filenameFromPath ImportPath)
 		try 
-		(
-			ObdFile = (getfiles (Filepath  + ".obd"))
-			local bd = ofio_iv_obd()
-			bd.read(ObdFile[1])
-			descriptor = bd.build()
-		--	for TheObj in descriptor.children do btlcIVColConvert.ConvertObd TheObj;
+		( 		
+			ObdFiles = (getfiles (Filepath  + "*.obd"))
+			if ObdFiles != undefined do 
+			(
+				dummyObj = Dummy() 
+				dummyObj.Name = "bd_" + (filenameFromPath ImportPath)
+				dummyObj.boxsize = [1, 1, 1]
+			
+				for ObdFile in ObdFiles do 
+				(
+					local bd = ofio_iv_obd()
+					bd.read(ObdFile)
+					descriptor = bd.build()
+					for Child in descriptor.children do Child.parent = dummyObj
+					delete descriptor
+				)
+			) 
 		)
 		catch 
 		(
 			print "Error while converting .obd file. Maybe missing?"
 		)
 
-		descriptor
+		dummyObj
 	),
 
 	fn MatchOdrtoCol ColContainer = 
@@ -488,13 +540,13 @@ struct  Btlc_ModelConvert
 				(
 					Col.parent = mdl
 					Col.pos = mdl.pos
-
-				--bb_Mdl = nodeGetBoundingBox TheModel TheModel.transform;
-				--	bb_Col = nodeGetBoundingBox Col Col.transform;
-				--Delta = bb_Mdl[1] - bb_Col[1];
-					--print Delta
-					--Col.pivot =   Col.pivot - Delta
-
+					for ColChild in Col.children do 
+					(
+						ColChild.parent = mdl
+					)
+					CenterOfMass = getUserProp Col  "CenterOfMass"
+					setUserProp mdl "CenterOfMass" CenterOfMass
+					if  classof Col == Dummy do delete Col
 				) 
 			)
 		)
@@ -515,6 +567,9 @@ struct  Btlc_ModelConvert
 
 			if ColContainer != undefined do 
 			(
+				Objs = ColContainer.children
+				for TheObj in Objs do btlcIVColConvert.ConvertObd TheObj;
+
 				MatchOdrtoCol ColContainer
 			) 
 		)
@@ -690,10 +745,10 @@ function btlc_GUIModelConvert =
 		button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:35 align:#center tooltip:"Export the models" 
 		on btn_ReinitTxdDb pressed do 
 		(
-			GenericTxdPath =  btlcConfig.GenericTexDir
-			ImportPath =  btlcConfig.CurrentModelConvPath
-			ExportPath =  btlcConfig.CurrentModelConvPathSA
-			InitTexDb()
+			btlcModelConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			btlcModelConvert.ImportPath =  btlcConfig.CurrentModelConvPath
+			btlcModelConvert.ExportPath =  btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.InitTexDb()
 			gc();	
 		)
 

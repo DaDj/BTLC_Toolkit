@@ -25,6 +25,7 @@ struct Btlc_Modelexport
             for Child in TheChilds do 
             (
                 if (btlcCol.isCol Child) == true do  Child.parent = undefined  -- unparent Collsions for export
+                if (getUserProp Child "breakmdl") == "breakable"  do  Child.parent = undefined  -- unparent breakable for export
             ) 
                 select obj
             -- print dir

@@ -116,6 +116,7 @@ struct ofio_iv_bound_container (
 				if CentroidPresent == 1 then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
 				setUserProp boundObject "margin" bound.Margin
+				setUserProp boundObject "CenterOfMass" CenterOfMass
 				-- mtl
 				local material = iv_col_material()
 				material.mtlid = bound.Material[1]
@@ -129,6 +130,7 @@ struct ofio_iv_bound_container (
 				boundObject.name = btlcUtil.CutNameAdv name	
 				if CentroidPresent == 1 then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
+				setUserProp boundObject "CenterOfMass" CenterOfMass
 				-- mtl
 				local material = iv_col_material()
 				material.mtlid = bound.Material[1]
@@ -142,6 +144,7 @@ struct ofio_iv_bound_container (
 				boundObject.name = btlcUtil.CutNameAdv name	
 				if CentroidPresent == 1 then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
+				setUserProp boundObject "CenterOfMass" CenterOfMass
 				-- mtl
 				local material = iv_col_material()
 				material.mtlid = bound.Material[1]
@@ -176,7 +179,7 @@ struct ofio_iv_bound_container (
 				if compositeIndependent == true then boundObject.pos = Centroid
 				setUserProp boundObject "type" type
 				setUserProp boundObject "margin" bound.Margin
-				setUserProp boundObject "centerofmass" CenterOfMass
+				setUserProp boundObject "CenterOfMass" CenterOfMass
 				local i
 				for i = 1 to bound.Children.count do
 				(
@@ -198,7 +201,7 @@ struct ofio_iv_bound_container (
 				convertTo boundObject (Editable_Poly)
 				setUserProp boundObject "type" type
 				setUserProp boundObject "margin" bound.Margin
-				setUserProp boundObject "centerofmass" CenterOfMass
+				setUserProp boundObject "CenterOfMass" CenterOfMass
 				local i, j
 				-- create materials
 				local mmat = multimaterial numsubs:bound.Materials.count
@@ -240,7 +243,9 @@ struct ofio_iv_bound_container (
 				
 				-- world pos
 				boundObject.pivot = 	boundObject.pivot - bound.VertexOffset;
-				print bound.VertexOffset
+				ResetXForm boundObject
+				collapsestack boundObject
+				--print bound.VertexOffset
 				boundObject.pos = bound.VertexOffset
 			)
 			default: throw ("unknown bound type " + type)		

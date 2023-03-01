@@ -56,6 +56,32 @@ struct btlc_utils
 			TheName = substring TheName 1 19
 		)
 		TheName
+	),
+
+	fn attachMeshKeepMatIds obj1 obj2 = 
+	(
+		matIds = #()
+		
+		faceIndex = 0
+		
+		for i=1 to getNumFaces obj1 do
+		(
+			faceIndex = faceIndex + 1
+			matIds[faceIndex] = getFaceMatID obj1 i
+		)
+		
+		for i=1 to getNumFaces obj2 do
+		(
+			faceIndex = faceIndex + 1
+			matIds[faceIndex] = getFaceMatID obj2 i
+		)
+		
+		meshop.attach obj1 obj2
+		
+		for i=1 to getNumFaces obj1 do
+		(
+			setFaceMatID obj1 i matIds[i]
+		)	
 	)
 )
 btlcUtil = btlc_utils();

@@ -1060,7 +1060,7 @@ struct ofio_iv_oft (
 	),
 	
 	fn build = (	
-		drawable.build skinned_as_chunked:true Load_Bones:true AdvCutName:true
+		drawable.build skinned_as_chunked:true Load_Bones:true AdvCutName:false
 		g_ft_skel = drawable.skel_obj
 		
 		local root_bone_name = g_ft_skel.rootBone.name
@@ -1091,7 +1091,8 @@ struct ofio_iv_oft (
 		setUserProp d "buoyancyFactor" buoyancyFactor
 		setUserProp d "flags" flags
 		
-		select d
+		--select d
+		d
 	),
 	
 	fn clean_globals = (

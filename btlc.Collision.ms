@@ -240,7 +240,8 @@ struct Btlc_Collision
 	(
 		isit = false
 		if ((isProperty obj #isShadow ) == true) or ((custattributes.get obj TheColMesh) == true) then isit =true
-
+		if classof obj == Collision_Box then isit = true
+		if classof obj ==Collision_Sphere then isit = true 
 		isit
 	),
 
@@ -400,6 +401,12 @@ struct btlc_IvBoundtoCol
 					else meshop.attach MakeAsMesh Child attachMat:#IDToMat condenseMat:true
 				)
 			)	
+			
+			if MakeAsMesh != undefined do 
+			(
+				MakeAsMesh.pivot = theobj.pos
+				resetxform MakeAsMesh
+			)
 		)
 
 		if 	BoundType == "boundbvh" or \
@@ -417,13 +424,12 @@ struct btlc_IvBoundtoCol
 btlcIVColConvert = btlc_IvBoundtoCol();
 
 /* Testscript
-Objs = selection[1].children
+	Objs = selection[1].children
 
-for TheObj in Objs do 
-( 
-	print TheObj.name
-	btlcIVColConvert.ConvertObd TheObj;
-	print "________"
-) 
-
+	for TheObj in Objs do 
+	( 
+		print TheObj.name
+		btlcIVColConvert.ConvertObd TheObj;
+		print "________"
+	) 
 */
