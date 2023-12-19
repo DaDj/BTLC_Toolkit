@@ -40,6 +40,54 @@ struct Btlc_Effect2D
 		--	format "Read particle system %: %\n" pcounter parname
 			pcounter=pcounter+1
 		)
+	),
+
+	
+	fn write2dfxLight f light = (
+		pad=1
+		if (light.enLookDirection) then pad+=1
+		writeColor f (light.color) 200
+		writeFloat f light.coronaFarClip
+		writeFloat f light.pointlightRange
+		writeFloat f light.coronaSize
+		writeFloat f light.shadowSize
+		writeByteIndex f light.coronaShowMode
+		refl=0
+		if light.coronaEnableReflection then refl=1
+		writeByte f refl
+		writeByteIndex f light.coronaFlareType
+		writeByte f light.shadowColorMultiplier
+		writeByte f (bitMask #(light.CHECK_OBSTACLES, light.FOG_TYPE, light.FOG_TYPE2, light.WITHOUT_CORONA, light.CORONALONG_DISTANCE, light.AT_DAY, light.AT_NIGHT, light.BLINKING1))
+		writeLimitedString f light.coronaTexName 24
+		writeLimitedString f light.shadowTexName 24
+		writeByte f light.shadowZDistance
+		writeByte f (bitMask #(light.CORONA_ONLY_FROM_BELOW, light.BLINKING2, light.UDPDATE_HEIGHT, light.CHECK_DIRECTION, light.BLINKING3))
+		if (light.enLookDirection) then (
+			writeByte f light.lookDirection_x
+			writeByte f light.lookDirection_y
+			writeByte f light.lookDirection_z
+		)
+		writePadding f pad
+	),
+
+	fn write2dfx f effects = (
+		--start=writeHeader f 39056120 0x1803FFFF
+		writeLong f effects.count
+		for e in effects do (
+			pos=(in coordsys parent e.position)
+			writeVertex f pos
+			type=e.dfxType
+			writeLong f type
+			writeLong f (e.getSize())
+			case type of (
+				0: write2dfxLight f e
+				1: writeLimitedString f e.effectName 24 --Particles
+				7: write2dfxSign f e
+				8: writeLong f e.index -- trigger point
+				10: write2dfxEscalator f e pos
+			)
+		)
+		--rewriteSectionSize f start
 	)
 )
 
@@ -47,7 +95,12 @@ btlcEffect2D = Btlc_Effect2D()
 btlcEffect2D.LoadIni()
 
 
-Btlc_2dfxLight =  attributes "Effect2d_Light"  attribID:#(0x4b285f86, 0x18daf1df)
+plugin light GTA_OmniLight
+name:"GTA OmniLight"
+classID:#(0x6b8c0112, 0x56eb092d)
+extends:freespot
+category:"GTA 2dfx"
+replaceUI:false
 (
 	parameters main rollout:params
 	(
@@ -58,6 +111,7 @@ Btlc_2dfxLight =  attributes "Effect2d_Light"  attribID:#(0x4b285f86, 0x18daf1df
 		coronaShowMode  type:#integer ui:spcoronaShowMode default:0
 		coronaEnableReflection  type:#integer ui:spcoronaEnableReflection default:1
 		coronaFlareType  type:#float ui:spcoronaFlareType default:1
+		shadowColorMultiplier	type:#integer default:40 ui:mul
 
 		CHECK_OBSTACLES type:#boolean default:true ui:chCORONA_CHECK_OBSTACLE --CORONA_CHECK_OBSTACLES
 		FOG_TYPE type:#boolean default:false ui:chFOG_TYPE --FOG_TYPE1
@@ -78,17 +132,25 @@ Btlc_2dfxLight =  attributes "Effect2d_Light"  attribID:#(0x4b285f86, 0x18daf1df
 		UDPDATE_HEIGHT type:#boolean default:true ui:chUDPDATE_HEIGHTGROUND --UDPDATE_HEIGHT_ABOVE_GROUND
 		CHECK_DIRECTION type:#boolean default:false ui:chCHECK_DIRECTION--CHECK_DIRECTION
 		BLINKING3 type:#boolean default:false ui:chBLINKING3 --BLINKING3
+
+		enLookDirection type:#boolean default:false ui:en
+		lookDirection_x	type:#integer default:0 ui:x
+		lookDirection_y	type:#integer default:0 ui:y
+		lookDirection_z	type:#integer default:0 ui:z
+
+		dfxType	type:#integer default:0
 	)
 	
 	rollout params "GTA Light Parameters"
 	(
-		spinner spcoronaFarClip "coronaFarClip" type: #float
-		spinner sppointlightRange "pointlightRange" type: #float
-		spinner spcoronaSize "coronaSize" type: #float
-		spinner spshadowSize "shadowSize" type: #float
+		spinner spcoronaFarClip "coronaFarClip" type: #float fieldwidth:30
+		spinner sppointlightRange "pointlightRange" type: #float fieldwidth:30
+		spinner spcoronaSize "coronaSize" type: #float fieldwidth:30
+		spinner spshadowSize "shadowSize" type: #float fieldwidth:30
+		spinner	mul	  "Shadowcolor mult" fieldwidth:30 type:#integer range:[0,255,40]
 		
-		spinner spcoronaFlareType "coronaFlareType" type: #integer range:[0,1,0]
-		spinner spDistance "shadowZDistance" type: #float
+		spinner spcoronaFlareType "coronaFlareType" type: #integer range:[0,1,0] fieldwidth:30
+		spinner spDistance "shadowZDistance" type: #float fieldwidth:30
 		dropdownlist spcoronaTexName "coronaTexName" selection:25 items:btlcEffect2D.fx_images
 		dropdownlist spshadowTexName "shadowTexName" selection:11 items:btlcEffect2D.fx_images
 
@@ -120,7 +182,12 @@ Btlc_2dfxLight =  attributes "Effect2d_Light"  attribID:#(0x4b285f86, 0x18daf1df
 			checkbox  chBLINKING3 "BLINKING3" tooltip:"BLINKING3"
 		)
 		
-
+		group "Look direction" (
+			checkbox en "Enable"
+			spinner	x "X" fieldwidth:30 type:#integer range:[-128,127,0] 
+			spinner	y "Y" fieldwidth:30 type:#integer range:[-128,127,0] 
+			spinner	z "Z" fieldwidth:30 type:#integer range:[-128,127,0] 
+		)
 		on params open do 
 		(
 			spcoronaShowMode.selection = coronaEnableReflection 
@@ -139,247 +206,22 @@ Btlc_2dfxLight =  attributes "Effect2d_Light"  attribID:#(0x4b285f86, 0x18daf1df
 		)		
 
 	)
-)
 
-
-
-struct Btlc_2dEffect 
-(   
-	inipath = "",
-
-	fn Init = 
-	(
-		scriptPath = (GetDir #userScripts )
-		inipath = scriptPath + "\\data\\saparticle.ini"
-	),
-	fn IsEffect obj = 
-	(
-		Is2dfx = false;
-		--make sure only appropriate objects are selected, and that they have parameters to export
-		if superclassof(obj) == light then
-		(
-			numattribs = custAttributes.count obj --count em up!
-			if numattribs != 0 then --more than 0!
-			(
-				for a=1 to numattribs do
-				(
-					--check the attribute type
-					custAttributes.get obj a
-					attribtype = (custAttributes.getDef obj a).name
-					if attribtype != undefined then --it HAS to have a name!
-					(
-						if attribtype == #fxdata_light then   Is2dfx = true;
-					)--end undefined attribtype name (attributes added with paramter editor)
-				)--end for
-			)--end if
-		)
-		else
-		if classof(obj) == Dummy then
-		(
-			numattribs = custAttributes.count obj --count em up!
-			if numattribs != 0 then --more than 0!
-			(
-				for a=1 to numattribs do
-				(
-					--check the attribute type
-					custAttributes.get obj a
-					attribtype = (custAttributes.getDef obj a).name
-					if attribtype != undefined then --it HAS to have a name!
-					(
-						if attribtype == #fxdata_particle then   Is2dfx = true;	
-					)--end undefined attribtype name (attributes added with paramter editor)
-				)--end for
-			)--end if
-		)
-
-	),
-
-	fn GetforObject Theobj  = 
-	(
-		objtoexp = #()
-		for obj in Theobj.children do 
-		(
-			if  IsEffect obj == true then append objtoexp obj
-		)
-		objtoexp
-	),
-	
-	fn Exportsection TheSec Filename =  
-	(
-		--effect types
-		local effectlight = 0x00 --light info
-		local effectparticle = 0x01 --particle system name
-		--0x02 n/a
-		local effectcard = 0x03 --for playing cards? also photo op places?
-		--0x04 n/a
-		--0x05 n/a
-		local effect_6 = 0x06 --unknown
-		local effecttext = 0x07 --2d sign text
-		local effect_8 = 0x08 --used by slot machine wheels/scripted objects?
-		local effect_9 = 0x09 --unknown, used alot (carter-column, stadium_sfse)
-		local effectescalator = 0x0a --seems to be used only on escalators
-		
-		--objects have been collected, time to start the export process
-		effectstream=fopen Filename "wb"
-		--write file header info here
-		writelong effectstream TheSec.count
-
-		for obj in TheSec do
-		(
-			--print obj.name
-			--determine object type, to know which info to write
-			if superclassof(obj) == light then
-			(
-				--gather light info
-				--declare data size for later use
-				datsize = 0
-				local tex1 = obj.sdfx_corona
-				local tex2 = obj.sdfx_shad
-				--determine light type
-				local lightparam1
-				local lightparam2
-				local lightparam3
-				(
-					--format "Light Type: % \n" obj.sdfx_lighttype
-					--do as a for loop
-					--for light=1 to num light types
-					for light = 1 to lightcount do
-					(
-						if obj.sdfx_lighttype == light then
-						(
-							--0 = mlampost
-							lightparam1 = (getINISetting inipath lighttypes ("type" + (light as string) + "_param1")) as integer
-							lightparam2 = (getINISetting inipath lighttypes ("type" + (light as string) + "_param2")) as integer
-							lightparam3 = (getINISetting inipath lighttypes ("type" + (light as string) + "_param3")) as integer
-						)
-					)
-				)
-				--position
-				posx = in coordsys parent obj.pos.x
-				posy = in coordsys parent obj.pos.y
-				posz = in coordsys parent obj.pos.z
-				--colour
-				lightred=obj.rgb.r
-				lightgreen=obj.rgb.g
-				lightblue=obj.rgb.b
-				lightcolx = obj.sdfx_color4
-				datsize = datsize + 4
-				--draw dist, size, etc
-				drawdist = obj.sdfxdrawdis
-				outerrange = obj.sdfxouterrange
-				lightsize = obj.sdfxsize
-				innerrange = obj.sdfxinnerrange
-				lightparam1 = lightparam1--light1
-				lightparam2 = lightparam2 --light2
-				datsize = datsize + 21
-				--image1
-				datsize = datsize + (tex1.count)
-				padding = 13 --write 14 bytes, subtract one byte for text
-				datsize = datsize + 14
-				--image2
-				datsize = datsize + (tex2.count)
-				padding2 = 14 --write 15 bytes, subtract one byte for text
-				datsize = datsize + 19
-				lightparam3 = lightparam3 --light2
-				datsize = datsize + 4
-				
-				--write light info
-				writefloat effectstream posx
-				writefloat effectstream posy
-				writefloat effectstream posz
-				writelong effectstream effectlight
-				writelong effectstream datsize
-				datsizepos = ftell effectstream
-				--write light data
-				writebyte effectstream lightred
-				writebyte effectstream lightgreen
-				writebyte effectstream lightblue
-				writebyte effectstream lightcolx
-				writefloat effectstream drawdist
-				writefloat effectstream outerrange
-				writefloat effectstream lightsize
-				writefloat effectstream innerrange
-				writelong effectstream lightparam1
-				writebyte effectstream lightparam2
-				writestring effectstream tex1
-				for pad1=1 to padding do
-				(
-					writebyte effectstream 0
-				)
-				writestring effectstream tex2
-				for pad2=1 to padding2 do
-				(
-					writebyte effectstream 0
-				)
-				writelong effectstream lightparam3
-				writelong effectstream 25600
-				
-				format "Exported GTA light info on %\n" obj.name
-			)
-			else
-			if classof(obj) == Dummy then
-			(
-				--get type info, need to determine what attributes are on dummy
-				numattribs = custAttributes.count obj --count em up!
-				if numattribs != 0 then --more than 0!
-				(
-					for a=1 to numattribs do
-					(
-						--check the attribute type
-						custAttributes.get obj a
-						attribtype = (custAttributes.getDef obj a).name
-						if attribtype != undefined then --it HAS to have a name!
-						(
-							if attribtype == #fxdata_particle then
-							(
-								--append objtoexp obj
-								--position
-								posx = in coordsys parent obj.pos.x
-								posy = in coordsys parent obj.pos.y
-								posz = in coordsys parent obj.pos.z
-								datsize = 0 --zero it to clear size data from last object
-								--string info
-								pstring = obj.sdfx_psys
-								datsize = obj.sdfx_psys.count
-								--datsize = datsize + pstring.count --string + terminator + garbage data is max 24 characters in length
-								--garbage
-								garbagesize = 24 - datsize
-								--write particle info
-								--write light info
-								writefloat effectstream posx
-								writefloat effectstream posy
-								writefloat effectstream posz
-								writelong effectstream effectparticle
-								--writelong effectstream datsize
-								writelong effectstream 24 --fixed size, don't do any more work than necessary?
-								datsizepos = ftell effectstream
-								writestring effectstream pstring --is also writing terminating 00
-								for a=1 to (garbagesize - 1) do
-								(
-									writebyte effectstream 00
-								)
-								format "Exported GTA Particle info on %\n" obj.name
-							)
-						)--end undefined attribtype name (attributes added with paramter editor)
-					)--end for
-				)
-			)
-			fclose effectstream
-		)
-	),
-
-	fn ExportModel obj Dirname = 
-	(
-		Obj_Effectsection  =  GetforObject obj
-	),
-
-	fn Exportall DirName = 
-	(
-
-	),
-
-	fn dfxRollout = 
-	(
-
+	fn getSize= (
+		if enLookDirection then return 80
+		return 76
 	)
+	
+	tool create
+	(
+		on mousePoint click do
+		(
+			nodeTM.translation = gridPoint;#stop
+		)
+	)
+	
+
 )
+
+
+

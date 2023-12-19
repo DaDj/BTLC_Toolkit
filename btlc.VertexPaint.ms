@@ -8,7 +8,7 @@ struct btlc_VertexPaint
         for f=1 to Obj.numfaces where (getFaceMatID Obj f) == MtlID do 
         (
             meshop.setFaceColor Obj ch_Night f  (color 255 255 255 255)
-            meshop.setFaceColor Obj ch_Day f (color 255 255 255 255)
+         --   meshop.setFaceColor Obj ch_Day f (color 255 255 255 255) --should we do the day prelight? looks a little bit weird to be honest
         )
     ),
 

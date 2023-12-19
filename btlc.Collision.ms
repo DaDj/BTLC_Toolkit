@@ -263,7 +263,7 @@ struct Btlc_Collision
 		myobjects = MyObjs
 		free allNames
 
-		if myobjects.count>0 then 
+		if myobjects.count > 0 then 
 		(
 			f = fopen Filepath "wb"
 			if f != undefined then 

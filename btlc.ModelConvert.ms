@@ -64,10 +64,9 @@ struct  Btlc_ModelConvert
 	(
 		TheTxdDir = ExportPath + "\\txd"
 		ImageName =  filenameFromPath ExportPath
-		
 
 		-- Copy normal txd folders first
-		-- delte old txd folder. (gtaconverter hangs up for soemreason if already here.
+		-- delte old txd folder. (gtaconverter hangs up for some reason if already existing.
 		sioDir = dotNetClass "System.IO.Directory"
 		if (SIODir.Exists TheTxdDir) do SIODir.Delete (TheTxdDir) true -- kinda unsafe just deletes stuff.
 		btlcDataConverter.CopyTextures ("\"" + ImportPath + "\\wtd" + "\"") ("\"" + ExportPath + "\\txd" + "\"");
@@ -90,8 +89,6 @@ struct  Btlc_ModelConvert
 				makeDir  (getFilenamePath NewPath)
 				copyFile Texture NewPath
 			)
-			
-
 		)
 	),
 
@@ -291,7 +288,7 @@ struct  Btlc_ModelConvert
 		)
 		TheMainNode
 	),
- 
+	
 	fn oft_CleanUp TheStructNode = 
 	(
 		AllNodes = get_all_nodes TheStructNode
@@ -382,7 +379,7 @@ struct  Btlc_ModelConvert
 			TheDmgMain.parent = dummyObj
 		)
 		-- combine into one mesh
-		 oft_combineMesh TheMainNode 
+		oft_combineMesh TheMainNode 
 
 		-- delete dummies.  
 		for theobj in deleteNode do if isValidNode theobj do  delete theobj
@@ -415,54 +412,45 @@ struct  Btlc_ModelConvert
 		(
 			Node.name =	btlcUtil.CutNameAdv Node.name
 		)
-
+		TopNode
 	),
 
-	fn ImportOft Path = 
+	fn ImportOft = 
 	(
-		local input_oft_file_name = getOpenFileName caption:"Select GTA IV *.oft file" types:"gta iv open formats fragments (*.oft)|*oft"
-		if (input_oft_file_name != undefined) and (getFileSize input_oft_file_name) > 0 then
+		TheModels = (getfiles (ImportPath + "\\wft\\" + "*.oft"))
+
+		posX = 0;
+		posY = 0;
+
+		for AModel in TheModels do 
 		(
-			with undo off
+			try 
 			(
-				with redraw off
+				ThisObj = undefined
+				local oft = ofio_iv_oft()
+
+				oft.read(AModel)
+				ThisObj = oft.build()
+
+				if ThisObj != undefined do ThisObj = oft_CleanUp ThisObj 
+
+				ThisObj.pos = [-(posX*10)-10, (posY * 10), 0]
+
+				posX = posX + 1;
+				if posX == 11 do 
 				(
-					local oft = ofio_iv_oft()
-					OftMainNode = undefined;
-					--ofioLog.start()
-					try ( 
-						local start_time = timeStamp()
-						ofioLog.print "reading input file"
-						oft.read(input_oft_file_name)
-						ofioLog.print "building"
-						OftMainNode = oft.build()
-						ofioLog.print ("oft import succeed, elapsed " + ( ( (timeStamp() - start_time) / 1000.0 ) as String ) + " seconds")
-						gc()
-					) catch
-					(
-						ofutils.showException()
-						oft.cleanup()
-						ofioLog.print "IMPORT ERROR !"
-					)
-					--ofioLog.finish()
-					oft = undefined
-
-					--Clean up
-					/*
-					TheStructName = getFilenameFile input_oft_file_name
-					TheStructName = btlcUtil.CutNameAdv TheStructName
-					TheStructName = "ft_" + TheStructName
-					TheStructNode = (getNodeByName TheStructName) 
-					*/
-					if OftMainNode != undefined do 
-					(
-						oft_CleanUp OftMainNode 
-					)
-					
-
+					posX = 0;
+					posY = posY + 1
 				)
-			)			
-		)		
+			)
+			catch 
+			(
+				print "Error while importing .oft files."
+				print AModel
+				--oft.cleanup()
+			)
+		)
+		--
 	),
 
 	fn ImportOdr =
@@ -507,7 +495,7 @@ struct  Btlc_ModelConvert
 				dummyObj = Dummy() 
 				dummyObj.Name = "bd_" + (filenameFromPath ImportPath)
 				dummyObj.boxsize = [1, 1, 1]
-			
+				
 				for ObdFile in ObdFiles do 
 				(
 					local bd = ofio_iv_obd()
@@ -550,7 +538,8 @@ struct  Btlc_ModelConvert
 				) 
 			)
 		)
-		 
+		delete ColContainer
+		
 	),
 
 	fn StartImport = 
@@ -562,6 +551,7 @@ struct  Btlc_ModelConvert
 			ConvertIde IDEFILE[1] 
 			CopyTxds();
 			InitTexDb();
+			ImportOft();
 			ImportOdr();
 			ColContainer = ImportObd();
 
@@ -779,7 +769,7 @@ function btlc_GUIModelConvert =
 	try (closeRolloutFloater btlcIdeModelsFloater) catch ()
 	Pos = getMaxWindowSize() 	
 	PosX = Pos[1]/2 - 300
-	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
+	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Model Convert" 620 400 PosX 250
 	addRollout  DirSettings btlcIdeModelsFloater
 	addRollout  ModelConvert btlcIdeModelsFloater
 	addRollout  Model_Utils btlcIdeModelsFloater

@@ -235,6 +235,7 @@ rollout btlcUtility  "BTLC Toolkit"
 	button btn_VertexAlphaday "Alpha2" width:50 align:#center across:2
 
 	checkbutton btn_map "Map" width:100 align:#center across:1
+	hyperLink link_doc "Help" address:"https://btlcdoc.ratpool.de/"
 
 	on btn_ShowCollision pressed do 
 	(

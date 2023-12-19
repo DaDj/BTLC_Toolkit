@@ -37,7 +37,7 @@
 - Collision Generator for dynamic objects 
 
 ## Planned
-- Path Toaolkit
+- Path Toolkit
 - Animation Toolkit
 - UV Animation converter
 
@@ -50,7 +50,7 @@ This toolchain is a combination of max scripts and external tool.
 The model conversion mostly works by using the openformats models and imports them with an modified ofio script. 
 
 Here the materials get directly set as RW material with env and opacity maps supported. Afterwards the materials get resorted to always have alpha textures on the highest material id. This assures that this material is rendered last. (Would cause alpha bugs otherwise). 
-At import the prelight gets also modified. The vertex paint is made 30% darker to have better visual rendering in gta sa. For night the prelight is made 90% darker. By looking at the iv shader names materials which have "emissive" shader are painted white at night. 
+At import the prelight gets also modified. The vertex paint is made 30% darker to have better visual rendering in gta sa. For night the prelight is made 90% darker. By looking at the iv shader names, materials which have "emissive" shader, are painted white at night. 
 Additionally a radiosity vertex paint can be used for nice night prelight which generates lightning using the 2dfx lights in the models. This is applied on to the already existing night prelight with screen blend mode.
 
 Export works by using the rw importer/exporter by aap. This exports the models to .dff.

@@ -28,7 +28,7 @@ fn computeConvexHull theNode maxVerts:64 pushAmt:-10.0 cleanup:true =
     hull
 )
 
-fn CreatDynamicCol ObjectMesh maxVert:8 push:-10.0= 
+fn CreatDynamicCol ObjectMesh maxVert:8 push:-5.0= 
 (
    TheHull =  computeConvexHull ObjectMesh maxVerts:maxVert pushAmt:push
    TheHull.parent = ObjectMesh
@@ -39,7 +39,7 @@ fn CreatDynamicCol ObjectMesh maxVert:8 push:-10.0=
    (
     Thepos = meshop.getVert TheHull idx_vert
     s= Collision_Sphere  pos:Thepos
-    s.delegate.radius = 0.1
+    s.delegate.radius = 0.05
     s.name = TheHull.name+"_sp" 
     s.wirecolor =  color 50 210 250
     s.parent = ObjectMesh
