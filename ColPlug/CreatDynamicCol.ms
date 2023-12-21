@@ -28,7 +28,7 @@ fn computeConvexHull theNode maxVerts:64 pushAmt:-10.0 cleanup:true =
     hull
 )
 
-fn CreatDynamicCol ObjectMesh maxVert:8 push:-5.0= 
+fn CreatDynamicCol ObjectMesh maxVert:16 push:-5.0= 
 (
    TheHull =  computeConvexHull ObjectMesh maxVerts:maxVert pushAmt:push
    TheHull.parent = ObjectMesh

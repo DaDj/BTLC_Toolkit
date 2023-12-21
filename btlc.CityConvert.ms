@@ -124,12 +124,36 @@ struct Btlc_ConvertCity
         btlcCol.GenerateColMeshes MyObjs
         gc()
     ),
+
+    fn PaintLights = 
+    (
+        start = timeStamp()
+		suspendEditing()
+		with undo off
+		(
+			with redraw off
+			(
+				btlcWorldLightPaint.PaintWorld() -- paint lights of lightsources on main models
+			)
+		)
+		resumeEditing()
+		redrawviews()
+		freeSceneBitmaps() 	
+		gc()
+		end = timeStamp()
+		format "WorldLightsPaint: Processing took % seconds\n" ((end - start) / 1000.0)  
+    ),
     
     fn BuildMap = 
     (
         TheMap.BuildAll();
         local IdeFile = (ExportCityPath  + ".ide")
+        
+        TheMap.PlaceLodModels (ExportCityPath  + "_LOD.ipl")
         ObjDeleteIfUnused IdeFile
+
+        PaintLights();
+        
         start = timeStamp()
         GenerateCollsion();
         end = timeStamp()

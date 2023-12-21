@@ -213,7 +213,7 @@ struct ofio_BTLC_MassOPL
 				btlcMaterial.EnableReflections = false
 				BuildLodModels() -- Load the corresponding LOds
 				btlcMaterial.EnableReflections = true
-				btlcWorldLightPaint.PaintWorld() -- paint lights of lightsources on main models
+				--btlcWorldLightPaint.PaintWorld() -- paint lights of lightsources on main models
 			)
 		)
 		resumeEditing()
