@@ -77,6 +77,8 @@ struct Btlc_ConvertCity
         (
             Filename = filenameFromPath f
             Newpath = ImgPath + "\\" + Filename
+      
+        try(deletefile Newpath)catch(print "error delating file")
             renameFile f Newpath
         )
         for f in files do 
@@ -102,13 +104,13 @@ struct Btlc_ConvertCity
         local IDEFILE = (getfiles (ImportCityPath + ".IDE"))
         local IDStart =  StartId as string
         btlcDataConverter.ConvertIDE ("\"" + IDEFILE[1] + "\"") ("\"" + ExportCityPath + "/" + "\"") IDStart;
-   
+        format "finished ide converter \n"
         /*Placement Converter*/
         btlcDataConverter.ConvertPlacementData ImportCityPath ExportCityPath;
-
+        format "finished opl converter \n"
         /*Copy Textures*/
         btlcDataConverter.CopyTextures ("\"" + ImportCityPath + "\\wtd" + "\"") ("\"" +ExportCityPath + "\\txd" + "\"");
-
+        format "finished Copy textures \n"
         btlcConfig.UpdateCurrentID (ExportCityPath + ".ide")
     ),
 	
@@ -119,7 +121,8 @@ struct Btlc_ConvertCity
         allNames = #() 
         for i in objects do
         (
-        if i.parent == undefined do  append MyObjs i
+            bIsLOd = getUserProp  i  "type" 
+        if i.parent == undefined  do  append MyObjs i
         )
         btlcCol.GenerateColMeshes MyObjs
         gc()
@@ -127,47 +130,80 @@ struct Btlc_ConvertCity
 
     fn PaintLights = 
     (
-        start = timeStamp()
-		suspendEditing()
-		with undo off
-		(
-			with redraw off
-			(
-				btlcWorldLightPaint.PaintWorld() -- paint lights of lightsources on main models
-			)
-		)
-		resumeEditing()
-		redrawviews()
-		freeSceneBitmaps() 	
-		gc()
-		end = timeStamp()
-		format "WorldLightsPaint: Processing took % seconds\n" ((end - start) / 1000.0)  
+        MapPartName =  filenameFromPath ExportCityPath 
+        --autosave.tempDisable = true
+        Numofobj = 0;
+        FailCnt = 0;
+        suspendEditing()
+        do -- run this in a loop, cause with many objects in one go, assignvertexcolors gets slow. maybe this helps a  bit.
+        (
+           
+            with undo off
+            (
+                with redraw off
+                (
+                   Numofobj =  btlcWorldLightPaint.PaintWorld() -- paint lights of lightsources on main models
+                )
+            )
+            freeSceneBitmaps() 	
+            gc()
+            if Numofobj == -1 do  --try to reload scene if painting gets sooooo slow
+            (
+                print "PaintWorld got slow, relaoding scene..."
+                FailCnt = FailCnt  + 1 
+                saveMaxFile MapPartName
+                sleep 5
+                --resetMaxFile() #noPrompt
+                gc()
+                freeSceneBitmaps() -- trying to free up memory
+                gc()
+                loadMaxFile MapPartName quiet:true
+                Numofobj == 1
+            )
+            if Numofobj == 0 do Numofobj = -2
+            print Numofobj
+            if FailCnt > 1 do quitmax #noprompt 
+        ) while Numofobj > -2
+
+        resumeEditing()
+        redrawviews()
+        saveMaxFile MapPartName	
+    --    autosave.tempDisable = false
     ),
     
     fn BuildMap = 
     (
         TheMap.BuildAll();
         local IdeFile = (ExportCityPath  + ".ide")
-        
+        format "Load map\n"
         TheMap.PlaceLodModels (ExportCityPath  + "_LOD.ipl")
         ObjDeleteIfUnused IdeFile
+        format "lod map\n"
 
+        start = timeStamp()
         PaintLights();
-        
+        end = timeStamp()
+		format "WorldLightsPaint: Processing took % seconds\n" ((end - start) / 1000.0)  
+       
+     
         start = timeStamp()
         GenerateCollsion();
         end = timeStamp()
         format "Collision: Processing took % seconds\n" ((end - start) / 1000.0)  
     ),
 
-    fn Import = 
+    fn GenMyData = 
     (
         LoadMap();      -- load map data etc.
         GenerateData(); -- generate data ipl,ide , copy txd etc
+        CleanupFiles();
+    ),
+
+    fn Import = 
+    (
+        GenMyData();
         InitTexDb();    -- Run Texture Database to get correct textures
         BuildMap();      -- Build Map --
-        CleanupFiles();
-
         freeSceneBitmaps();
         gc();
     ),

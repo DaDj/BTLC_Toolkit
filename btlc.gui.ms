@@ -1,5 +1,6 @@
 global btlcCityFloater -- All Controls needed to convert a city part
 global btlcUtilsFloater  -- Utils, mostly what to display/ alphasorting etc.
+global btlcModelToolsFloater
 global btlcPathTools -- Tools for path creation
 global gims_maphlpr --mapdisplay
 function btlc_GUICityConvert = 
@@ -70,7 +71,7 @@ function btlc_GUICityConvert =
 		
 	)
 
-	rollout CityConvert "CityConvert" width:210 height:400
+	rollout MYconvert "CityConvert" width:210 height:400
 	(	
 		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
 
@@ -80,7 +81,7 @@ function btlc_GUICityConvert =
 			btlcConfig.Save() 
 		)
 
-		button btn_ConvertCity "Import City Part" width:110 height:35 align:#center tooltip:"Imports the selected city part" across:5
+		button btn_ConvertCity "Import City Part" width:110 height:35 align:#left tooltip:"Imports the selected city part" across:5
 		on btn_ConvertCity pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -91,7 +92,7 @@ function btlc_GUICityConvert =
 			strtid.value = btlcConfig.CurrentID;
 		)
 
-		button btn_ExportCity "Gen/Export Files" width:110 height:35 align:#center tooltip:"Exports .dff Models & Collision" 
+		button btn_ExportCity "Gen/Export Files" width:110 height:35 align:#left tooltip:"Exports .dff Models & Collision" 
 		on btn_ExportCity pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -100,7 +101,7 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.Export();
 		)
 
-		button btn_GenTxd "Build .Txds" width:110 height:35 align:#center tooltip:"Generates Txds" 
+		button btn_GenTxd "Build .Txds" width:110 height:35 align:#left tooltip:"Generates Txds" 
 		on btn_GenTxd pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -109,7 +110,7 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.BuildTxd();
 		)
 
-		button btn_OpenCol "Open .Col" width:110 height:35 align:#center tooltip:"Opens the .COl File to generate facegroups" 
+		button btn_OpenCol "Open .Col" width:110 height:35 align:#left tooltip:"Opens the .COl File to generate facegroups" 
 		on btn_OpenCol pressed do 
 		(
 			OutputPath = btlcConfig.CurrentExpoSaPAth  + "\\img";
@@ -121,7 +122,7 @@ function btlc_GUICityConvert =
         	ShellLaunch Program Command
 		)
 
-		button btn_GenerateIMG "Build IMG" width:110 height:35 align:#center tooltip:"Builds the final Img File" 
+		button btn_GenerateIMG "Build IMG" width:110 height:35 align:#left tooltip:"Builds the final Img File" 
 		on btn_GenerateIMG pressed do 
 		(
 			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
@@ -131,11 +132,26 @@ function btlc_GUICityConvert =
 
 			btlcImgBuild.BuildImg IniPath OutPath
 		)
-	)
 
-	rollout Map_Utils "Map Utils" width:210 height:400
-	(
-		button btn_ExportCollision "ExportCollision" width:110 height:35 align:#center tooltip:"Export the Collision models" across:4
+		group "Utils"
+		(
+			button btn_ExportCollision "ExportCollision" width:110 height:25 align:#center tooltip:"Export the Collision models" across:5
+	
+			button btn_ExportModels "Export Models" width:110 height:25 align:#center tooltip:"Export the models" 
+
+			button btn_PaintWorld "Paint World" width:110 height:25 align:#center tooltip:"Paint Light on World"
+		
+			button btn_CrtCol "Create Collision" width:110 height:25 align:#center tooltip:"Create Collision for all models in Scene"  
+
+			button btn_GenerateData "Gen Data" width:110 height:25 align:#center tooltip:"Create external Data again" 
+		)
+
+		group "Misc."
+		(
+			button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:25 align:#left tooltip:"Export the models" across:5
+			button btn_Cleanup "Cleanup Files" width:110 height:25 align:#left tooltip:"Cleanup external Files" 
+		)
+
 		on btn_ExportCollision pressed do 
 		(
 			-- Collision Export
@@ -151,7 +167,6 @@ function btlc_GUICityConvert =
 			gc();
 		)
 
-		button btn_ExportModels "Export Models" width:110 height:35 align:#center tooltip:"Export the models" 
 		on btn_ExportModels pressed do 
 		(
 			-- Export Models
@@ -165,8 +180,6 @@ function btlc_GUICityConvert =
 			gc();	
 		)
 
-		
-		button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:35 align:#center tooltip:"Export the models" 
 		on btn_ReinitTxdDb pressed do 
 		(
 			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
@@ -175,40 +188,85 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.InitTexDb()
 			gc();	
 		)
-		/*
-		button btn_GenerateTxds "GenerateTXDs" width:120 height:35 align:#center tooltip:"Generate the .txds" 
-		on btn_GenerateTxds pressed do 
+
+		on btn_PaintWorld pressed do 
 		(
-			
-			TxdPath = btlcConfig.CurrentExpoSaPAth + "\\txd"
-			Outpath = btlcConfig.CurrentExpoSaPAth + "\\img"
-			btlcMagicTxd.GenerateTxds TxdPath OutPath
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
+			BTLCCityConvert.PaintLights()
 		)
 
-		button btn_GenerateIMG "Generate IMG" width:120 height:35 align:#center tooltip:"Generate the Img file" 
-		on btn_GenerateIMG pressed do 
+		on btn_CrtCol pressed do 
 		(
-			MapPartName =  filenameFromPath btlcConfig.CurrentExpoSaPAth 
-		
-			IniPath = btlcConfig.CurrentExpoSaPAth + "\\" + MapPartName + ".ini"
-			OutPath = (pathConfig.removePathLeaf btlcConfig.CurrentExpoSaPAth) 
-
-			btlcImgBuild.BuildImg IniPath OutPath
+			BTLCCityConvert.GenerateCollsion()
 		)
-		*/
+
+		on btn_Cleanup pressed do 
+		(
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth 
+			BTLCCityConvert.CleanupFiles()
+		)
+
+		on btn_GenerateData pressed do 
+		(
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
+			BTLCCityConvert.StartId = 	btlcConfig.CurrentID ;
+			BTLCCityConvert.GenMyData();
+			strtid.value = btlcConfig.CurrentID;
+		)
 	)
+
 
 	try (closeRolloutFloater btlcCityFloater) catch ()
 	Pos = getMaxWindowSize() 	
 	PosX = Pos[1]/2 - 300
 	btlcCityFloater  = newRolloutFloater  "BTLC Main" 620 400 PosX 250
 	addRollout DirSettings btlcCityFloater
-	addRollout CityConvert btlcCityFloater
-	addRollout Map_Utils btlcCityFloater
+	addRollout MYconvert btlcCityFloater
+	--addRollout Map_Utils btlcCityFloater
 )
 
 
+fn btlcUIModelTools = 
+(
+	rollout CollisionTools "Collision" width:350 height:400
+	(
+		button btn_SetasCol "Set As Col" width:110 height:25 align:#center tooltip:"Set selected as Col" across:2
+		on btn_SetasCol pressed do 
+		(
+			btlcCol.ConvertMeshtoCol selection[1]
+		)
+		button btn_SetasShdw "Set As Shadow" width:110 height:25 align:#center tooltip:"Set selected as Shadow" 
+		on btn_SetasShdw pressed do 
+		(
+			btlcCol.ConvertMeshtoCol selection[1]
+			selection[1].isShadow = true
+		)
+		button btn_PivotasParent "Pivot to Parent" width:110 height:25 align:#center tooltip:"Set selected pivot to same as the parent" across:1
+		on btn_PivotasParent pressed do 
+		(
+			if selection[1].parent != undefined do 
+			(
+				selection[1].pivot = selection[1].parent.pivot
+				ResetXForm selection[1]
+				converttomesh selection[1]
 
+			)
+		
+		)
+	)
+
+	try (closeRolloutFloater btlcModelToolsFloater) catch ()
+	Pos = getMaxWindowSize() 	
+	PosX = Pos[1]/2 - 300
+	btlcModelToolsFloater  = newRolloutFloater  "ModelTools" 400 400 PosX 250
+	addRollout CollisionTools btlcModelToolsFloater
+)
 
 
 rollout btlcUtility  "BTLC Toolkit"
@@ -222,11 +280,17 @@ rollout btlcUtility  "BTLC Toolkit"
 	
 	button btn_PathTool "Path Tools" width:150 align:#center enabled:false
 
+	button btn_ModelTools "Model Tools" width:150 align:#center 
+
 
 	label lbl_dummy1 "///// Display Utils /////"
 	button btn_ShowAll "All" width:45 align:#center across:3
 	button btn_ShowCollision "Col" width:45 align:#center across:3
 	button btn_ShowModels "Models" width:45 align:#center across:3
+
+	button btn_Showallmods "--" width:45 align:#center across:3
+	button btn_ShowLOD "LOD" width:45 align:#center across:3
+	button btn_ShowHD "HD" width:45 align:#center across:3
 
 	label lbl_dummy2 "///// Vertex Display Utils /////"
 	button btn_VertexDay "Day" width:50 align:#center across:2
@@ -235,7 +299,44 @@ rollout btlcUtility  "BTLC Toolkit"
 	button btn_VertexAlphaday "Alpha2" width:50 align:#center across:2
 
 	checkbutton btn_map "Map" width:100 align:#center across:1
+
+
+
+
 	hyperLink link_doc "Help" address:"https://btlcdoc.ratpool.de/"
+
+	on btn_ModelTools pressed do 
+	(
+		btlcUIModelTools();
+	)
+
+
+	on btn_ShowHD pressed do 
+	(
+		for obj in objects do 
+		(
+			unhide obj
+			if  (classof  obj == Collision_Sphere)then 	hide obj
+			if  (classof  obj == Collision_Box)then  	hide obj
+			if  (isCol obj == true)  then hide obj
+			bIsLOd = getUserProp  obj  "type" 
+			if  (bIsLOd == "LOD")  then hide obj
+		)
+	)
+
+	on btn_ShowLOD pressed do 
+	(
+		for obj in objects do 
+		(
+			unhide obj
+			if  (classof  obj == Collision_Sphere)then 	hide obj
+			if  (classof  obj == Collision_Box)then  	hide obj
+			if  (isCol obj == true)  then hide obj
+			bIsLOd = getUserProp  obj  "type" 
+			if  (bIsLOd != "LOD")  then hide obj
+		)
+	)
+
 
 	on btn_ShowCollision pressed do 
 	(
@@ -328,3 +429,5 @@ rollout btlcUtility  "BTLC Toolkit"
 
 )
 addrollout btlcUtility
+
+

@@ -1956,10 +1956,13 @@ struct ofio_iv_odr (
 					light.dir = lights[i].Direction * -1
 					light.pos = lights[i].Position					
 				)				
-				
+			
 				light.color = lights[i].Color
-				light.farattenend = lights[i].Distance / 1.5
-				light.multiplier = lights[i].Range / 8 --originally divided by 10. but its kind weak at times. 
+				light.farattenend = lights[i].Distance * 0.95 -- / 1.5
+				light.farattenstart = light.farattenend * 0.35
+				--light.attenDecay = 3
+				--light.DecayRadius = lights[i].Distance
+				light.multiplier = lights[i].Range / 9.5 --originally divided by 10. but its kind weak at times. 
 				light.falloff = lights[i].Falloff
 				
 				local type = ofutils.lowercase(lights[i].Type)

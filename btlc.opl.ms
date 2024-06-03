@@ -67,7 +67,7 @@ struct ofio_BTLC_OPL
 					local dr = ofio_iv_odr()
 					dr.read(Modelfile[1])
 					dr.TexDir  = @"F:\Modding\BTLC\02_GameData\IV\data\maps\manhat\manhat01\wtd\"
-					ThisObj =  dr.build()
+					ThisObj =  dr.build AdvCutName:true
 					-- objID = amax (for o in objects collect o.inode.handle) 
 					-- Object =  maxOps.getNodeByHandle objID
 					-- if ThisObj.name.count >  19 do print ThisObj.name
@@ -150,14 +150,16 @@ struct ofio_BTLC_MassOPL
 				Thepos.pos.y  = LineData[5] as float
 				Thepos.pos.z  = LineData[6] as float
 			
-				
-				Thepos.rot.x  = LineData[7] as float
-				Thepos.rot.y  = LineData[8] as float
-				Thepos.rot.z  = LineData[9] as float
+	
+				Thepos.rot.x  = -1* (LineData[7] as float)
+				Thepos.rot.y  = -1*(LineData[8] as float)
+				Thepos.rot.z  = -1 *(LineData[9] as float)
 				Thepos.rot.w  = LineData[10] as float
 				
                 isUsed.pos = Thepos.pos
                 rotate isUsed  Thepos.rot
+
+				setUserProp isUsed "type" "LOD"
 			)    
 		)
         close fs

@@ -154,10 +154,12 @@ struct Btlc_Material
       (
         FilePath = BtlcTextDB.TexturesList[idxEnv]
         rw.enEnv = true
-        rw.shininess = 0.5
+        rw.shininess = 0.35
+        rw.scaleX = 0.6
+        rw.scaleY = 0.3
         rw.matfxeffect = 3
         rw.texmap_envmap = bitmaptexture filename:Filepath
-        rw.envmap_amount = 0.65
+        rw.envmap_amount = 0.16
       )
     ) 
 

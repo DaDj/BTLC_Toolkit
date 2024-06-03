@@ -80,7 +80,7 @@ fn writeColMesh f m isShadow = (
 				   mat = 0
 				  
 				WriteByte f mat
-				WriteByte f 254
+				WriteByte f 254 -- we should Get face brightness from vertex paint instead
 			)
 	)
 )

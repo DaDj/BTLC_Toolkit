@@ -40,6 +40,7 @@ struct btlc_utils
 		(
 			TheName = substituteString TheName  "_" ""
 		) 
+
 		-- 2. if its still too long try to delete every second character till it fits
 		if TheName.count >  19 then 
 		(
@@ -50,11 +51,12 @@ struct btlc_utils
 				TheName =  replace TheName (idx + 1) 1 ""
 			)
 		)
+		
 		-- 3. if that doesnt help..cut the end characters..should never happen. lol
-		if TheName.count >  19 then 
+		/*if TheName.count >  19 then 
 		(
 			TheName = substring TheName 1 19
-		)
+		)*/
 		TheName
 	),
 

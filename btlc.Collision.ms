@@ -63,10 +63,12 @@ struct Btlc_Collision
 	(
 		Materialname = Material.name
 		isgone = false
-		MatsForbidden = #("MO_DC_Road_Markings_01MO_D","DC_Road_Markings_01DC_Road","MC_Glue_01MC_Glue_01_A","DC_Glue_01dc_glue_01_A","swnjdirt1")
+		MatsForbidden = #("MO_DC_Road_Markings_01MO_D","DC_Road_Markings_01DC_Road","MC_Glue_01MC_Glue_01_A","DC_Glue_01dc_glue_01_A","swnjdirt1","mo_dc_road_markings_01mo_d")
 		for i in MatsForbidden do
 		(   
-			test_mat = findstring  Materialname i
+			thestring = (toLower i)
+			themat = (toLower Materialname)
+			test_mat = findstring  themat thestring
 			if test_mat != undefined and test_mat > 0 do
 			(
 				deleteMeshFacesByMatID_Mesh node MtlID
@@ -105,6 +107,7 @@ struct Btlc_Collision
 				TheObj.Material= copy TheObj.Material
 				for MtlID = 1 to TheObj.Material.MaterialList.Count do 
 				(
+					TheObj.Material.MaterialList[MtlID].name =  TheObj.Material.names[MtlID]
 					isgone =  DeleteForbiddenCollison TheObj MtlID TheObj.Material.MaterialList[MtlID] 
 					
 					if isgone == false do TheObj.Material.MaterialList[MtlID]  = ConvertMaterialtoCol TheObj.Material.MaterialList[MtlID] 
@@ -124,10 +127,79 @@ struct Btlc_Collision
 	(
 		optimizer = optimize()
 		addModifier obj optimizer
-		optimizer.facethreshold1 = 4.0
+		optimizer.facethreshold1 = 2.0
 		optimizer.edgethreshold1 = 1.0
 		maxOps.CollapseNode obj 1
 	),
+
+	fn RsOptimzeMesh newCollisionMesh currentAngle = 
+	(
+		convertTo newCollisionMesh Editable_poly
+		
+		-- get the value of the angleNumeric parameter as a float
+		local currentAngle = (decimalToFloat angleNumeric)
+		
+		-- if the currentAngle is greater than 0 we optimise the newCollisionMesh by removing edges
+		if currentAngle > 0.0 then
+		(
+			local edgeArray = #()
+			local vertArray = #()
+			
+			-- loop through the edges checking if any of them have face angles less than the currentAngle
+			for edge in newCollisionMesh.edges do
+			(
+				local edgeFaces = (polyOp.getFacesUsingEdge newCollisionMesh edge) as array
+				
+				if edgeFaces.count == 2 then
+				(
+					-- get the face normals for the 2 faces connected to the edge
+					local face1Normal = polyOp.getFaceNormal newCollisionMesh edgeFaces[1]
+					local face2Normal = polyOp.getFaceNormal newCollisionMesh edgeFaces[2]
+					
+					-- calculate the angle difference between them
+					local angle = acos (dot face1Normal face2Normal)
+					
+					-- if the angle is less than the currentAngle, we can remove the edge
+					if angle < currentAngle then
+					(
+						append edgeArray edge.index
+						
+						-- we also add the vertx connected to the edge to see if they can be removed also
+						local verts = (polyOp.getVertsUsingEdge newCollisionMesh edge.index) as array
+						for v in verts do
+						(
+							appendIfUnique vertArray v
+						)
+					)
+				)
+			)
+			
+			-- select the edges we want to remove and remove them
+			polyOp.setEdgeSelection newCollisionMesh edgeArray
+			newCollisionMesh.Remove selLevel:#Edge
+			
+			local finalVertArray = #()
+			
+			-- loop through the verts connected to the edges we removed and check to see if they are now connected to
+			-- less than 3 edges and append them to the finalVertArray if they are
+			for vert in vertArray do
+			(
+				local edges = (polyOp.getEdgesUsingVert newCollisionMesh vert) as array
+				
+				if edges.count < 3 then
+				(
+					append finalVertArray vert
+				)
+			)
+			
+			-- select the vertices we want to remove and remove them
+			polyOp.setVertSelection newCollisionMesh finalVertArray
+			newCollisionMesh.Remove selLevel:#Vertex
+
+			converttomesh newCollisionMesh
+		)
+	),
+
 	-- for Clean Col Mesh
 	fn fn_getNarrowFace obj face degree = 
 	(
@@ -166,7 +238,7 @@ struct Btlc_Collision
 				f2 = #{}
 				fnarrow = #{}
 				for i = 1 to obj.numfaces do (
-					if abs (meshop.getFaceArea obj i) < 0.001 then append f i
+					if abs (meshop.getFaceArea obj i) < 0.002 then append f i
 					if (fn_getNarrowFace obj i 178) == true then  append f2 i
 				)
 				if not f.isEmpty then (
@@ -223,6 +295,7 @@ struct Btlc_Collision
 					) */
 					StdMattoColMat thecopy
 					OptimizeColMesh thecopy 
+					CleanColMesh thecopy 
 					CleanColMesh thecopy 
 				)
 			)
