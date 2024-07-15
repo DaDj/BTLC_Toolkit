@@ -238,9 +238,41 @@ fn writeCol f col version =
 	bounds[1]=col.min - col.pos
 	bounds[2]=col.max - col.pos
 	bounds[3]=[0,0,0]
-	bounds[4]=0.5*(length (bounds[1]+bounds[2]))
+	thing = bounds[1]- bounds[2]
+	bounds[4]=0.5*(distance  bounds[1] bounds[2])
 	clearSelection()
-	--print bounds
+
+	if(m != undefined) do 
+	(		
+		mbounds=#()
+		mbounds[1]=m.min - m.pos
+		mbounds[2]=m.max - m.pos
+		--Check if any axis is above 255 units
+		SizeLimit = false
+		if abs(mbounds[1].x) > 255 or  abs(mbounds[1].y) > 255  or  abs(mbounds[1].z) > 255 do SizeLimit = true
+		if abs(mbounds[2].x) > 255 or  abs(mbounds[2].y) > 255  or  abs(mbounds[1].z) > 255 do SizeLimit = true
+		
+		
+		if SizeLimit == true do 
+		(
+			for v = getNumVerts m to 1 by -1 do--loop through all vertices
+			(
+					vert = getVert m v --get the v-th vertex
+					vbounds=#()
+					vbounds[1]=vert - m.pos
+					if abs(vbounds[1].x) > 255 or  abs(vbounds[1].y) > 255  or  abs(vbounds[1].z) > 255 do  
+					(
+						deleteVert m v
+						update m
+					)
+			)
+
+			format "ColWarning: Too Big --> We trimmed the mesh! Model: % Min: % Max: % \n" col.name  bounds[1] bounds[2]
+		)
+	)
+	
+	
+	
 	size=64+(spheres.count)*20+(boxes.count)*28
 	if version>1 then
 	(

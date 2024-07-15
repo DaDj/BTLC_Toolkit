@@ -105,9 +105,11 @@ rollout ofgui "OPEN FORMATS I/O"
 	group " \\ DRAWABLE \\ ODR " 
 	(
 		button btn_IV_DR_Import "Import Single" width:120 align:#center
+		button btn_IV_DR_ImportSkin "Import Single Skin" width:120 align:#center
 		button btn_IV_DR_Export "Export Single" width:120 align:#center
 		button btn_IV_DR_ExportAll "Export All" width:120 align:#center		
 		label margin_IV_DR "" height:0 
+	
 	)	
 	
 	on btn_IV_DR_Import pressed do
@@ -142,6 +144,41 @@ rollout ofgui "OPEN FORMATS I/O"
 			)			
 		)		
 	)	
+
+	on btn_IV_DR_ImportSkin pressed do
+	(
+		local input_odr_file_name = getOpenFileName caption:"Select GTA IV *.odr file" types:"gta iv open formats drawable (*.odr)|*odr"
+		if (input_odr_file_name != undefined) and (getFileSize input_odr_file_name) > 0 then
+		(
+			with undo off
+			(
+				with redraw off
+				(
+					local dr = ofio_iv_odr()
+				--	ofioLog.start()
+					try ( 
+						local start_time = timeStamp()
+						ofioLog.print "reading input file"
+						dr.read(input_odr_file_name)
+						dr.TexDir  = @"F:\Modding\BTLC\02_GameData\IV\data\maps\manhat\manhat01\wtd\"
+						ofioLog.print "building"
+						dr.build Load_Bones:true
+						ofioLog.print ("odr import succeed, elapsed " + ( ( (timeStamp() - start_time) / 1000.0 ) as String ) + " seconds")
+						gc()
+					) catch
+					(
+						ofutils.showException()
+						dr.cleanup()
+						ofioLog.print "IMPORT ERROR !"
+					)
+					--ofioLog.finish()
+					dr = undefined
+				)
+			)			
+		)		
+	)	
+
+
 	
 	on btn_IV_DR_Export pressed do
 	(
@@ -258,6 +295,7 @@ rollout ofgui "OPEN FORMATS I/O"
 	group " \\ DRAWABLE \\ ODD " 
 	(
 		button btn_IV_DD_Import "Import Single" width:120 align:#center
+		button btn_IV_DD_ImportSkin "Import Single Skin" width:120 align:#center
 		button btn_IV_DD_Export "Export Single" width:120 align:#center
 		label margin_IV_DD "" height:0 
 	)	
@@ -279,6 +317,38 @@ rollout ofgui "OPEN FORMATS I/O"
 						dd.read(input_odd_file_name)
 						ofioLog.print "building"
 						dd.build()
+						ofioLog.print ("odd import succeed, elapsed " + ( ( (timeStamp() - start_time) / 1000.0 ) as String ) + " seconds")
+						gc()
+					) catch
+					(
+						ofutils.showException()
+						dd.cleanup()
+						ofioLog.print "IMPORT ERROR !"
+					)
+					ofioLog.finish()
+					dd = undefined
+				)
+			)			
+		)		
+	)	
+
+	on btn_IV_DD_ImportSkin pressed do
+	(
+		local input_odd_file_name = getOpenFileName caption:"Select GTA IV *.odd file" types:"gta iv open formats drawable dict (*.odd)|*odd"
+		if (input_odd_file_name != undefined) and (getFileSize input_odd_file_name) > 0 then
+		(
+			with undo off
+			(
+				with redraw off
+				(
+					local dd = ofio_iv_odd()
+					ofioLog.start()
+					try ( 
+						local start_time = timeStamp()
+						ofioLog.print "reading input file"
+						dd.read(input_odd_file_name)
+						ofioLog.print "building"
+						dd.build Load_Bones:true
 						ofioLog.print ("odd import succeed, elapsed " + ( ( (timeStamp() - start_time) / 1000.0 ) as String ) + " seconds")
 						gc()
 					) catch

@@ -3,7 +3,9 @@ struct Btlc_Collision
 	-- Get Col Material Ids based on Materialname
 	fn set_COLMAT texture_name =
 	(
-		COL_MATERIALS = #("grass","pavement","road","metal","dirt","glass","path","water","window","wood","rustedmtl","railing","chrome","meshfencing","mesh","fence","soil","dc_pavement_plainvent01")
+		COL_MATERIALS = #("grass","pavement","road","metal","dirt","glass","path","water","window","wood", \
+		"rustedmtl","railing","chrome","meshfencing","mesh","fence","soil","dc_pavement_plainvent01","rubble","alley", \
+		"sidewalk")
 		COL_MATERIALS_ID = #(11,4,1,167,26,45,5,39,45,43,167,167,167,55,164,55,26)
 		
 		GRASS_ID = 80 --11
@@ -16,7 +18,9 @@ struct Btlc_Collision
 		WATER_ID = 39
 		GLASS_ID = 45
 		WOOD_ID = 43
-		
+		RUBBLE_ID = 101
+		Alley_ID = 139
+
 		MyID = 0
 		for i in COL_MATERIALS do
 		(
@@ -42,6 +46,9 @@ struct Btlc_Collision
 				if i == COL_MATERIALS[16] do MyID = METAL_ID --Fence					
 				if i == COL_MATERIALS[17] do MyID = DIRT_ID --Dirt/Soil		
 				if i == COL_MATERIALS[18] do MyID = METAL_ID --Pavement vent metal	
+				if i == COL_MATERIALS[19] do MyID = RUBBLE_ID --rubble
+				if i == COL_MATERIALS[20] do MyID = Alley_ID --Alleyrubbish
+				if i == COL_MATERIALS[21] do  MyID =  PAVEMENT_ID --sidewalk
 			)
 		)
 		MyID
@@ -63,7 +70,8 @@ struct Btlc_Collision
 	(
 		Materialname = Material.name
 		isgone = false
-		MatsForbidden = #("MO_DC_Road_Markings_01MO_D","DC_Road_Markings_01DC_Road","MC_Glue_01MC_Glue_01_A","DC_Glue_01dc_glue_01_A","swnjdirt1","mo_dc_road_markings_01mo_d")
+		MatsForbidden = #("MO_DC_Road_Markings_01MO_D","DC_Road_Markings_01DC_Road","MC_Glue_01MC_Glue_01_A","DC_Glue_01dc_glue_01_A","mo_dc_road_markings_01mo_d", \
+		"grass_weed1grass","et_grass02","grasstest","grassdark","bushdead","weedleaves","weedleavesa_2","weedylong","weedduo","sm_weeds","am_cables")
 		for i in MatsForbidden do
 		(   
 			thestring = (toLower i)
@@ -75,6 +83,32 @@ struct Btlc_Collision
 				isgone = true
 			)
 		)
+
+		try
+        (
+          Shader = custAttributes.get Material BTLC_MatShader 
+        
+          if Shader != undefined do
+          (
+            if ((findstring Shader.MyShaderName "decal") != undefined) then
+            (					
+				deleteMeshFacesByMatID_Mesh node MtlID
+				isgone = true
+            )
+
+			if ((findstring Shader.MyShaderName "gta_wire") != undefined) then
+            (					
+				deleteMeshFacesByMatID_Mesh node MtlID
+				isgone = true
+            )
+          )
+      
+        )
+        catch
+        (
+          format "***Error In Deletefobiddencollisionmats:  % ***   % \n " obj.name (getCurrentException()) 
+        )
+
 		isgone
 	),
 

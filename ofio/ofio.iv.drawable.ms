@@ -1785,9 +1785,9 @@ struct ofio_iv_odr (
 		-- build main drawable
 		local group_arr = #()
 		append group_arr #(high_obj, undefined)
-		append group_arr #(med_obj, "med")
-		append group_arr #(low_obj, "low")
-		append group_arr #(vlow_obj, "vlow")
+	--	append group_arr #(med_obj, "med") We don't need any lods any time soon.
+	--	append group_arr #(low_obj, "low")
+	--	append group_arr #(vlow_obj, "vlow")
 
 		if Load_Mesh == true then 
 		(
@@ -1818,7 +1818,7 @@ struct ofio_iv_odr (
 							else 
 							(
 								local tmpName =  (descName + "_" + (i as string) )
-
+								
 								if AdvCutName == false then 
 								(
 									if tmpName.count >  19 do tmpName = substring tmpName 1 19 
@@ -1830,6 +1830,7 @@ struct ofio_iv_odr (
 						else 
 						(
 							build_mesh obj mtls (descName + "_" + i as String)
+							print (descName + "_" + i as String)
 						)
 						
 						if bone_using_id.count > 0 then
@@ -1861,7 +1862,7 @@ struct ofio_iv_odr (
 						setUserProp obj.objs[1] "lod" lod
 						i += 1
 
-						if obj != undefined do 
+						if obj != undefined and Load_Bones == false then 
 						(
 							btlcMaterial.ReshuffleByShader obj.objs[1]
 							btlcVertexPaint.PrelightModel obj.objs[1]
@@ -2544,7 +2545,7 @@ struct ofio_iv_odd (
 		throw ("DICTIONARY ERROR\n\n" + obj.name + " has no drawable children")
 	),	
 	
-	fn build = (
+	fn build Load_Bones:false  AdvCutName:false = (
 		ofioLog.print ("building drawable dictionary " + descName)
 		--descriptor = dummy boxsize:[0.3, 0.3, 0.3]
 		--descriptor.name = "ddict_" + descName
@@ -2552,7 +2553,7 @@ struct ofio_iv_odd (
 		local bone_using_id
 		for obj in drawables do
 		(
-			obj.build()
+			obj.build Load_Bones:Load_Bones AdvCutName:AdvCutName
 			--obj.descriptor.parent = descriptor
 		)
 	),

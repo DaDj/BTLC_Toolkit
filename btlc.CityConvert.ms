@@ -162,7 +162,7 @@ struct Btlc_ConvertCity
             )
             if Numofobj == 0 do Numofobj = -2
             print Numofobj
-            if FailCnt > 1 do quitmax #noprompt 
+            if FailCnt > 2 do quitmax #noprompt 
         ) while Numofobj > -2
 
         resumeEditing()

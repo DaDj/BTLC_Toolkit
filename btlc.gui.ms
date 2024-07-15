@@ -296,7 +296,7 @@ rollout btlcUtility  "BTLC Toolkit"
 	button btn_VertexDay "Day" width:50 align:#center across:2
 	button btn_VertexNight "Night" width:50 align:#center across:2
 	button btn_VertexAlphA "Alpha1" width:50 align:#center across:2
-	button btn_VertexAlphaday "Alpha2" width:50 align:#center across:2
+	button btn_VertexNone "None" width:50 align:#center across:2
 
 	checkbutton btn_map "Map" width:100 align:#center across:1
 
@@ -366,9 +366,8 @@ rollout btlcUtility  "BTLC Toolkit"
 
 
 	on btn_VertexNight pressed do
-	if $ != undefined then 
 	(
-		for o in $ do
+		for o in objects do
 		if superclassof o == GeometryClass then 
 		(
 			o.showVertexColors = true
@@ -379,9 +378,8 @@ rollout btlcUtility  "BTLC Toolkit"
 	)
 	
 	on btn_VertexDay pressed do
-	if $ != undefined then 
 	(
-		for o in $ do
+		for o in objects do
 		if superclassof o == GeometryClass then 
 		(
 			o.showVertexColors = true
@@ -389,6 +387,19 @@ rollout btlcUtility  "BTLC Toolkit"
 		)
 		completeRedraw()
 	)
+
+	on btn_VertexNone pressed do
+	(
+		for o in objects do
+		if superclassof o == GeometryClass then 
+		(
+			o.showVertexColors = false
+			o.vertexColorType = #color
+		)
+		completeRedraw()
+	)
+
+	
 
 	on btn_map changed state do (
 		try

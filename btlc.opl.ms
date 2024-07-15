@@ -68,10 +68,6 @@ struct ofio_BTLC_OPL
 					dr.read(Modelfile[1])
 					dr.TexDir  = @"F:\Modding\BTLC\02_GameData\IV\data\maps\manhat\manhat01\wtd\"
 					ThisObj =  dr.build AdvCutName:true
-					-- objID = amax (for o in objects collect o.inode.handle) 
-					-- Object =  maxOps.getNodeByHandle objID
-					-- if ThisObj.name.count >  19 do print ThisObj.name
-					-- if ThisObj.name.count >  19 do ThisObj.name = substring ThisObj.name 1 19 --move into importer
 					ThisObj.pos = Singleone.pos
 					rotate ThisObj  Singleone.rot
 					gc()
@@ -127,7 +123,7 @@ struct ofio_BTLC_MassOPL
 		(
 			local dr = ofio_iv_odd()
 			dr.read(obj)
-			dr.build()
+			dr.build AdvCutName:true
 		)
 		
 	),
