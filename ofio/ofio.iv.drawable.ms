@@ -1960,7 +1960,7 @@ struct ofio_iv_odr (
 			
 				light.color = lights[i].Color
 				light.farattenend = lights[i].Distance * 0.95 -- / 1.5
-				light.farattenstart = light.farattenend * 0.35
+				light.farattenstart = light.farattenend * 0.15
 				--light.attenDecay = 3
 				--light.DecayRadius = lights[i].Distance
 				light.multiplier = lights[i].Range / 9.5 --originally divided by 10. but its kind weak at times. 

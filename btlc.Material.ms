@@ -145,7 +145,7 @@ struct Btlc_Material
       if ((findstring shader[1] "reflect") != undefined) do envId = FindEnvTexId shader[1]
     )
   
-    envId = -1  -- Disable automatic env maps. Used in windows very often and looks realllly bad.
+   -- envId = -1  -- Disable automatic env maps. Used in windows very often and looks realllly bad.
     if envId != -1 do 
     (
       TheTexName = getFilenameFile shader[envId + 1]
@@ -155,12 +155,12 @@ struct Btlc_Material
       (
         FilePath = BtlcTextDB.TexturesList[idxEnv]
         rw.enEnv = true
-        rw.shininess = 0.15
-        rw.scaleX = 0.5
-        rw.scaleY = 0.5
+        rw.shininess = 0.055
+        rw.scaleX = 1
+        rw.scaleY = 1
         rw.matfxeffect = 3
         rw.texmap_envmap = bitmaptexture filename:Filepath
-        rw.envmap_amount = 0.5
+        rw.envmap_amount = 1
       )
     ) 
 

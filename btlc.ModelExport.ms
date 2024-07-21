@@ -28,6 +28,7 @@ struct Btlc_Modelexport
                 if (getUserProp Child "breakmdl") == "breakable"  do  Child.parent = undefined  -- unparent breakable for export
             ) 
                 select obj
+              -- selectmore obj.children
             -- print dir
                 dff =   dir  + "/" + obj.name + ".dff" 
             --  print dff
