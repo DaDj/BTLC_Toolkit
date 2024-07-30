@@ -71,7 +71,8 @@ struct Btlc_Collision
 		Materialname = Material.name
 		isgone = false
 		MatsForbidden = #("MO_DC_Road_Markings_01MO_D","DC_Road_Markings_01DC_Road","MC_Glue_01MC_Glue_01_A","DC_Glue_01dc_glue_01_A","mo_dc_road_markings_01mo_d", \
-		"grass_weed1grass","et_grass02","grasstest","grassdark","bushdead","weedleaves","weedleavesa_2","weedylong","weedduo","sm_weeds","am_cables","weedylong_1weedylong_1a")
+		"grass_weed1grass","et_grass02","grasstest","grassdark","bushdead","weedleaves","weedleavesa_2","weedylong","weedduo","sm_weeds","am_cables","weedylong_1weedylong_1a",\
+		"shrub1_bshrub1_ba","shrubred2bushdead1a")
 		for i in MatsForbidden do
 		(   
 			thestring = (toLower i)

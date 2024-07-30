@@ -1,12 +1,4 @@
 
-function isCol obj=
-(
-    isit = false
-    if ((isProperty obj #isShadow ) == true) or ((custattributes.get obj TheColMesh) == true) then isit =true
-
-    isit
-)
-
 fn enableEdges msh id = (
 	for i = 1 to 3 do setEdgeVis msh id i true
 )

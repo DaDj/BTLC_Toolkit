@@ -1,6 +1,7 @@
 struct BTLC_UVAnim  
 (
     myAnims = #(),
+    MyObjs = #(),
     
 	fn scanline fInput = (
 		if eof(fInput) then throw "unexpected eof"	
@@ -34,9 +35,13 @@ struct BTLC_UVAnim
             myAnims[AnimId] =  ofio_iv_anim()
             OutPath = (pathConfig.removePathLeaf Path)
             MyPath = OutPath + "\\" + elements[2]
-            print MyPath
+            --print MyPath
             myAnims[AnimId].read MyPath
             elements = scanline fInput
+
+            AnimObjName = getFilenameFile MyPath
+           -- AnimObjName = filterString AnimObjName 
+            MyObjs[AnimId] = AnimObjName
             AnimId = AnimId + 1
         )
         close fInput
@@ -44,15 +49,20 @@ struct BTLC_UVAnim
 
     fn ApplyAnim Obj = 
     (
-       for UvAnim in myAnims do 
+       for  AnimId=1 to MyObjs.count do 
        (
-            for Mat in Obj.material do
-            (
-                if Mat.MyShaderOrgMatId  ==  (UvAnim.MaterialID + 1 )  do 
+            UvAnim = myAnims[AnimId]
+            if (findString MyObjs[AnimId] Obj.name) != undefined do
+           (
+               -- print  Obj.name
+                for Mat in Obj.material do
                 (
-                    UvAnim.ApplyAnimtoMaterial Mat
+                    if Mat.MyShaderOrgMatId  ==  (UvAnim.MaterialID + 1 )  do 
+                    (
+                        UvAnim.ApplyAnimtoMaterial Mat
+                    )
                 )
-            )
+            ) 
        )
     )
 )
