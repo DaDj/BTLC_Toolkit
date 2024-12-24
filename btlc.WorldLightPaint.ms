@@ -77,6 +77,18 @@ struct btlc_WorldLightPaint
         TheLight.HotSpot = 40.0
         TheLight.Falloff = 60.0
         TheLightObjs[5] = TheLight;
+
+        TheLight  = btlc_StaticLightObj();
+        TheLight.Name = "cj_et_dock_light"
+        TheLight.Color = (color 255 221 163 0)
+        TheLight.Position = [-0.001, 0.003, 20.953]
+        TheLight.Direction = [0.0, 0.0,0.0]
+        TheLight.Type = "Spot"
+        TheLight.Distance = 45.0
+        TheLight.Range = 45.0
+        TheLight.HotSpot = 40.0
+        TheLight.Falloff = 60.0
+        TheLightObjs[6] = TheLight;
     ),
 
     fn UnloadLightObjs = -- Unloads the lightobjects again 
@@ -135,7 +147,7 @@ struct btlc_WorldLightPaint
                     gc()
                     gc()
                 )
-                if NumOfInst.count > 1 do print obj.name
+               -- if NumOfInst.count > 1 do print obj.name
             )
         )
         if Fail == true do 

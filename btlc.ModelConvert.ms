@@ -152,6 +152,12 @@ struct  Btlc_ModelConvert
 		IdStart = IDCurr 
 	),
 
+	fn ExportIde Path = 
+	(
+		
+
+	),
+
 	fn oft_ConvertCol myobj = 
 	(
 		TheChilds = #()
@@ -353,12 +359,15 @@ struct  Btlc_ModelConvert
 		-- sort the objects
 		for theobj in KeepNodes do 
 		(
+			
 			if theobj == TheMainNode then continue 
 			else if theobj == TheMainColNode then continue
 			if  classof theobj == Editable_mesh then theobj.parent = TheMainNode 
 			else if  classof theobj == freeSpot or classof theobj == Omnilight  then theobj.parent = TheMainNode 
 			else if  classof theobj == ofio_iv_col_box then theobj.parent = TheMainColNode  
 			else if  classof theobj == Editable_Poly and (getUserProp theobj "type") == "BoundGeometry" then theobj.parent = TheMainColNode 
+			else if  classof theobj == ofio_iv_col_sphere then theobj.parent = TheMainColNode  
+			else delete theobj
 			-- ofio_iv_col_box , Editable_mesh
 			-- Try to attach the meshes to the main mesh
 			-- Try to attach the collision to the main collision. (keep boxes or just duck it to a single mesh?)

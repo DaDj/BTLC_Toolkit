@@ -1,40 +1,96 @@
+struct Childdef
+(
+    Obj,
+    Childs = #()
+)
+
+
+if versions==undefned then
+(
+	global versions=#(0x1803FFFF, 0xC02FFFF, 0x800FFFF)
+)
+
 struct Btlc_Modelexport 
 (
-    function SetExporterSettings =
-    (
-        dffExp.prelight = 1
-        dffExp.NodeNames = 1
-        dffExp.normals = 1
-        dffExp.skinning = 0
-        dffExp.worldSpace = 0
-        dffExp.FILEVERSION = 0x36003
-        dffExp.extraColors = 1
-        dffExp.Lighting  = 1
-        dffExp.createHAnim = 0
+    fn getMyDffData TheObjs = (
+        objects = for obj in TheObjs where (canExport obj) collect obj
+        if objects.count>0 then (
+            atomics=#()
+            bones=#()
+            hAnimTable=#()
+            for i = 1 to objects.count do (
+                if (superclassof (objects[i]) == GeometryClass) then append atomics (#(i, undefined))
+                if useAnimation (objects[i]) then(
+                    bones[i]=#(objects[i].id)
+                    if (hAnimTable.count==0) then bones[i][2]=hAnimTable
+                    append hAnimTable (getAnimEntry (objects[i]))
+                )
+            )
+            if (hAnimTable.count==0) then bones=undefined
+            return #(objects, atomics, bones)
+        )
+        return undefined
     ),
+
+    function ExportObj Obj Path = 
+    (
+        expData=getMyDffData Obj
+		if expData!=undefined then (
+            doExtraColor = true;
+            doUVAnim = true;
+            doNormals = true;
+
+            f =  fopen Path "wb"
+			if f != undefined then 
+            (
+				if (1)and( doUVAnim ) then writeUVAnimationDictionary f expData[1] expData[2]
+				writeClump f expData[1] expData[2] doExtraColor doNormals versions[1] bones:(expData[3])
+				fclose f
+            )
+        )
+    ),
+
 
     function ExportModels dir lstItems =
     (
-        SetExporterSettings();
-        
         for obj in lstItems as array  do
         (
             TheChilds= #()
+            Childdefs = #()
             for Child in obj.children do append TheChilds Child
 
             for Child in TheChilds do 
             (
                 if (btlcCol.isCol Child) == true do  Child.parent = undefined  -- unparent Collsions for export
                 if (getUserProp Child "breakmdl") == "breakable"  do  Child.parent = undefined  -- unparent breakable for export
+
+                if Child.children.count > 0 do 
+                (
+                    theThing = Childdef()
+                    append Childdefs theThing
+                    Childdefs[Childdefs.count].Obj = Child
+
+                    for ChildChild in Child.children do 
+                    (
+                        append Childdefs[Childdefs.count].Childs ChildChild
+                        ChildChild.parent = undefined
+                    )
+                )
+               
             ) 
-                select obj
-              -- selectmore obj.children
-            -- print dir
-                dff =   dir  + "/" + obj.name + ".dff" 
-            --  print dff
-                exportfile dff #noprompt using:"DFF File Im-/Exporter" 
+                --select obj
+                Fielpath =  dir  + "/" + obj.name + ".dff" 
+                ExportObj obj Fielpath
 
         for Child in TheChilds do  Child.parent = obj -- parent Collsions after export
+
+        for ADef in Childdefs do 
+        (
+            for AChild in ADef.Childs do 
+            (
+                AChild.parent = ADef.obj
+            )
+        )
 
         )		
     ),

@@ -64,9 +64,35 @@ struct btlc_gtaDatUtils
 		if isIMG do append IMG Name
 		if isIDE do append IDE Name
 		if isIPL do append IPL Name
+	),
+
+	fn DeleteEntry Name isIMG isIDE isIPL =
+	(
+		if isIMG do 
+		(
+			MyId = findItem  IMG Name
+			if MyId > 0 do 
+			   deleteItem IMG MyId
+		)
+
+		if isIDE do 
+		(
+			MyId = findItem  IDE Name
+			if MyId > 0 do 
+			   deleteItem IDE MyId
+		)
+
+		if isIPL do 
+		(
+			MyId = findItem  IPL Name
+			if MyId > 0 do 
+			   deleteItem IPL MyId
+		)
+
 	)
 )
 btlcgtaDatUtils = btlc_gtaDatUtils();
+
 
 
 function btlc_GUIGtaDatUtil =
@@ -132,4 +158,4 @@ function btlc_GUIGtaDatUtil =
 	addRollout  DirSettings btlcGtaDatUtilFloater
 	addRollout  Lists btlcGtaDatUtilFloater
 )
-btlc_GUIGtaDatUtil()
+--btlc_GUIGtaDatUtil()

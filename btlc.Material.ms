@@ -1,4 +1,4 @@
-fileIn "RW_Material.ms"
+--fileIn "RW_Material.ms"
 
 BTLC_MatShader = attributes "BTLC_MatShader"  attribID:#(0x3c0e6f, 0xb139b19)
 (
@@ -108,7 +108,82 @@ struct Btlc_Material
     idx2
   ),
 
-  fn SetMaterialData  shader MatId:0 =
+  fn SetMaterialDataCJ shader MtlID:0 =
+  (
+    TheName =  toLower (shader[2]) 
+    TheName = getFilenameFile TheName
+    rw = RW_Mtl()
+    rw.sp_ambient  = 1.0
+    rw.sp_specular = 1.0 
+    rw.sp_diffuse  = 1.0
+    rw.color = color 255 255 255 255
+    
+    /* std map */
+    if TheName.count >  26 do TheName = substring TheName 1 26
+    local  idx = finditem BtlcTextDB.TexNameList TheName
+    FilePath = TheName
+    if idx != 0 do  FilePath = BtlcTextDB.TexturesList[idx]
+    if idx == 0 and FilePath != "null" do 
+    ( 
+      print "Not Found:"  
+      print FilePath
+    )
+    rw.texture = bitmaptexture filename:Filepath
+    rw.name =  TheName
+
+    rw.delegate.shaderType = 1;
+    if rw.texture != undefined do
+    (
+      rw.delegate.diffuseMap.color1 = rw.color*rw.sp_diffuse
+    )
+    rw.delegate.diffuse = rw.color*rw.sp_diffuse
+
+    /* Reflection map */
+    envId = -1
+    if btlcMaterial.EnableReflections == true do 
+    (
+      if ((findstring shader[1] "reflect") != undefined) do envId = FindEnvTexId shader[1]
+    )
+  
+   -- envId = -1  -- Disable automatic env maps. Used in windows very often and looks realllly bad.
+    if envId != -1 do 
+    (
+      TheTexName = getFilenameFile shader[envId + 1]
+      TheTexName = toLower TheTexName
+      idxEnv = finditem BtlcTextDB.TexNameList TheTexName
+      if idxEnv != 0 do  
+      (
+        FilePath = BtlcTextDB.TexturesList[idxEnv]
+        rw.enEnv = true
+        rw.shininess = 0.055
+        rw.scaleX = 1
+        rw.scaleY = 1
+        rw.matfxeffect = 3
+        rw.envmap = bitmaptexture filename:Filepath
+        rw.envmap_amount = 1
+      )
+    ) 
+
+    /* Opacity */
+    rw.delegate.opacityMap = undefined
+    if ((findstring shader[1] "decal") != undefined) or ((findstring shader[1] "alpha")  != undefined) or ((findstring shader[1] "glass")  != undefined) or ((findstring shader[1] "cutout")) != undefined then
+    (					
+        alphamap = copy  rw.texture
+				alphamap.monoOutput = 1
+				rw.delegate.opacityMap = alphamap
+				rw.delegate.opacityMap.output.invert = false
+    )
+ 
+    custAttributes.add rw BTLC_MatShader
+    rw.MyShaderID = 0
+    rw.MyShaderType = 2
+    rw.MyShaderName = shader[1]
+    rw.MyShaderOrgMatId = MtlID
+    rw.showInViewport = true
+    rw
+  ),
+
+  fn SetMaterialDataAAP  shader MtlID:0 =
   (
     TheName =  toLower (shader[2]) 
     TheName = getFilenameFile TheName
@@ -178,9 +253,19 @@ struct Btlc_Material
     rw.MyShaderID = 0
     rw.MyShaderType = 2
     rw.MyShaderName = shader[1]
-    rw.MyShaderOrgMatId = MatId
+    rw.MyShaderOrgMatId = MtlID
     rw.showInViewport = true
     rw
+  ),
+
+  fn SetMaterialData  shader MatId:0 =
+  (
+   if BTLCRWType == 1 then  
+    mtl = SetMaterialDataCJ shader MtlID:MatId
+   else
+    mtl = SetMaterialDataAAP shader MtlID:MatId
+
+    mtl
   ),
 
   fn SetMeshFace_MatID node matID newID = if iskindof node Editable_Mesh do

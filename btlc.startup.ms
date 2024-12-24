@@ -1,4 +1,5 @@
 global MyBtlcRoot = pathConfig.removePathLeaf ( getSourceFileName()) ;
+global BTLCRWType = 1; -- 1 = cj200 0= aap
 
 fn btlcStartupLoadALL MyRoot = 
 (
@@ -15,8 +16,10 @@ fn btlcStartupLoadALL MyRoot =
     (	
 	 try 
 	 (
-		fileIn f
-		format "loaded script '%'\n" f
+		
+			fileIn f
+			format "loaded script '%'\n" f
+
 	 )	
 	 catch
 	 (

@@ -157,7 +157,7 @@ struct Btlc_Collision
 			
 		)
 	),
-
+	
 	fn OptimizeColMesh obj = 
 	(
 		optimizer = optimize()
@@ -355,14 +355,16 @@ struct Btlc_Collision
 
 	fn ExportCollisions Filepath items =
 	(
-		myobjects = for obj in items where (classof obj == Editable_mesh) collect obj
-		
+		myobjects = for obj in items  where (obj.parent == undefined) collect obj
+		--where ( and
 		-- Make exported objects unique, dont export duplicates
 		MyObjs = #()
 		allNames = #() 
 		for i in myobjects do
 		(
-			if findItem allNames i.name == 0  do 
+			if (classof i == Dummy) do i = i.children[1]
+
+			if (findItem allNames i.name == 0) and (classof i ==Editable_mesh)  do 
 			(
 				append MyObjs i
 				append allNames i.name 
@@ -433,6 +435,7 @@ struct btlc_IvBoundtoCol
 				NewObj.matID = theobj.Material.surface
 				delete theobj
 				theobj = NewObj
+				custattributes.add theobj ColMesh
 			) 
 			else 
 			(
@@ -450,6 +453,7 @@ struct btlc_IvBoundtoCol
 			NewObj.matID = theobj.Material.surface
 			delete theobj
 			theobj = NewObj
+			custattributes.add theobj ColMesh
 		)
 		else 
 		(

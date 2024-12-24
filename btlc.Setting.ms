@@ -49,6 +49,7 @@ struct BTLCConfig
 	function UpdateCurrentID IdeFile = 
 	(
 		CurrentID = btlcUtil.GetMaxIDFromIDE IdeFile;
+		CurrentID = CurrentID + 1; -- We want to start at the next free ID of course. 
 		print CurrentID
 		Save();
 	)

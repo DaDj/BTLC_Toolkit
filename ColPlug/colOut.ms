@@ -49,13 +49,13 @@ fn hasPadding m =
 
 fn writeColMesh f m isShadow = (
 	--for vert in m.verts do writeFixPointVertex f 128 (vert.pos)
----	for vert in V = in coordsys local (getVert m i) do writeFixPointVertex f 128 (vert.pos)
+	---	for vert in V = in coordsys local (getVert m i) do writeFixPointVertex f 128 (vert.pos)
 	
- NVerts =  m.NumVerts
- for i = 1 to NVerts do (
-  V = in coordsys local (getVert m i)
-  writeFixPointVertex f 128 (V)
- )
+	NVerts =  m.NumVerts
+	for i = 1 to NVerts do (
+	V = in coordsys local (getVert m i)
+	writeFixPointVertex f 128 (V)
+	)
  
 	
 	if (hasPadding m) then writeShort f 0
@@ -86,40 +86,49 @@ fn writeColMesh f m isShadow = (
 				ch_Day = 0 -- (0 - vertex color)
 				ch_Night = -1 --  (-1 - vert illum)
 
-				MyMapFace = meshop.getMapFace m ch_Day i  
-				MyNightMapFace = meshop.getMapFace m ch_Night i  
-
-				MyDayBrightness = 0
-				MyNightBrightness = 0
-				
-					for i2 = 1 to MyMapFace.count do 
-					(
-						THECOLOUR = meshop.getMapVert m ch_Day MyMapFace[i2] as color
-						MyDayBrightness = MyDayBrightness + THECOLOUR.value 
-					)
-					MyDayBrightness = MyDayBrightness /3;
-				
-				--	MyDayBrightness = 1;
-				
-				
+			
 				try 
 				(
-					for i2 = 1 to MyMapFace.count do 
+					MyMapFace = meshop.getMapFace m ch_Day i  
+					MyNightMapFace = meshop.getMapFace m ch_Night i  
+	
+					MyDayBrightness = 0
+					MyNightBrightness = 0
+					
+						for i2 = 1 to MyMapFace.count do 
+						(
+							THECOLOUR = meshop.getMapVert m ch_Day MyMapFace[i2] as color
+							MyDayBrightness = MyDayBrightness + THECOLOUR.value 
+						)
+						MyDayBrightness = MyDayBrightness /3;
+					
+					--	MyDayBrightness = 1;
+					
+					
+					try 
 					(
-					THECOLOUR = meshop.getMapVert m ch_Night MyMapFace[i2] as color
-					MyNightBrightness = MyNightBrightness + THECOLOUR.value 	
-					)	
-					MyNightBrightness = MyNightBrightness/3
-				) catch 
-				(
-					MyNightBrightness = 1.0
+						for i2 = 1 to MyMapFace.count do 
+						(
+						THECOLOUR = meshop.getMapVert m ch_Night MyMapFace[i2] as color
+						MyNightBrightness = MyNightBrightness + THECOLOUR.value 	
+						)	
+						MyNightBrightness = MyNightBrightness/3
+					) catch 
+					(
+						MyNightBrightness = 1.0
+					)
+				
+					MyDayBrightness = amin #(ceil((MyDayBrightness^2*4) * 15),15) as integer
+					MyNightBrightness = amin #(ceil((MyNightBrightness^2 * 10) * 15),15) as integer
+					MyNightBrightness = bit.shift MyNightBrightness 4
+					MyCompletBright = MyDayBrightness + MyNightBrightness
+					WriteByte f MyCompletBright
 				)
-			
-				MyDayBrightness = amin #(ceil((MyDayBrightness^2*4) * 15),15) as integer
-				MyNightBrightness = amin #(ceil((MyNightBrightness^2 * 6 + 0.6) * 15),15) as integer
-				MyNightBrightness = bit.shift MyNightBrightness 4
-				MyCompletBright = MyDayBrightness + MyNightBrightness
-				WriteByte f MyCompletBright
+				catch 
+				(
+					WriteByte f 254 
+				)
+		
 
 			/*	thing = 0 https://gtaforums.com/topic/989107-sa-about-collision-lightning/
 				thing = bit.set thing 1 true
