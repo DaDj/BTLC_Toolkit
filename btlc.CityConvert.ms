@@ -170,6 +170,21 @@ struct Btlc_ConvertCity
         saveMaxFile MapPartName	
     --    autosave.tempDisable = false
     ),
+
+    fn CityLightSettings =  
+    (
+        for TheLight in Lights do 
+        (
+            if classof TheLight == GTA_Light do 
+            ( -- We hide shadows of map gta Lights. is painted anyway
+                TheLight.shadowSize =  0.0
+                TheLight.shadowColorMultiplier = 0
+                
+                -- Increase Drawdistance of LOD Coronas.
+                if TheLight.parent != undefined and (getUserProp  TheLight.parent  "type" ) == "LOD" do  TheLight.coronaFarClip = 700
+            )
+        )
+    ),
     
     fn BuildMap = 
     (
@@ -180,6 +195,7 @@ struct Btlc_ConvertCity
         ObjDeleteIfUnused IdeFile
         format "lod map\n"
 
+        CityLightSettings()
         start = timeStamp()
         PaintLights();
         end = timeStamp()

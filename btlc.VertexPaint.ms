@@ -76,7 +76,7 @@ struct btlc_VertexPaint
                 my_color = meshop.getMapVert Obj ch_Day  i 
                 my_color2 = (my_color*0.6*255) as color 
                 my_color2.saturation = 0
-                my_color_Night = (my_color2*0.1)
+                my_color_Night = (my_color2*0.15)
                 meshop.setMapVert Obj ch_Day  i (my_color2/255)
                 meshop.setMapVert Obj ch_Night i (my_color_Night/255)
                

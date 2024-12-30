@@ -1940,10 +1940,12 @@ struct ofio_iv_odr (
 			
 			for i = 1 to lights.count do
 			(
-				local light = freespot()
-				light.usefaratten = true
-				light.showfaratten = true
-				light.farattenstart = 0		
+				local light = GTA_Light() -- freespot()
+			
+				light.delegate.usefaratten = true
+				light.delegate.showfaratten = true
+				light.delegate.farattenstart = 0		
+				
 				light.parent = light_root
 				
 				local light_bone = undefined
@@ -1952,29 +1954,36 @@ struct ofio_iv_odr (
 				if light_bone == undefined then
 				light_bone = light_root
 				
+
+			
 				in coordsys light_bone
 				(
 					light.dir = lights[i].Direction * -1
 					light.pos = lights[i].Position					
 				)				
-			
+	
 				light.color = lights[i].Color
-				light.farattenend = lights[i].Distance * 0.95 -- / 1.5
-				light.farattenstart = light.farattenend * 0.15
-				--light.attenDecay = 3
-				--light.DecayRadius = lights[i].Distance
-				light.multiplier = lights[i].Range / 9.5 --originally divided by 10. but its kind weak at times. 
-				light.falloff = lights[i].Falloff
-				
+				light.delegate.showCone = false
+				light.delegate.usefaratten = true
+				light.delegate.showfaratten = false
+				light.delegate.farattenend = lights[i].Distance *  1.0
+				light.delegate.farattenstart = light.delegate.farattenend * 0.25
+				light.delegate.attenDecay = 2
+				light.delegate.DecayRadius = lights[i].Distance
+				light.delegate.multiplier = lights[i].Range / 10 --originally divided by 10. but its kind weak at times. 
+				light.delegate.falloff = lights[i].Falloff
+
+			
 				local type = ofutils.lowercase(lights[i].Type)
 				if type == "omni" then
 				(
-					light.type = #omni
+					light.delegate.type = #omni
 				) else
 				(
-					light.type = #freeSpot
-					light.hotspot = lights[i].HotSpot
+					light.delegate.type = #freeSpot
+					light.delegate.hotspot = lights[i].HotSpot
 				)
+					
 				--light.type = #omni
 				setUserProp light "type" "light"
 				setUserProp light "typeflags" lights[i].TypeFlags					
@@ -1992,7 +2001,46 @@ struct ofio_iv_odr (
 				setUserProp light "_f60" lights[i]._f60				
 				setUserProp light "_f66" lights[i]._f66
 				
+
+				light.coronaTex=getTexture "coronastar"
+				light.shadowTex=getTexture "shad_exp"
+
+				light.coronaSize = lights[i].CoronaSize
+				light.pointlightRange = lights[i].Distance
+				light.coronaEnableReflection = true
+		
+				light.coronaFarClip = 100
+				light.shadowSize =  lights[i].Distance
+				light.shadowColorMultiplier = 180
+				light.shadowZDistance = 0.001
+
+				light.flag10 = true --CORONA_CHECK_OBSTACLES
+				light.flag11 = true--FOG_TYPE1
+				light.flag16 = true--AT_NIGHT
+
+				if 	light.coronaSize < 0.04 do 
+				(
+					light.shadowSize =  0.0
+					light.shadowColorMultiplier = 0
+					light.flag13 = true--WITHOUT_CORONA
+				)
+
+				if type == "omni" then
+				(
+					light.flag23 = true
+					light.enLookDirection = false
+				)
+				else
+				(
+					light.flag23 = true
+					light.enLookDirection = true
+					light.lookDirection_x = (lights[i].Direction.x * 10)  as integer
+					light.lookDirection_y = (lights[i].Direction.y * 10)  as integer
+					light.lookDirection_z = (lights[i].Direction.z * 10)  as integer
+				)
+
 				lights[i].obj = light
+			
 			)
 		)
 		

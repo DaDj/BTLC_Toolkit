@@ -1,15 +1,6 @@
 fileIn ("io.ms") quiet:true
 fileIn ("utils.ms") quiet:true
 
-function isCol obj=
-(
-    isit = false
-    if ((isProperty obj #isShadow ) == true) or ((custattributes.get obj TheColMesh) == true) then isit =true
-
-    isit
-)
-
-
 fn writeColBoxes f boxes col= (
 	for box in boxes do 
 	(

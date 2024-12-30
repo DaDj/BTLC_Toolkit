@@ -72,44 +72,72 @@ struct Btlc_Collision
 		isgone = false
 		MatsForbidden = #("MO_DC_Road_Markings_01MO_D","DC_Road_Markings_01DC_Road","MC_Glue_01MC_Glue_01_A","DC_Glue_01dc_glue_01_A","mo_dc_road_markings_01mo_d", \
 		"grass_weed1grass","et_grass02","grasstest","grassdark","bushdead","weedleaves","weedleavesa_2","weedylong","weedduo","sm_weeds","am_cables","weedylong_1weedylong_1a",\
-		"shrub1_bshrub1_ba","shrubred2bushdead1a")
-		for i in MatsForbidden do
+		"shrub1_bshrub1_ba","shrubred2bushdead1a","weedleavesa_1weedleavesa_2","et_ruststaindarkdirt256_2a","et_ruststainet_ruststain_a","dc_glue_01","ware_graf1","dc_rust_drips_01dc_rust_dr", \
+		"et_pud01et_pudc_a","wires_bxw","rd_mrkings1","lod_burgershotlod_burgersh","bxe_tags_1","bxetags2","grasstestgrasstest_a","nj5_rubbish_flowernj5_rubb",\
+		"et_puddet_pudd_a","njdocks_oilstainnjdocks_oi","weedleavesa_1weedleavesa_1","rd_dirt1","derelict_brush2derelict_br","nj01_ivybush02nj01_ivybush","am_glue_dirttreesurround",\
+		"ap_oil_stain_01","dc_waterdamage01dc_waterda","njdock_yell1njdock_yell3a","njdocks_drain1njdocks_drai","bm_helipad_logobm_helipad_","sl_parkinglines01sl_parkin",\
+		"db_bahamasigndb_bahamasign","db_diner4_litdb_diner4_lit" ,"db_spraysignage1db_spraysi","db_spraysignage2db_spraysi","dc_bawsaq_videowall_01dc_b","dc_bawsaq_videowall_02bdc_",\
+		"dc_bulb_direction_01dc_bul","dc_bulbs_pulse_01dc_bulbs_","dc_bulbs01_patern_1dc_bulb","dc_hk_bagel05dc_hk_bagel05","dc_mslogos01dc_mslogos01_a","dc_roadedgeglue_01sl_roade",\
+		"dc_rugspaintsgn01dc_rugspa","dc_yellowarrows_01dc_yello","dc_yellowhashlines_01dc_ye","dm_bp_oildripsdm_bp_oildri","dm_bp_rustbdm_bp_rust",\
+		"et_leavelitter01et_leaveli","et_leavelitter02et_leaveli","et_leavelitter03et_leaveli","et_numbers3et_keepclear_a","et_numbers3et_slow_a",\
+		"grassdarkgrassdark_a","ht_keepclear","ht_yellowline","mh_bsskate01mh_bsskate01_a","mh_bsskate02mh_bsskate02_a","nj01_keepclear","nj5_splatset_splats01",\
+		"ns_disabledparking","ns_italy_bunting_flagsns_i","ns_italy_bunting_greenns_i","ns_italy_bunting_orangens_","ns_italy_bunting_whitens_i",\
+		"ns_leaflitter01ns_leaflitt","ns_leavelittertile01ns_lea","ns_telegraphwire","sjmgrsssjmgrssa","sl_glue_01","sl_glue_01sl_glue_01_a","sl_grassedge_glue01sl_gras",\ 
+		"sl_parknglineglue_01sl_par","sl_paveedgeglue_01sl_pavee", "sl_roadedgeglue_01sl_roade","sl_tarmac02_cracks","sl_wires01","sm_brush1","sm_weeds1","sm_weeds2", \
+		"sm_weeds3","sm_weeds6","sm_weeds7","tf_grimedriptf_grimedrip_a","ws_drips1_smallm","ws_keepclearws_keepclear_a","xj_overlay_spill01xj_overl", "xj_overlay_spill02xj_overl",
+		"xj_overlay_spill04xj_overl","abs-flr-mxabs-flr-mx-a","abs-leafyabs-leafy-a","bkh_ivy","bushdead2bushdead2a","ed_sb9_foliageed_sb9_folia","et_arrowroadet_arrowroad_a",\
+		"et_glu01","et_gluerustet_gluerust_a","et_gluleaveet_gluleave_a","et_grass01et_grass01_a","et_grass02et_grass02_a","et_grassbitet_grassbit_a","et_keepcl2et_keepcl2_a",\
+		"et_letters1et_letters1_a","et_numbers2et_numbers2_a","et_numbers3et_numbers3_a","et_pierroadmarkinget_pierr","et_shiprust01et_shiprust01","et_stopet_slow_a","et_stopet_stop_a",\
+		"et_whitelineet_whiteline_a","grass_test_2grass_test_1a","grass_weed1grass_weed2a","ld_28_16bld_28_16","ld_28_17bld_28_17","ld_28_17ld_28_17b","ldwires",\
+		"leafybush1leafybush1a","leafybush2leafybush2a","nj01_italyflagsnj01_italyf","nj01_portugalflagsnj01_ita","nj01_roadmarkings01nj01_ro","nj01_ruststains","nj01_shadowoverlay",\
+		"nj01_twigsnj01_twigs_a","nj5_shrubthing_rubbish2nj5","nj5_splatsnj5_splatsalpha","njdock_stain1njdock_stain1","njdock_yellownjdock_yellow","njdocknumbers2njdocknumber",\
+		"njdockrustnjdockrust_a","njdocks_treadnjdocks_tread","pipedriptpipedripa","shrubred2shrubreda","swnjbuntingswnjbuntinga","swnjrustmtl1_resizeet_rust",\
+		"weedylong_4weedylong_4a","am_ap_leafedge256_d","am_glue_dirt","am_ap_terminal_wall_glue","am_glue_grassdirtgrasstest","am_rust1","ap_flyus_numbers","bkn_gunk_overlay_slime",\
+		"bxrd_dirt2bxrd_dirt2_a","bxrd_dirtbxrd_dirt_a","bxw_coastgrass","et_ap_tyre01et_ap_tyre01a","et_nums1et_nums1_a","jacob_scum","mo_fdlc_signmo_fdlc_sign_a",\
+		"nj5_pipewire1nj5_pipewire1","og_glue_01og_glue_01_a","rustdrip","startplay_bxstartplay_a_bx","wii_brdg_glu","wii_puddle","wii_tank_numbers")
+		
+		local notFound = true
+		for i in MatsForbidden while notFound  do
 		(   
-			thestring = (toLower i)
-			themat = (toLower Materialname)
-			test_mat = findstring  themat thestring
-			if test_mat != undefined and test_mat > 0 do
+			--thestring = (toLower i)
+			--themat = (toLower Materialname)
+			test_mat = matchPattern Materialname pattern:i
+			--test_mat = findstring  themat thestring
+			if test_mat == true do
 			(
 				deleteMeshFacesByMatID_Mesh node MtlID
 				isgone = true
+				notFound = false
 			)
 		)
 
-		try
-        (
-          Shader = custAttributes.get Material BTLC_MatShader 
-        
-          if Shader != undefined do
-          (
-            if ((findstring Shader.MyShaderName "decal") != undefined) then
-            (					
-				deleteMeshFacesByMatID_Mesh node MtlID
-				isgone = true
-            )
-
-			if ((findstring Shader.MyShaderName "gta_wire") != undefined) then
-            (					
-				deleteMeshFacesByMatID_Mesh node MtlID
-				isgone = true
-            )
-          )
-      
-        )
-        catch
-        (
-          format "***Error In Deletefobiddencollisionmats:  % ***   % \n " obj.name (getCurrentException()) 
-        )
-
+		if isgone == false do 
+		(
+			try
+			(
+			  Shader = custAttributes.get Material BTLC_MatShader 
+			
+			  if Shader != undefined do
+			  (
+				if ((findstring Shader.MyShaderName "decal") != undefined) then
+				(					
+					deleteMeshFacesByMatID_Mesh node MtlID
+					isgone = true
+				)
+	
+				if ((findstring Shader.MyShaderName "gta_wire") != undefined) then
+				(					
+					deleteMeshFacesByMatID_Mesh node MtlID
+					isgone = true
+				)
+			  )
+		  
+			)
+			catch
+			(
+			  format "***Error In Deletefobiddencollisionmats:  % ***   % \n " obj.name (getCurrentException()) 
+			)
+		)
 		isgone
 	),
 
@@ -162,8 +190,15 @@ struct Btlc_Collision
 	(
 		optimizer = optimize()
 		addModifier obj optimizer
-		optimizer.facethreshold1 = 1.5
-		optimizer.edgethreshold1 = 1.0
+
+		optimizer.facethreshold1 = 2.0
+		optimizer.edgethreshold1 = 1.1
+		if (matchPattern obj.name pattern:"*road*") or (matchPattern obj.name pattern:"*freeway*")  or (matchPattern obj.name pattern:"*highway*") then 
+		(
+			optimizer.facethreshold1 = 1.2
+			optimizer.edgethreshold1 = 1.0
+		)
+
 		maxOps.CollapseNode obj 1
 	),
 
@@ -172,7 +207,7 @@ struct Btlc_Collision
 		convertTo newCollisionMesh Editable_poly
 		
 		-- get the value of the angleNumeric parameter as a float
-		local currentAngle = (decimalToFloat angleNumeric)
+		--	local currentAngle = (decimalToFloat angleNumeric)
 		
 		-- if the currentAngle is greater than 0 we optimise the newCollisionMesh by removing edges
 		if currentAngle > 0.0 then

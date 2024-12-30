@@ -154,7 +154,14 @@ struct  Btlc_ModelConvert
 
 	fn ExportIde Path = 
 	(
-		
+		fs = openFile Path mode:"wb"
+		format "objs\n" to:fs
+		for Item in Ide do 
+		(
+			format "%, %, %, %, % \n" (Item.Id as string) Item.MdlName Item.Txd (Item.DrawDist as string) (Item.Flag as string)  to:fs
+		)
+		format "end\n" to:fs
+		close fs
 
 	),
 
@@ -351,7 +358,7 @@ struct  Btlc_ModelConvert
 				theobj.parent = undefined
 			)
 		)
-
+	
 		-- delete "-1"
 		TheMainNode.name = substring TheMainNode.name 1 (TheMainNode.name.count-2)
 
@@ -364,6 +371,7 @@ struct  Btlc_ModelConvert
 			else if theobj == TheMainColNode then continue
 			if  classof theobj == Editable_mesh then theobj.parent = TheMainNode 
 			else if  classof theobj == freeSpot or classof theobj == Omnilight  then theobj.parent = TheMainNode 
+			else if  classof theobj == GTA_Light   then theobj.parent = TheMainNode 
 			else if  classof theobj == ofio_iv_col_box then theobj.parent = TheMainColNode  
 			else if  classof theobj == Editable_Poly and (getUserProp theobj "type") == "BoundGeometry" then theobj.parent = TheMainColNode 
 			else if  classof theobj == ofio_iv_col_sphere then theobj.parent = TheMainColNode  
@@ -373,7 +381,7 @@ struct  Btlc_ModelConvert
 			-- Try to attach the collision to the main collision. (keep boxes or just duck it to a single mesh?)
 			-- put the lights below the main mesh
 		)
-
+		
 		-- Build damage mesh
 		dummyObj = undefined
 		if (oft_IsDamagable TheMainNode) == true then 
@@ -387,6 +395,7 @@ struct  Btlc_ModelConvert
 			TheMainNode.parent = dummyObj
 			TheDmgMain.parent = dummyObj
 		)
+
 		-- combine into one mesh
 		oft_combineMesh TheMainNode 
 
@@ -433,14 +442,15 @@ struct  Btlc_ModelConvert
 
 		for AModel in TheModels do 
 		(
-			try 
-			(
+			--try 
+		--	(
 				ThisObj = undefined
 				local oft = ofio_iv_oft()
 
 				oft.read(AModel)
 				ThisObj = oft.build()
 
+				
 				if ThisObj != undefined do ThisObj = oft_CleanUp ThisObj 
 
 				ThisObj.pos = [-(posX*10)-10, (posY * 10), 0]
@@ -451,13 +461,13 @@ struct  Btlc_ModelConvert
 					posX = 0;
 					posY = posY + 1
 				)
-			)
+		/*	)
 			catch 
 			(
 				print "Error while importing .oft files."
 				print AModel
 				--oft.cleanup()
-			)
+			)*/
 		)
 		--
 	),
@@ -551,6 +561,18 @@ struct  Btlc_ModelConvert
 		
 	),
 
+	fn BuildTxd = 
+    (
+     -- Build Txd with Magictxd
+        start = timeStamp();
+        TxdPath = ExportPath  + "\\txd"
+        Outpath = ExportPath + "\\img"
+        btlcMagicTxd.RunMagicTxd TxdPath OutPath
+        end = timeStamp();
+        format "Build Txds: Processing took % seconds\n" ((end - start) / 1000.0)  
+        gc();
+    ),
+
 	fn StartImport = 
 	(
 		with redraw off
@@ -576,6 +598,20 @@ struct  Btlc_ModelConvert
 		resumeEditing()
 		redrawviews()
 		freeSceneBitmaps() 	
+	),
+
+	fn StartExport = 
+	(
+		Path =  ExportPath + ".ide"
+		btlcModelConvert.ExportIde Path
+
+		OutputPath = ExportPath + "\\img";
+		makeDir OutputPath
+		btlcModelExport.ExportAllModels(OutputPath);
+		
+		MapPartName =  filenameFromPath ExportPath
+		Filepath = OutputPath + "\\" + MapPartName + ".col";
+		btlcCol.ExportAllCollisions(Filepath);
 	)
 
 
@@ -676,12 +712,16 @@ function btlc_GUIModelConvert =
 		button btn_ExportCity "Gen/Export Files" width:110 height:35 align:#center tooltip:"Exports .dff Models & Collision" 
 		on btn_ExportCity pressed do 
 		(
+			btlcModelConvert.ExportPath  =  btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.StartExport()
 		)
 		
 		button btn_GenTxd "Build .Txds" width:110 height:35 align:#center tooltip:"Generates Txds" 
 		on btn_GenTxd pressed do 
 		(
-			
+			btlcModelConvert.ImportPath =  btlcConfig.CurrentModelConvPath
+			btlcModelConvert.ExportPath =    btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.BuildTxd()
 		)
 		
 		button btn_OpenCol "Open .Col" width:110 height:35 align:#center tooltip:"Opens the .COl File to generate facegroups" 
