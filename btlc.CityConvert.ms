@@ -220,6 +220,8 @@ struct Btlc_ConvertCity
         GenMyData();
         InitTexDb();    -- Run Texture Database to get correct textures
         BuildMap();      -- Build Map --
+        btlcIDEUtils.IVParticlestoModels (ImportCityPath + ".IDE")  -- Import Particles
+        btlcIDEUtils.SetAlphaFlags (ExportCityPath  + ".ide") -- Find Decal Flags etc
         freeSceneBitmaps();
         gc();
     ),

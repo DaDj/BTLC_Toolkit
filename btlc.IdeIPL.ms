@@ -449,9 +449,191 @@ struct btlc_IDETools
 		Decalobjs = findDecalsObjs Myobjlist
 		print Decalobjs.count
 		TheIde = ChangeFlagsInIde TheIde Decalobjs 132
-		TheIde.thePath = TheIde.thePath + ".test"
+		TheIde.thePath = TheIde.thePath 
 		TheIde.Save() -- Overwrites the original .ide later
+	),
+
+	fn WriteDynObjData  idePath:undefined = --finds dynamic objectdata and writes them in correct format to listener
+	(
+		Myobjlist = #()
+		for aModel in objects where aModel.parent == undefined do append Myobjlist aModel
+
+		for theobj in Myobjlist do 
+		(
+			if 	(custattributes.get theobj gtaDynObject != undefined) do 
+			(
+				ObjDat = (custattributes.get theobj gtaDynObject)
+				format "%, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, % \n" \
+				theobj.name ObjDat.Mass ObjDat.TurnMass ObjDat.AirResistance ObjDat.Elasticity ObjDat.PercSubmerged ObjDat.Uproot \
+				ObjDat.CDMult ObjDat.CDEff ObjDat.SpCDR ObjDat.CamAv ObjDat.Expl ObjDat.FX_TYPE \
+				ObjDat.FX_OFFSETx ObjDat.FX_OFFSETy ObjDat.FX_OFFSETz ObjDat.FX_NAME \
+				ObjDat.B_SM ObjDat.B_VX ObjDat.B_VY ObjDat.B_VZ ObjDat.B_VR ObjDat.B_GUN ObjDat.B_SPK 
+			)
+		)
+		format "\n"
+
+		if idePath != undefined do 
+		(
+			TheIde = btlc_SA_IDE() 
+			TheIde.thePath = idePath  
+			TheIde.Load()
+	
+			for theobj in Myobjlist do 
+			(
+				if 	(custattributes.get theobj gtaDynObject != undefined) do 
+				(
+					for Item in TheIde.objs do 
+					(
+						if matchpattern Item.name pattern:theobj.name  do 
+						(
+							ObjDat = (custattributes.get theobj gtaDynObject)
+							format "%, %, %, %, %, % \n" (Item.Id as string) Item.Name ObjDat.MassPType  ObjDat.MassPx ObjDat.MassPy	ObjDat.MassPz	
+						)
+					)
+				
+				)
+			)
+		)
 	)
 
 )
 btlcIDEUtils = btlc_IDETools()
+
+
+
+if gtaDynObject==undefined then(
+
+	global gtaDynObject = attributes "DynObject" attribID:#(0x59d1c458, 0xd290803)
+	(
+		parameters main rollout:params
+		(
+
+			Mass type:#Float  default:100.0 ui:spin_Mass
+			TurnMass type:#Float  default:150.0 ui:spin_TurnMass
+			AirResistance type:#Float  default:0.99 ui:spinAirRes
+			Elasticity type:#Float  default:0.03 ui:spinElas
+			PercSubmerged type:#Float  default:50.0 ui:spinPerSubmrgd
+			Uproot type:#Float  default:20.0 ui:spinUproot
+			CDMult type:#Float  default:2.0 ui:spinCdMult
+			CDEff type:#Integer  default:0 ui:spinEff -- 0: none, 1:changemdl , 20:smash , 21: changthensmash , 200:breakable, 202:breakable ansd remove forever
+			SpCDR type:#Integer  default:0 ui:spinSpCDR-- 0: none, 1: lampost, 2:smallbox, 3: bigbox, 4:fencepart,5:grenade,6:swingdoor,7:Lockdoor, 8:Hanging, 9:ob_col_poolball
+			CamAv type:#Integer  default:1 ui:chbCAv
+			Expl type:#Integer  default:0 ui:chbExpl
+			FX_TYPE type:#Integer  default:0 ui:spinFxSysType -- 0 - no FxSystem, 1 - play when hit, 2 - play when destroyed, 3 - play when hit or destroyed
+			FX_OFFSETx type:#Float  default:0.0 ui:spinOffsx
+			FX_OFFSETy type:#Float  default:0.0 ui:spinOffsy
+			FX_OFFSETz type:#Float  default:0.0 ui:spinOffsz
+			FX_NAME type:#string  default:"none" ui:edtxtFxNAme
+			B_SM type:#Float  default:100.0 ui:spinSmshMult--if set to 2.0 then it will take twice the force to smash as opposed to break an object (1.0 - smash only - never break, set very large if it only breaks and never smashes)
+			B_VX type:#Float  default:0.0 ui:spinbrkVelX
+			B_VY type:#Float  default:0.0 ui:spinbrkVelY
+			B_VZ type:#Float  default:0.1 ui:spinbrkVelZ
+			B_VR type:#Float  default:0.07 ui:spinbrkVelRand
+			B_GUN type:#Integer  default:0 ui:spinGunBrkM
+			B_SPK type:#Integer  default:1 ui:chbSprk
+			MassPType  type:#Integer  default:1 ui:spinMassp
+			MassPx	type:#Float  default:0.0  ui:spinMasspCx
+			MassPy	type:#Float  default:0.0  ui:spinMasspCy
+			MassPz	type:#Float  default:0.0  ui:spinMasspCz
+		)
+		rollout params "GTA Dynamic Object"
+		(
+			spinner spin_Mass "Mass" range:[0.0,10000.0,100.0] tooltip:"1 to 50000 inclusive. Unit is kilograms."
+			spinner spin_TurnMass "Turn Mass" range:[0.0,10000.0,150.0] tooltip:".. "
+			spinner spinAirRes "Air Resistance" range:[0.0,1.0,0.99] tooltip:"Normalised  0 = complete air resistance, 1 = no air resistance."
+			spinner spinElas "Elasticity" range:[0.0,1.0,0.03] tooltip:"Bounciness. Normalised. 0 is least bouncy, 1 is the most."
+			spinner spinPerSubmrgd "PercSubmerged" range:[0.0,120,50.0] tooltip:"10 to 120. Most objects have a value of 50.0 for this attribute."
+			spinner spinUproot "Uproot" range:[0.0,5000,20.0] tooltip:"force magnitude required to uproot"
+			spinner spinCdMult "CDMult" range:[0.0,10.0,2.0] tooltip:"how much damage a collision should do to vehicles. 0.1 - 5.0 ish according to the file."
+			spinner spinEff "CDEff" range:[0,202,0] enabled:false type:#integer
+			dropDownList ddlEffect "CDEff" items:#("0: none", "1:changemdl ", "20:smash ", "21: changthensmash ", "200:breakable", "202:breakable and remove forever") 
+			on ddlEffect selected TheEff do 
+			(
+				if TheEff == 1 do CDEff = 0
+				if TheEff == 2 do CDEff = 1
+				if TheEff == 3 do CDEff = 20
+				if TheEff == 4 do CDEff = 21
+				if TheEff == 5 do CDEff = 200
+				if TheEff == 6 do CDEff = 202
+			) 
+			spinner spinSpCDR "Special Response" range:[0,10,0] enabled:false type:#integer
+			dropDownList ddlSpCDR "Special Response" items:#("0: none", "1: lampost", "2:smallbox", "3: bigbox", "4:fencepart","5:grenade","6:swingdoor","7:Lockdoor", "8:Hanging", "9:ob_col_poolball") 
+			on ddlSpCDR selected TheResp do 
+			(
+				if TheResp == 1 do SpCDR = 0
+				if TheResp == 2 do SpCDR = 1
+				if TheResp == 3 do SpCDR = 2
+				if TheResp == 4 do SpCDR = 3
+				if TheResp == 5 do SpCDR = 4
+				if TheResp == 6 do SpCDR = 5
+				if TheResp == 7 do SpCDR = 6
+				if TheResp == 8 do SpCDR = 7
+				if TheResp == 9 do SpCDR = 8
+				if TheResp == 10 do SpCDR = 9
+			) 
+			checkbox chbCAv "Cam avoid Obj" type:#boolean
+			checkbox chbExpl "Cause Explosion" type:#boolean
+
+			group "Fx System"
+			( 
+				spinner spinFxSysType "Fx Type" range:[0,202,0] enabled:false type:#integer
+				dropDownList ddlFXType "Fx Type" items:#(" 0 - no FxSystem", "1 - play when hit", "2 - play when destroyed", "3 - play when hit or destroyed") 
+				on ddlFXType selected TheEff do 
+				(
+					if TheEff == 1 do FX_TYPE = 0
+					if TheEff == 2 do FX_TYPE = 1
+					if TheEff == 3 do FX_TYPE = 2
+					if TheEff == 4 do FX_TYPE = 3
+				) 
+				spinner spinOffsx "Fx Offset x" range:[0,1000,0]  type:#float
+				spinner spinOffsy "Fx Offset y" range:[0,1000,0]  type:#float
+				spinner spinOffsz "Fx Offset z" range:[0,1000,0]  type:#float
+
+				edittext edtxtFxNAme "Fx Name" 
+			)
+
+			group "Breakable"
+			(
+				spinner spinSmshMult "Smash Mult" range:[0.0,10000.0,100.0] 
+				spinner spinbrkVelx "Break Vel. X" range:[0.0,10000.0,0.0]
+				spinner spinbrkVely "Break Vel. Y" range:[0.0,10000.0,0.0]  
+				spinner spinbrkVelZ "Break Vel. Z" range:[0.0,10000.0,0.1]  
+				spinner spinbrkVelRand "Break Vel. Rand" range:[0.0,10000.0,0.07]  
+
+				spinner spinGunBrkM "GunBrkMode" range:[0,202,0] enabled:false type:#integer
+				dropDownList ddlGunBrkM "GunBrkMode" items:#(" 0 - Immune to Gun", "1 - Breakable", "2 - Smashable") 
+				on ddlGunBrkM selected TheEff do 
+				(
+					if TheEff == 1 do B_GUN = 0
+					if TheEff == 2 do B_GUN = 1
+					if TheEff == 3 do B_GUN = 2
+				) 
+
+				checkbox chbSprk "Sparks on impact" type:#boolean
+			)
+
+			group "Custom Masspoint"
+			(
+				spinner spinMassp "MassPoint" range:[0,3,0] enabled:false type:#integer
+				dropDownList ddlMassp "MassPoint" items:#(" 0 - Pivot", "1 - Middle", "2 - Custom")  selection:2
+				on ddlMassp selected TheEff do 
+				( 
+					if TheEff == 1 do MassPType = 0
+					if TheEff == 2 do MassPType = 1
+					if TheEff == 3 do MassPType = 2
+				) 
+				label mylabl "Type 3 coords:"
+				spinner spinMasspCx "Custom X" range:[0.0,10000.0,0.0]
+				spinner spinMasspCy "Custom Y" range:[0.0,10000.0,0.0]  
+				spinner spinMasspCz "Custom Z" range:[0.0,10000.0,0.1]  
+
+			)
+
+			hyperlink btnhelp "Help/Info" address:"https://gtamods.com/wiki/Object.dat"
+
+			
+			
+		)
+	)
+	
+	)

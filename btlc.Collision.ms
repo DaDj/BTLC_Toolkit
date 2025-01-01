@@ -382,7 +382,7 @@ struct Btlc_Collision
 	function isCol obj=
 	(
 		isit = false
-		if ((isProperty obj #isShadow ) == true) or ((custattributes.get obj TheColMesh) == true) then isit =true
+		if ((isProperty obj #isShadow ) == true) or ((custattributes.get obj ColMesh) == true) then isit =true
 		if classof obj == Collision_Box then isit = true
 		if classof obj ==Collision_Sphere then isit = true 
 		isit

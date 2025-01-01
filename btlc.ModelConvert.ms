@@ -95,6 +95,7 @@ struct  Btlc_ModelConvert
 	-- Load IdeData
 	fn ConvertIde Path  = 
 	(
+		Ide = #()
 		IdObj= 1
 		IDCurr = IdStart
 		fs = openFile Path
@@ -278,25 +279,43 @@ struct  Btlc_ModelConvert
 
 	fn oft_combineMesh TheMainNode = 
 	(
-		BreakNode = copy TheMainNode
-		BreakNode.name = BreakNode.name + "_b"
-		BreakNode.parent = TheMainNode
-		setUserProp BreakNode "breakmdl" "breakable"
+		--BreakNode = copy TheMainNode
+		--BreakNode.name = BreakNode.name + "_b"
+		--BreakNode.parent = TheMainNode
+		--setUserProp BreakNode "breakmdl" "breakable"
+
+	--	for iface = 1 to (getNumFaces BreakNode) do  setFaceSmoothGroup BreakNode iface 1
+		for iface = 1 to (getNumFaces TheMainNode) do  setFaceSmoothGroup TheMainNode iface 1
+
+	
 
 		TheMeshNodes = get_all_nodes TheMainNode
+		objcounter = 2
 		for obj in TheMeshNodes do 
 		(
-			
-			if (isValidNode obj) != true or  obj == TheMainNode or  obj == BreakNode  then continue 
+			sg_bitarray = #{} as bitarray
+			sg_bitarray[32] = 0
+			if (isValidNode obj) != true or  obj == TheMainNode   then continue 
 			if  classof obj == Editable_mesh then 
 			(
-				objb = copy obj name:(obj.name + "_b")
-				objb.Material = copy objb.Material
 
-				meshop.attach BreakNode objb attachMat:#IDtoMat condenseMat:false
-
+				sg_bitarray[objcounter] = 1
 				converttomesh obj
+				for iface = 1 to (getNumFaces obj) do
+				(
+					local sgroup_val=0
+					for i in sg_bitarray do sgroup_val += 2^(i-1)
+					setFaceSmoothGroup obj iface sgroup_val
+				) 
+				update obj
+
+				--objb = copy obj name:(obj.name + "_b")
+				--objb.Material = copy objb.Material
+				--meshop.attach BreakNode objb attachMat:#IDtoMat condenseMat:false
+
 				meshop.attach TheMainNode obj attachMat:#matToID condenseMat:true
+				
+				objcounter = objcounter + 1 
 			)
 		)
 		TheMainNode
@@ -366,7 +385,7 @@ struct  Btlc_ModelConvert
 		-- sort the objects
 		for theobj in KeepNodes do 
 		(
-			
+			if isValidNode theobj == false then continue
 			if theobj == TheMainNode then continue 
 			else if theobj == TheMainColNode then continue
 			if  classof theobj == Editable_mesh then theobj.parent = TheMainNode 
@@ -593,6 +612,7 @@ struct  Btlc_ModelConvert
 
 				MatchOdrtoCol ColContainer
 			) 
+			btlcIDEUtils.IVParticlestoModels IDEFILE[1]  -- Import Particles
 		)
 		gc();
 		resumeEditing()
@@ -790,8 +810,41 @@ function btlc_GUIModelConvert =
 			btlcModelConvert.InitTexDb()
 			gc();	
 		)
+		button btn_dummy "  " width:110 height:35 align:#center tooltip:"Export the models" 
 
-		button btn_DynCol "DynamicColUtil" width:110 height:35 align:#center tooltip:"Tool for Dynmaic Collision creation.(spheres)" 
+		button btn_AddDynObj "Set as Dynamic Obj" width:110 height:35 align:#center tooltip:"Adds dynamic attributes to Object"  across:4
+		on btn_AddDynObj pressed do 
+		(
+			custAttributes.add selection[1] gtaDynObject 
+		)
+
+		button btn_DynData "Export Dynamic Data" width:110 height:35 align:#center tooltip:"Export the objects dynamic data" 
+		on btn_DynData pressed do 
+		(
+			btlcIDEUtils.WriteDynObjData idePath: (btlcConfig.CurrentModelConvPathSA + ".ide")
+		)
+ 
+		button btn_dummy2"  " width:110 height:35 align:#center tooltip:"Export the models" 
+		button btn_dummy3"  " width:110 height:35 align:#center tooltip:"Export the models" 
+
+	
+		group "Dynamic Col Creation"
+		(
+			spinner spinMaxverts "maxvert" range:[0,32,16]  type:#integer  across:4
+			spinner spinSphSize "SphereRadius" range:[0.0,1.0,0.05]  type:#float
+			spinner spinpushin "Push in" range:[-30.0,0.0,-5.0]  type:#float
+	
+			
+			button btn_DynCol "Create Dyn. Spheres" width:110 height:35 align:#center tooltip:"Tool for Dynmaic Collision creation.(spheres)"  
+			on btn_DynCol pressed do 
+			(
+				if selection.count > 0 do CreatDynamicCol selection[1]  maxVert:spinMaxverts.value push:spinpushin.value tradius:spinSphSize.value
+				
+			)
+			
+		)
+
+
 		/*
 		button btn_GenerateTxds "GenerateTXDs" width:120 height:35 align:#center tooltip:"Generate the .txds" 
 		on btn_GenerateTxds pressed do 

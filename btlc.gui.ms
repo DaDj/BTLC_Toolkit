@@ -247,7 +247,7 @@ fn btlcUIModelTools =
 			btlcCol.ConvertMeshtoCol selection[1]
 			selection[1].isShadow = true
 		)
-		button btn_PivotasParent "Pivot to Parent" width:110 height:25 align:#center tooltip:"Set selected pivot to same as the parent" across:1
+		button btn_PivotasParent "Pivot to Parent" width:110 height:25 align:#center tooltip:"Set selected pivot to same as the parent" across:2
 		on btn_PivotasParent pressed do 
 		(
 			if selection[1].parent != undefined do 
@@ -255,9 +255,13 @@ fn btlcUIModelTools =
 				selection[1].pivot = selection[1].parent.pivot
 				ResetXForm selection[1]
 				converttomesh selection[1]
-
 			)
-		
+		)
+
+		button btn_AddDynObj "Set as Dynamic Obj" width:110 height:25 align:#center tooltip:"Adds dynamic attributes to Object" 
+		on btn_AddDynObj pressed do 
+		(
+			custAttributes.add selection[1] gtaDynObject
 		)
 	)
 
