@@ -6,7 +6,7 @@ struct btlc_IV_ObjAnim(Name = "",  Txd = "",  Anim = "",  DrawDist = 100,  Flag 
 
 struct btlc_IV_2dfxParticle(Modelname,  Position, FxName = "")
 
-struct btlc_IV_2dfxSpawn(Modelname,    Position, Rotation, Flags)
+struct btlc_IV_2dfxSpawn(Modelname,    Position, Rotation, Flags1, Flags2)
 
 struct btlc_Txdp( Txd = "", TxdParent = "")
 
@@ -31,6 +31,7 @@ struct btlc_SA_IDE
     fn Load  = 
     (
         fs = openFile thePath
+		if fs == undefined do return()
 		while not eof fs do
 		(
 			l = readline fs
@@ -153,6 +154,12 @@ struct btlc_IV_IDE
     fxParticle = #(),
 	fxSpawn = #(),
     txdp = #(),
+	objsorg = #(),
+	tobjsorg = #(),
+	animorg = #(),
+	fxorg = #(),
+	txdporg = #(),
+	mloorg = #(),
 
     fn Load = 
     (
@@ -163,10 +170,12 @@ struct btlc_IV_IDE
 			if l == "objs" do 
 			(
                 IdObj= objs.count + 1
+				
 				while l != "end" do
 				(
 					l = readline fs
 					if l == "end" then exit
+					objsorg[IdObj] = l
 					fl = filterString l  ","
 					objs[IdObj] = btlc_IV_Obj();
 					objs[IdObj].Name = (trimLeft(trimRight fl[1]))
@@ -184,6 +193,7 @@ struct btlc_IV_IDE
 				(
 					l = readline fs
 					if l == "end" then exit
+					tobjsorg[IdObj] = l
 					fl = filterString l  ","
 					tobjs[IdObj] = btlc_IV_TObj();
 					tobjs[IdObj].Name = (trimLeft(trimRight fl[1]))
@@ -203,6 +213,7 @@ struct btlc_IV_IDE
 				(
 					l = readline fs
 					if l == "end" then exit
+					animorg[IdObj] = l
 					fl = filterString l  ","
 					anim[IdObj] = btlc_IV_ObjAnim();
 					anim[IdObj].Name = (trimLeft(trimRight fl[1]))
@@ -221,6 +232,7 @@ struct btlc_IV_IDE
 				(
 					l = readline fs
 					if l == "end" then exit
+					txdporg[IdObj] = l
 					fl = filterString l  ","
 					txdp[IdObj] = btlc_Txdp();
 					txdp[IdObj].Txd = (trimLeft(trimRight fl[1]))
@@ -229,13 +241,30 @@ struct btlc_IV_IDE
 				)
 			)
 
-			if l == "2dfx" do 
+			
+            if l == "mlo" do 
 			(
-                IdObj = fxParticle.count + 1
+                IdObj = mloorg.count + 1
 				while l != "end" do
 				(
 					l = readline fs
 					if l == "end" then exit
+					mloorg[IdObj] = l
+					IdObj = IdObj + 1
+				)
+			)
+
+			if l == "2dfx" do 
+			(
+				dfxcounter = fxorg.count +1;
+			
+				while l != "end" do
+				(
+					l = readline fs
+					if l == "end" then exit
+					
+					fxorg[dfxcounter] = l
+					dfxcounter = dfxcounter +1
 					fl = filterString l  ","
 
 					dfxType = toLower(trimLeft(trimRight fl[5])) as integer
@@ -245,10 +274,10 @@ struct btlc_IV_IDE
 						isvalid2dfx = toLower(trimLeft(trimRight fl[11])) as integer 
 						if isvalid2dfx == 0 do 
 						(
+							IdObj = fxParticle.count + 1
 							--btlc_IV_2dfxParticle
 							fxParticle[IdObj] = btlc_IV_2dfxParticle();
-
-							
+				
 							fxParticle[IdObj].Modelname = toLower(trimLeft(trimRight fl[1]))
 							fxParticle[IdObj].Position = [0,0,0] as point3 
 							fxParticle[IdObj].Position[1] =  toLower(trimLeft(trimRight fl[2])) as Float  
@@ -262,7 +291,27 @@ struct btlc_IV_IDE
 
 					if dfxType == 17 do 
 					(
-						
+						idspawn = fxSpawn.count +1
+						fxSpawn[idspawn] = btlc_IV_2dfxSpawn();
+
+						fxSpawn[idspawn].Modelname = toLower(trimLeft(trimRight fl[1]))
+						fxSpawn[idspawn].Position = [0,0,0] as point3 
+						fxSpawn[idspawn].Position[1] =  toLower(trimLeft(trimRight fl[2])) as Float  
+						fxSpawn[idspawn].Position[2] =  toLower(trimLeft(trimRight fl[3])) as Float  
+						fxSpawn[idspawn].Position[3] =  toLower(trimLeft(trimRight fl[4])) as Float  
+
+						x =  toLower(trimLeft(trimRight fl[6])) as Float  
+						y =  toLower(trimLeft(trimRight fl[7])) as Float  
+						z =  toLower(trimLeft(trimRight fl[8])) as Float  
+						w =  toLower(trimLeft(trimRight fl[9])) as Float  
+						fxSpawn[idspawn].Rotation = quat x y z w
+						fxSpawn[idspawn].Flags1 = toLower(trimLeft(trimRight fl[10])) 
+						fxSpawn[idspawn].Flags2 = toLower(trimLeft(trimRight fl[11])) 
+						--fxSpawn = #(),Modelname,    Position, Rotation, Flags1, Flags2
+
+						--print fxSpawn[idspawn].Modelname  
+						--print fxSpawn[idspawn].Flags1
+					
 					)		
 				)
 			)
@@ -270,9 +319,68 @@ struct btlc_IV_IDE
         close fs
     ),
 
-    fn Save = 
+    fn SaveOrg = 
     (
+        fs = openFile thePath mode:"wb"
+		format "objs\r\n" to:fs
+		for Item in objsorg do 
+		(
+			format "%\r\n" (Item as string) to:fs
+		)
+		format "end\r\n" to:fs
 
+		format "tobj\r\n" to:fs
+		for Item in tobjsorg do 
+		(
+			format "%\r\n" (Item as string) to:fs
+		)
+		format "end\r\n" to:fs
+
+		format "tree\r\n" to:fs
+		format "end\r\n" to:fs
+		
+		format "path\r\n" to:fs
+		format "end\r\n" to:fs
+		
+		format "anim\r\n" to:fs
+		for Item in animorg do 
+		(
+			format "%\r\n" (Item as string) to:fs
+		)
+		format "end\r\n" to:fs
+		
+				
+		format "tanm\r\n" to:fs
+		format "end\r\n" to:fs
+		
+
+		format "mlo\r\n" to:fs
+		for Item in mloorg do 
+		(
+			format "%\r\n" (Item as string) to:fs
+		)
+		format "end\r\n" to:fs
+		
+		format "2dfx\r\n" to:fs
+		for Item in fxorg do 
+		(
+			format "%\r\n" (Item as string) to:fs
+		)
+		format "end\r\n" to:fs
+		
+		
+				
+		format "amat\r\n" to:fs
+		format "end\r\n" to:fs
+		
+
+		format "txdp\r\n" to:fs
+		for Item in txdporg do 
+		(
+			format "%\r\n" (Item as string) to:fs
+		)
+		format "end\r\n" to:fs
+		close fs
     )
 )
 
@@ -352,6 +460,34 @@ struct btlc_IDETools
 		MyIde.thePath = IdePath;
 		MyIde.Load()
 		ApplyParticletoModels MyIde.fxParticle
+	),
+
+	fn ApplySpawntoModel SpawnList = 
+	(
+		for TheSpawn in SpawnList do 
+		(
+			for aModel in objects where aModel.parent == undefined do 
+			(
+				if matchpattern aModel.name pattern:TheSpawn.Modelname do 
+				(
+					TheEffect = GTA_Pedattractor()
+					TheEffect.probability = 20
+					TheEffect.parent = aModel
+					--TheEffect.pos = aModel.pos
+					TheEffect.pos =  (in coordsys parent TheSpawn.Position) + aModel.pos
+				
+				)
+			)
+		)
+
+	),
+
+	fn IVSpawntoModel IdePath = 
+	(
+		MyIde = btlc_IV_IDE()
+		MyIde.thePath = IdePath;
+		MyIde.Load()
+		ApplySpawntoModel MyIde.fxSpawn
 	),
 
 	-- VV Decal obj finder and apply to SA IDE VV ---
@@ -494,6 +630,21 @@ struct btlc_IDETools
 				)
 			)
 		)
+	),
+
+	fn SetObjAsBreakable theObj = 
+	(
+		if ((classof theObj == Editable_mesh)and((custattributes.get theObj BreakableMesh)==undefined)and(meshop.getMapSupport theObj 0)and(meshop.getMapSupport theObj 1)) then 
+		(
+			b=copy theObj
+			makeBreakable b
+			b.name=(theObj.name)+"_breakable"
+			b.parent=theObj
+		)
+		custAttributes.add theObj gtaDynObject 
+		theObj.CDEff = 200
+				
+	
 	)
 
 )

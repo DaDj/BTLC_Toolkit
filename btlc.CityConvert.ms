@@ -168,7 +168,7 @@ struct Btlc_ConvertCity
         resumeEditing()
         redrawviews()
         saveMaxFile MapPartName	
-    --    autosave.tempDisable = false
+        --    autosave.tempDisable = false
     ),
 
     fn CityLightSettings =  
@@ -186,6 +186,15 @@ struct Btlc_ConvertCity
         )
     ),
     
+    fn ApplyUVAnim =
+    (
+        MapPartName =  filenameFromPath ExportCityPath
+        AnimPath = ImportCityPath + "\\wad\\" + MapPartName + ".oad"
+        BtlcUVAnim = BTLC_UVAnim()
+        IsAnim =  BtlcUVAnim.ImportAnim AnimPath
+        if IsAnim > 0 do  BtlcUVAnim.ApplytoAllObjs()
+    ),
+    
     fn BuildMap = 
     (
         TheMap.BuildAll();
@@ -194,6 +203,9 @@ struct Btlc_ConvertCity
         TheMap.PlaceLodModels (ExportCityPath  + "_LOD.ipl")
         ObjDeleteIfUnused IdeFile
         format "lod map\n"
+
+       
+        ApplyUVAnim()
 
         CityLightSettings()
         start = timeStamp()

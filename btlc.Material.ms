@@ -7,8 +7,9 @@ BTLC_MatShader = attributes "BTLC_MatShader"  attribID:#(0x3c0e6f, 0xb139b19)
 		MYShaderID type:#integer default:0;
 		MyShaderType type:#integer default:0;
 		MyShaderName type:#string	default:"";
-    MyShaderOrgMatId type:#integer default:0
-    MyShaderIsAnim type:#integer default:0
+    MyShaderOrgMatId type:#integer default:0;
+    MyShaderIsAnim type:#integer default:0;
+    MyShaderOrgName  type:#string	default:"";
 	)
 	rollout params "BTLC MaterialData"
 	(
@@ -17,6 +18,7 @@ BTLC_MatShader = attributes "BTLC_MatShader"  attribID:#(0x3c0e6f, 0xb139b19)
 		edittext lnShaderName  "ShaderName" type:#string
     spinner lblOrgMatID "OrgMatId" type:#integer
     spinner lblisANim "Is Animated" type:#integer
+    edittext lnOrgName  "OrgMatName" type:#string
 		on params open do 
 		(
 			lblShaderID.value = MYShaderID
@@ -24,6 +26,7 @@ BTLC_MatShader = attributes "BTLC_MatShader"  attribID:#(0x3c0e6f, 0xb139b19)
 			lnShaderName.text = MyShaderName
       lblOrgMatID.value = MyShaderOrgMatId
       lblisANim.value = MyShaderIsAnim
+      lnOrgName.text = MyShaderOrgName
 		)
 	)
 )
@@ -119,6 +122,7 @@ struct Btlc_Material
     rw.color = color 255 255 255 255
     
     /* std map */
+    OrgName = TheName
     if TheName.count >  26 do TheName = substring TheName 1 26
     local  idx = finditem BtlcTextDB.TexNameList TheName
     FilePath = TheName
@@ -179,7 +183,9 @@ struct Btlc_Material
     rw.MyShaderType = 2
     rw.MyShaderName = shader[1]
     rw.MyShaderOrgMatId = MtlID
+    rw.MyShaderOrgName = OrgName
     rw.showInViewport = true
+   
     rw
   ),
 

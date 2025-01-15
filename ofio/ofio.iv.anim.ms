@@ -1106,7 +1106,7 @@ struct ofio_iv_anim (
 	fn ApplyAnimtoMaterial TheMat = 
     (
         local texture
-        texture = TheMat.texmap_texture
+        texture = TheMat.texture
 
         local block, i, j
         frameRate = Frames / Duration

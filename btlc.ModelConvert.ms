@@ -284,7 +284,7 @@ struct  Btlc_ModelConvert
 		--BreakNode.parent = TheMainNode
 		--setUserProp BreakNode "breakmdl" "breakable"
 
-	--	for iface = 1 to (getNumFaces BreakNode) do  setFaceSmoothGroup BreakNode iface 1
+		--	for iface = 1 to (getNumFaces BreakNode) do  setFaceSmoothGroup BreakNode iface 1
 		for iface = 1 to (getNumFaces TheMainNode) do  setFaceSmoothGroup TheMainNode iface 1
 
 	
@@ -613,6 +613,8 @@ struct  Btlc_ModelConvert
 				MatchOdrtoCol ColContainer
 			) 
 			btlcIDEUtils.IVParticlestoModels IDEFILE[1]  -- Import Particles
+			btlcIDEUtils.IVSpawntoModel IDEFILE[1]
+			
 		)
 		gc();
 		resumeEditing()
@@ -707,7 +709,7 @@ function btlc_GUIModelConvert =
 		
 	)
 
-	rollout ModelConvert "ModelConvert" width:210 height:400
+	rollout ModelConvert "ModelConvert" width:210 height:450
 	(	
 		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
 		
@@ -818,13 +820,19 @@ function btlc_GUIModelConvert =
 			custAttributes.add selection[1] gtaDynObject 
 		)
 
+		button btn_CreateBrk "Set as Breakable" width:110 height:35 align:#center tooltip:"Export the models" 
+		on btn_CreateBrk pressed do 
+		(
+			btlcIDEUtils.SetObjAsBreakable selection[1] 
+		)
+
 		button btn_DynData "Export Dynamic Data" width:110 height:35 align:#center tooltip:"Export the objects dynamic data" 
 		on btn_DynData pressed do 
 		(
 			btlcIDEUtils.WriteDynObjData idePath: (btlcConfig.CurrentModelConvPathSA + ".ide")
 		)
  
-		button btn_dummy2"  " width:110 height:35 align:#center tooltip:"Export the models" 
+
 		button btn_dummy3"  " width:110 height:35 align:#center tooltip:"Export the models" 
 
 	
@@ -871,7 +879,7 @@ function btlc_GUIModelConvert =
 	try (closeRolloutFloater btlcIdeModelsFloater) catch ()
 	Pos = getMaxWindowSize() 	
 	PosX = Pos[1]/2 - 300
-	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Model Convert" 620 400 PosX 250
+	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Model Convert" 620 500 PosX 250
 	addRollout  DirSettings btlcIdeModelsFloater
 	addRollout  ModelConvert btlcIdeModelsFloater
 	addRollout  Model_Utils btlcIdeModelsFloater

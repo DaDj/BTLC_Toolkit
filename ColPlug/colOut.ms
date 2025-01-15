@@ -110,7 +110,7 @@ fn writeColMesh f m isShadow = (
 					)
 				
 					MyDayBrightness = amin #(ceil((MyDayBrightness^2*4) * 15),15) as integer
-					MyNightBrightness = amin #(ceil((MyNightBrightness^2 * 10) * 15),15) as integer
+					MyNightBrightness = amin #(ceil((MyNightBrightness^2*6 + 0.6) * 15),15) as integer
 					MyNightBrightness = bit.shift MyNightBrightness 4
 					MyCompletBright = MyDayBrightness + MyNightBrightness
 					WriteByte f MyCompletBright
