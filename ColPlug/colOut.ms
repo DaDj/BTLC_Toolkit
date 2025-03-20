@@ -10,7 +10,10 @@ fn writeColBoxes f boxes col= (
 		writeVertex f (pos1)
 		writeVertex f (pos2)
 		writeByteIndex f (box.matID +1 )
-		writePadding f 3
+		--writePadding f 3
+		writeByteIndex f 255
+		writeByteIndex f 255
+		writeByteIndex f 255
 	)
 )
 
@@ -29,7 +32,8 @@ fn writeColSpheres f spheres reverse col = (
 		)
 		writeByteIndex f (sphere.matID + 1)
 		writeByteIndex f (sphere.flag)
-		writeShort f 0
+		writeByteIndex f 255
+		writeByteIndex f 255
 	)
 )
 

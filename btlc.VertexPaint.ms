@@ -113,6 +113,18 @@ struct btlc_VertexPaint
         for i = 1 to vcnum do meshop.setMapVert obj CHVertex_Alpha i ( meshop.getMapVert obj ChVertexAlpha3dsmax  i )
         for i = 1 to vcfaces do meshop.setMapFace obj CHVertex_Alpha i (meshop.getMapFace obj ChVertexAlpha3dsmax  i) 
         update obj
+    ),
+
+
+
+    fn PaintWindMatiID Obj MtlID = 
+    ( 
+    for f=1 to Obj.numfaces where (getFaceMatID Obj f) == MtlID do 
+	(
+		meshop.setFaceColor Obj -2 f  (color 230 230 230 255)
+		meshop.setFaceColor Obj 9 f  (color 230 230 230 255)
+	)
     )
+
 )
 btlcVertexPaint = btlc_VertexPaint();

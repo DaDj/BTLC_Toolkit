@@ -76,9 +76,18 @@ struct btlc_MapDataConverter
 		local OutputDir = "\"" + DestPath  + "\""
 		
 		Dos_Command.run Program arg_array:#("-MapConvert", IdeFile, ObjFile, OPLPath, MainWPL,  MdlPath, OutputDir)
+	),
+
+	fn PropPlace IdePath OPLPath DestPath Name= 
+	(
+		scriptPath = (GetDir #userScripts )
+		Program =  scriptPath + "\\BTLC\\Tools\\GTAConverter.exe"
+		Dos_Command.run Program arg_array:#("-PropPlace",   IdePath,  OPLPath, DestPath, Name)
 	)
 )
 btlcDataConverter = btlc_MapDataConverter();
+
+--btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\manhat"  "F:\Modding\BTLC\02_GameData\proplacer\out" "Manhat"
 
 /*
 function ConvertIDE SrcPath DestPath StartID= 

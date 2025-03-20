@@ -119,6 +119,8 @@ struct  Btlc_ModelConvert
 						Ide[IdObj].Renamed = true
 					)  	
 					Ide[IdObj].Txd =  toLower  (trimLeft(trimRight fl[2])) 
+					ImageName =  filenameFromPath ExportPath
+					if Ide[IdObj].Txd == "null" then  Ide[IdObj].Txd = (substring ImageName  1 10 ) + "txd"
 					Ide[IdObj].DrawDist =  toLower  (trimLeft(trimRight fl[3])) as integer
 					IDCurr = IDCurr + 1 
 					IdObj = IdObj + 1
@@ -142,6 +144,7 @@ struct  Btlc_ModelConvert
 						Ide[IdObj].Renamed = true
 					)  	
 					Ide[IdObj].Txd =  toLower  (trimLeft(trimRight fl[2])) 
+					if Ide[IdObj].Txd == "null" then  Ide[IdObj].Txd = (substring ImageName  1 10 ) + "txd"
 					Ide[IdObj].DrawDist =  toLower  (trimLeft(trimRight fl[4])) as integer
 					IDCurr = IDCurr + 1 
 					IdObj = IdObj + 1
@@ -461,8 +464,8 @@ struct  Btlc_ModelConvert
 
 		for AModel in TheModels do 
 		(
-			--try 
-		--	(
+			try 
+			(
 				ThisObj = undefined
 				local oft = ofio_iv_oft()
 
@@ -480,13 +483,13 @@ struct  Btlc_ModelConvert
 					posX = 0;
 					posY = posY + 1
 				)
-		/*	)
+			)
 			catch 
 			(
 				print "Error while importing .oft files."
 				print AModel
-				--oft.cleanup()
-			)*/
+				oft.cleanup()
+			)
 		)
 		--
 	),
@@ -624,8 +627,8 @@ struct  Btlc_ModelConvert
 
 	fn StartExport = 
 	(
-		Path =  ExportPath + ".ide"
-		btlcModelConvert.ExportIde Path
+	--	Path =  ExportPath + ".ide"
+		--btlcModelConvert.ExportIde Path
 
 		OutputPath = ExportPath + "\\img";
 		makeDir OutputPath
@@ -772,7 +775,7 @@ function btlc_GUIModelConvert =
 
 	rollout Model_Utils "Map Utils" width:210 height:400
 	(
-		button btn_ExportCollision "ExportCollision" width:110 height:35 align:#center tooltip:"Export the Collision models" across:4
+		button btn_ExportCollision "ExportCollision" width:110 height:35 align:#center tooltip:"Export the Collision models" across:5
 		on btn_ExportCollision pressed do 
 		(
 			-- Collision Export
@@ -812,32 +815,93 @@ function btlc_GUIModelConvert =
 			btlcModelConvert.InitTexDb()
 			gc();	
 		)
-		button btn_dummy "  " width:110 height:35 align:#center tooltip:"Export the models" 
-
-		button btn_AddDynObj "Set as Dynamic Obj" width:110 height:35 align:#center tooltip:"Adds dynamic attributes to Object"  across:4
-		on btn_AddDynObj pressed do 
+		button btn_ideredo "Convert IDE" width:110 height:35 align:#center tooltip:"Gen IDE" 
+		on btn_ideredo pressed do 
 		(
-			custAttributes.add selection[1] gtaDynObject 
+			
+			btlcModelConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			btlcModelConvert.ImportPath =  btlcConfig.CurrentModelConvPath
+			btlcModelConvert.ExportPath =  btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.IdStart = btlcConfig.CurrentID as integer
+			IDEFILE = (getfiles (btlcModelConvert.ImportPath   + ".ide"))
+			print IDEFILE
+			btlcModelConvert.ConvertIde IDEFILE[1] 
+
+			Path =  btlcModelConvert.ExportPath + ".ide"
+			btlcModelConvert.ExportIde Path
+		btlcConfig.CurrentID = btlcModelConvert.IdStart ;
 		)
 
-		button btn_CreateBrk "Set as Breakable" width:110 height:35 align:#center tooltip:"Export the models" 
-		on btn_CreateBrk pressed do 
+		button btn_iplexpo "Export Ipl" width:110 height:35 align:#center tooltip:"Export model placement as ipl lines" 
+		on btn_iplexpo pressed do 
 		(
-			btlcIDEUtils.SetObjAsBreakable selection[1] 
+				
+			btlcModelConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			btlcModelConvert.ImportPath =  btlcConfig.CurrentModelConvPath
+			btlcModelConvert.ExportPath =  btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.IdStart = btlcConfig.CurrentID as integer
+			IDEFILE = (getfiles (btlcModelConvert.ExportPath   + ".ide"))
+			Iplexpo = btlc_SA_IPL()
+			Iplexpo.ExportToList IDEFILE[1]
 		)
 
-		button btn_DynData "Export Dynamic Data" width:110 height:35 align:#center tooltip:"Export the objects dynamic data" 
-		on btn_DynData pressed do 
+
+
+		group "WindFx and effects"
 		(
-			btlcIDEUtils.WriteDynObjData idePath: (btlcConfig.CurrentModelConvPathSA + ".ide")
+			button btn_setWindfyx "Set as WindFx" width:110 height:35 align:#center tooltip:"Sets the model to have wind swaying"  across:4
+			on btn_setWindfyx pressed do 
+			(
+				for obj in selection do setUserProp obj "windfx" "yes"
+				
+			)
+
+			
+			button btn_unsetWindfyx "unSet  WindFx" width:110 height:35 align:#center tooltip:"unSets the model to have wind swaying" 
+			on btn_unsetWindfyx pressed do 
+			(
+				for obj in selection do setUserProp obj "windfx" "no"
+			)
+
+			button btn_PaintLights "PaintLights" width:110 height:35 align:#center tooltip:"Paints the Lights to vertex night" 
+			on btn_PaintLights pressed do 
+			(
+				btlcWorldLightPaint.PaintWorld() 
+			)
+
+			button btn_empty "--" width:110 height:35 align:#center tooltip:"Paints the Lights to vertex night" 
+			on btn_empty pressed do 
+			(
+				
+			)
+
+				
 		)
- 
 
-		button btn_dummy3"  " width:110 height:35 align:#center tooltip:"Export the models" 
-
-	
 		group "Dynamic Col Creation"
 		(
+			button btn_AddDynObj "Set as Dynamic Obj" width:110 height:35 align:#center tooltip:"Adds dynamic attributes to Object"  across:4
+			on btn_AddDynObj pressed do 
+			(
+				custAttributes.add selection[1] gtaDynObject 
+			)
+	
+			button btn_CreateBrk "Set as Breakable" width:110 height:35 align:#center tooltip:"Export the models" 
+			on btn_CreateBrk pressed do 
+			(
+				btlcIDEUtils.SetObjAsBreakable selection[1] 
+			)
+	
+			button btn_DynData "Export Dynamic Data" width:110 height:35 align:#center tooltip:"Export the objects dynamic data" 
+			on btn_DynData pressed do 
+			(
+				btlcIDEUtils.WriteDynObjData idePath: (btlcConfig.CurrentModelConvPathSA + ".ide")
+			)
+	 
+			label lbldum ""
+
+
+
 			spinner spinMaxverts "maxvert" range:[0,32,16]  type:#integer  across:4
 			spinner spinSphSize "SphereRadius" range:[0.0,1.0,0.05]  type:#float
 			spinner spinpushin "Push in" range:[-30.0,0.0,-5.0]  type:#float
@@ -879,7 +943,7 @@ function btlc_GUIModelConvert =
 	try (closeRolloutFloater btlcIdeModelsFloater) catch ()
 	Pos = getMaxWindowSize() 	
 	PosX = Pos[1]/2 - 300
-	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Model Convert" 620 500 PosX 250
+	btlcIdeModelsFloater  = newRolloutFloater  "BTLC Model Convert" 620 650 PosX 250
 	addRollout  DirSettings btlcIdeModelsFloater
 	addRollout  ModelConvert btlcIdeModelsFloater
 	addRollout  Model_Utils btlcIdeModelsFloater

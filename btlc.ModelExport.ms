@@ -13,12 +13,16 @@ if versions==undefned then
 struct Btlc_Modelexport 
 (
     fn getMyDffData TheObjs = (
+
+       
         objects = for obj in TheObjs where (canExport obj) collect obj
+        if TheObjs.name == "CJ_FENCE_3_1" do print objects
         if objects.count>0 then (
             atomics=#()
             bones=#()
             hAnimTable=#()
             for i = 1 to objects.count do (
+           
                 if (superclassof (objects[i]) == GeometryClass) then append atomics (#(i, undefined))
                 if useAnimation (objects[i]) then(
                     bones[i]=#(objects[i].id)
@@ -27,6 +31,7 @@ struct Btlc_Modelexport
                 )
             )
             if (hAnimTable.count==0) then bones=undefined
+            
             return #(objects, atomics, bones)
         )
         return undefined
@@ -34,20 +39,72 @@ struct Btlc_Modelexport
 
     function ExportObj Obj Path = 
     (
-        expData=getMyDffData Obj
-		if expData!=undefined then (
+        --here we check if it is a multiclump model, becuase we have to export it differently
+        windfx = false
+           isMulticlump = false
+        ClumpMdl = undefined
+        ClumpMdlDmg = undefined
+        domulti = false
+        if ClassOf Obj == Dummy and domulti do 
+        (
+     
+            for achild in Obj.children do 
+            (
+            if MatchPattern achild.name pattern:Obj.name do ClumpMdl = achild;
+            thepattern = Obj.name + "_dam"
+            if MatchPattern achild.name pattern:thepattern do (ClumpMdlDmg = achild; ) 
+            )
+            if ClumpMdl != undefined and ClumpMdlDmg != undefined do 
+            (
+                isMulticlump = true
+            ) 
+        )
+        theobjects = #()
+        if ClumpMdl != undefined do  append theobjects ClumpMdl
+        if ClumpMdlDmg != undefined do  append theobjects ClumpMdlDmg
+
+        if  domulti and isMulticlump == true and theobjects.count>0 then 
+        ( 
+           -- f = createDffOStream " "
             doExtraColor = true;
             doUVAnim = true;
             doNormals = true;
 
+        --    print Obj.name
             f =  fopen Path "wb"
-			if f != undefined then 
+            if f != undefined then 
             (
-				if (1)and( doUVAnim ) then writeUVAnimationDictionary f expData[1] expData[2]
-				writeClump f expData[1] expData[2] doExtraColor doNormals versions[1] bones:(expData[3])
-				fclose f
+                for i = 1 to theobjects.count do  
+                (
+                  --  print theobjects[i].name
+                    expData=getMyDffData theobjects[i]
+                    writeClump f expData[1] expData[2] doExtraColor doNormals versions[1] bones:(expData[3])  iswindfx:windfx
+                    --writeModel f (theobjects[i]) doExtraColor doNormals versions[1] false
+                )
+            )
+            fclose f
+        ) else 
+        (
+            expData=getMyDffData Obj
+         
+            if (getUserProp Obj "windfx") == "yes" do windfx = true
+            if expData!=undefined then (
+                doExtraColor = true;
+                doUVAnim = true;
+                doNormals = true;
+    
+            
+                f =  fopen Path "wb"
+                if f != undefined then 
+                (
+                    if (1)and( doUVAnim ) then writeUVAnimationDictionary f expData[1] expData[2]
+                    writeClump f expData[1] expData[2] doExtraColor doNormals versions[1] bones:(expData[3])  iswindfx:windfx
+                    fclose f
+                )
             )
         )
+   
+
     ),
 
 

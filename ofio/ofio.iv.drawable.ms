@@ -2011,12 +2011,14 @@ struct ofio_iv_odr (
 		
 				light.coronaFarClip = 150
 				light.shadowSize =  lights[i].Distance
-				light.shadowColorMultiplier = 180
+				light.shadowColorMultiplier = 80
 				light.shadowZDistance = 0.001
 
-				light.flag10 = true --CORONA_CHECK_OBSTACLES
+				--light.flag10 = true --CORONA_CHECK_OBSTACLES
 				light.flag11 = true--FOG_TYPE1
 				light.flag16 = true--AT_NIGHT
+				light.flag22 = true--UPDATEHEIGHT
+			
 
 				if 	light.coronaSize < 0.04 do 
 				(
@@ -2027,12 +2029,12 @@ struct ofio_iv_odr (
 
 				if type == "omni" then
 				(
-					light.flag23 = true
+					--light.flag23 = true
 					light.enLookDirection = false
 				)
 				else
 				(
-					light.flag23 = true
+					--light.flag23 = true
 					light.enLookDirection = true
 					light.lookDirection_x = (lights[i].Direction.x * 10)  as integer
 					light.lookDirection_y = (lights[i].Direction.y * 10)  as integer

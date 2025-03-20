@@ -84,11 +84,64 @@ struct btlc_utils
 		(
 			setFaceMatID obj1 i matIds[i]
 		)	
+	),
+
+	fn SetLightDataGlobal = 
+	(
+		-- helper function to set light data do all lights
+		for TheLight in Lights do 
+        (
+            if classof TheLight == GTA_Light do 
+            ( 
+             -- TheLight.shadowSize =    TheLight.shadowSize * 0.0
+		--	  TheLight.coronaSize = 1.0
+		--	if TheLight.pointlightRange > 2 do TheLight.pointlightRange = 2
+                TheLight.shadowColorMultiplier = 65.0
+           --     TheLight.flag22 = true
+			--	TheLight.flag10 = false
+			--	TheLight.shadowZDistance = 0.0
+			--	TheLight.flag23 = false
+         	)
+        )
+	),
+
+	fn SetObjDataGlobal = 
+	(
+		Myobjlist = #()
+		for aModel in objects where aModel.parent == undefined do append Myobjlist aModel
+
+		for theobj in Myobjlist do 
+		(
+			if 	(custattributes.get theobj gtaDynObject != undefined) do 
+			(
+
+				ObjDat = (custattributes.get theobj gtaDynObject)
+				ObjDat.Mass = 350
+				ObjDat.TurnMass = 340
+
+				
+				ObjDat.Uproot = 0.0
+				if ObjDat.CDEff == 200 do 
+				(
+				--	print theobj.name
+					--ObjDat.SpCDR = 0 --1: lampost
+				--	ObjDat.FX_TYPE = 2 --play when destroyed
+					--ObjDat.FX_NAME = "prt_spark_3"
+				--	ObjDat.CDMult = 0.9--damager multiplier
+				
+				)
+				/* ObjDat.Mass ObjDat.TurnMass ObjDat.AirResistance ObjDat.Elasticity ObjDat.PercSubmerged ObjDat.Uproot \
+				ObjDat.CDMult ObjDat.CDEff ObjDat.SpCDR ObjDat.CamAv ObjDat.Expl ObjDat.FX_TYPE \
+				ObjDat.FX_OFFSETx ObjDat.FX_OFFSETy ObjDat.FX_OFFSETz ObjDat.FX_NAME \
+				ObjDat.B_SM ObjDat.B_VX ObjDat.B_VY ObjDat.B_VZ ObjDat.B_VR ObjDat.B_GUN ObjDat.B_SPK */
+			)
+		)
 	)
 )
 btlcUtil = btlc_utils();
 
-
+--btlcUtil.SetLightDataGlobal()
+--btlcUtil.SetObjDataGlobal()
 fn get_all_nodes nodes =
 (
 	allnodes = #()

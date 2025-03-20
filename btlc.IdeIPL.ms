@@ -33,10 +33,11 @@ struct btlc_SA_IDE
         fs = openFile thePath
 		if fs == undefined do return()
 		while not eof fs do
-		(
+		(	print "yes"
 			l = readline fs
 			if l == "objs" do 
 			(
+			
                 IdObj= objs.count + 1
 				while l != "end" do
 				(
@@ -384,6 +385,29 @@ struct btlc_IV_IDE
     )
 )
 
+struct btlc_SA_IPL 
+(
+	fn ExportToList IdePath = 
+	(
+		TheIde = btlc_SA_IDE()
+		TheIde.thePath = IdePath
+		TheIde.Load()
+
+		for theobj in objects where theobj.parent == undefined do 
+		(
+			for Item in TheIde.objs do 
+			(
+				if matchpattern theobj.name pattern:Item.Name do
+				(
+					r = theobj.rotation
+					format "%, %, %, %, %, %, %, %, %, %, -1\n"  (Item.Id as string) Item.Name  0 theobj.position.x  theobj.position.y theobj.position.z \
+					(-r.x as float) (-r.y as float) (-r.z as float) (r.w as float) -1
+				)
+			)
+		)
+	)
+)
+
 struct btlc_IDETools
 (
     Main = "",
@@ -598,8 +622,9 @@ struct btlc_IDETools
 		(
 			if 	(custattributes.get theobj gtaDynObject != undefined) do 
 			(
+			
 				ObjDat = (custattributes.get theobj gtaDynObject)
-				format "%, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, %, % \n" \
+				format "%,\t\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t\t %,\t\t %,\t %,\t %,\t %,\t %,\t %,\t % \n" \
 				theobj.name ObjDat.Mass ObjDat.TurnMass ObjDat.AirResistance ObjDat.Elasticity ObjDat.PercSubmerged ObjDat.Uproot \
 				ObjDat.CDMult ObjDat.CDEff ObjDat.SpCDR ObjDat.CamAv ObjDat.Expl ObjDat.FX_TYPE \
 				ObjDat.FX_OFFSETx ObjDat.FX_OFFSETy ObjDat.FX_OFFSETz ObjDat.FX_NAME \
@@ -623,6 +648,28 @@ struct btlc_IDETools
 						if matchpattern Item.name pattern:theobj.name  do 
 						(
 							ObjDat = (custattributes.get theobj gtaDynObject)
+
+							if classof theobj == Dummy do 
+							(
+								for child in theobj.children do
+								(
+									if matchpattern child.name pattern:theobj.name  do theobj = child
+								)
+							)
+
+							if (getUserProp theobj "CenterOfMass") != undefined do
+							(
+								dadata = (getUserProp theobj "CenterOfMass") as point3
+								if dadata != undefined do 
+								(
+									ObjDat.MassPType = 2
+									ObjDat.MassPx = dadata[1]
+									ObjDat.MassPy= dadata[2]
+									ObjDat.MassPz	= dadata[3]
+								)
+								
+							
+							)
 							format "%, %, %, %, %, % \n" (Item.Id as string) Item.Name ObjDat.MassPType  ObjDat.MassPx ObjDat.MassPy	ObjDat.MassPz	
 						)
 					)
@@ -638,7 +685,8 @@ struct btlc_IDETools
 		(
 			b=copy theObj
 			makeBreakable b
-			b.name=(theObj.name)+"_breakable"
+			b.name=(theObj.name)+"_brk"
+			b.name = btlcUtil.CutNameAdv b.name
 			b.parent=theObj
 		)
 		custAttributes.add theObj gtaDynObject 
@@ -646,6 +694,9 @@ struct btlc_IDETools
 				
 	
 	)
+
+
+
 
 )
 btlcIDEUtils = btlc_IDETools()

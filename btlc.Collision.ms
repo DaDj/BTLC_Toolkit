@@ -397,8 +397,13 @@ struct Btlc_Collision
 		allNames = #() 
 		for i in myobjects do
 		(
-			if (classof i == Dummy) do i = i.children[1]
 
+
+			if (classof i == Dummy) do 
+			(
+				i2 = i.children[1]
+				if (matchpattern i2.name pattern:"*_dam") and (i.children.count > 1) then i = i.children[2] else i = i.children[1]
+			)
 			if (findItem allNames i.name == 0) and (classof i ==Editable_mesh)  do 
 			(
 				append MyObjs i

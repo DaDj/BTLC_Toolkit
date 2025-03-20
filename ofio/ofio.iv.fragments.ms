@@ -728,7 +728,7 @@ struct ofio_iv_ft_group (
 								for i = 1 to 4 do
 								(
 									elements = scanline fInput
-									child.f50[i] = [elements[1] as Float, elements[2] as Float, elements[3] as Float]
+									if  elements != undefined and elements[1] != undefined and  elements[2] != undefined and  elements[3] != undefined and elements[1] != "NAN" do child.f50[i] = [elements[1] as Float, elements[2] as Float, elements[3] as Float]
 								)
 								elements = scanline fInput
 							)
