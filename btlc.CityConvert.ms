@@ -269,7 +269,6 @@ struct Btlc_ConvertCity
         start = timeStamp();
         OutputPath = ExportCityPath + "\\img";
         btlcModelExport.ExportAllModels(OutputPath);
-
         end = timeStamp();
         format "Model Export: Processing took % seconds\n" ((end - start) / 1000.0)  
         gc();

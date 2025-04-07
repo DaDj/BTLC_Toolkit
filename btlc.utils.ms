@@ -136,6 +136,30 @@ struct btlc_utils
 				ObjDat.B_SM ObjDat.B_VX ObjDat.B_VY ObjDat.B_VZ ObjDat.B_VR ObjDat.B_GUN ObjDat.B_SPK */
 			)
 		)
+	),
+
+	fn WeldVertices obj thresh  = 
+	(
+				--thresh = 0.01 -- weld threshold
+				allVerts = #{1..(obj.numVerts)} -- get all verts list
+				meshop.weldVertsByThreshold obj allVerts thresh -- Weld
+				meshop.deleteIsoVerts obj
+	),
+
+	fn GetModelsinScene = 
+	(
+		 MyObjs = #()
+        for i in objects as array  do 
+        (
+            if (btlcCol.isCol i) == false and (i.parent == undefined) do append MyObjs i
+        ) 
+        MyObjs =  makeUniqueArray MyObjs
+	),
+
+	fn ReduceVertsforAllModels = 
+	(
+		Objs = GetModelsinScene();
+		btlcVertexPaint.ReduceMapVertsObjects Objs
 	)
 )
 btlcUtil = btlc_utils();

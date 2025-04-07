@@ -37,7 +37,7 @@ struct Btlc_Modelexport
         return undefined
     ),
 
-    function ExportObj Obj Path = 
+    function ExportObj TheObj Path = 
     (
         --here we check if it is a multiclump model, becuase we have to export it differently
         windfx = false
@@ -45,9 +45,25 @@ struct Btlc_Modelexport
         ClumpMdl = undefined
         ClumpMdlDmg = undefined
         domulti = false
+
+        Obj = copy TheObj
+
+        --btlcVertexPaint.FitChannelVertNum obj
+        btlcVertexPaint.unifyVC Obj -2 --Always reduce Alpha channel
+        btlcVertexPaint.OptimzeMapChannels Obj
+      /*  bIsLOd = getUserProp  Obj  "type" 
+       if  (bIsLOd == "LOD")  then 
+        (
+            btlcVertexPaint.unifyVC Obj 0
+            btlcVertexPaint.unifyVC Obj -1
+        ) 
+        else 
+        (
+            
+        ) */
+     
         if ClassOf Obj == Dummy and domulti do 
         (
-     
             for achild in Obj.children do 
             (
             if MatchPattern achild.name pattern:Obj.name do ClumpMdl = achild;
@@ -103,8 +119,9 @@ struct Btlc_Modelexport
                 )
             )
         )
-   
+        btlcUtil.WeldVertices Obj 0.01
 
+        delete Obj
     ),
 
 

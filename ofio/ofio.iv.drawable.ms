@@ -1970,7 +1970,7 @@ struct ofio_iv_odr (
 				light.delegate.farattenstart = light.delegate.farattenend * 0.25
 				light.delegate.attenDecay = 2
 				light.delegate.DecayRadius = lights[i].Distance
-				light.delegate.multiplier = lights[i].Range / 11 --originally divided by 10. but its kind weak at times. 
+				light.delegate.multiplier = lights[i].Range / 15 --originally divided by 10. 
 				light.delegate.falloff = lights[i].Falloff
 
 			

@@ -142,14 +142,17 @@ function btlc_GUICityConvert =
 			button btn_PaintWorld "Paint World" width:110 height:25 align:#center tooltip:"Paint Light on World"
 		
 			button btn_CrtCol "Create Collision" width:110 height:25 align:#center tooltip:"Create Collision for all models in Scene"  
+			
+			button btn_CrtSelCol "Selected to Col" width:110 height:25 align:#center tooltip:"Create Collision for selected"  
 
-			button btn_GenerateData "Gen Data" width:110 height:25 align:#center tooltip:"Create external Data again" 
+		--	button btn_GenerateData "Gen Data" width:110 height:25 align:#center tooltip:"Create external Data again" 
 		)
 
 		group "Misc."
 		(
 			button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:25 align:#left tooltip:"Export the models" across:5
 			button btn_Cleanup "Cleanup Files" width:110 height:25 align:#left tooltip:"Cleanup external Files" 
+			
 		)
 
 		on btn_ExportCollision pressed do 
@@ -201,6 +204,16 @@ function btlc_GUICityConvert =
 		(
 			BTLCCityConvert.GenerateCollsion()
 		)
+
+		on btn_CrtSelCol pressed do 
+		(
+			for obj in selection do 
+			(
+				btlcCol.GenerateColMeshes obj tresh:0.3 
+			)
+			
+		)
+
 
 		on btn_Cleanup pressed do 
 		(

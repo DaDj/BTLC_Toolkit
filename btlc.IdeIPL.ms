@@ -623,7 +623,9 @@ struct btlc_IDETools
 			if 	(custattributes.get theobj gtaDynObject != undefined) do 
 			(
 			
+			
 				ObjDat = (custattributes.get theobj gtaDynObject)
+				if ObjDat.Elasticity < 0.1 do ObjDat.Elasticity = 0.1
 				format "%,\t\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t %,\t\t %,\t\t %,\t %,\t %,\t %,\t %,\t %,\t % \n" \
 				theobj.name ObjDat.Mass ObjDat.TurnMass ObjDat.AirResistance ObjDat.Elasticity ObjDat.PercSubmerged ObjDat.Uproot \
 				ObjDat.CDMult ObjDat.CDEff ObjDat.SpCDR ObjDat.CamAv ObjDat.Expl ObjDat.FX_TYPE \
@@ -653,7 +655,9 @@ struct btlc_IDETools
 							(
 								for child in theobj.children do
 								(
-									if matchpattern child.name pattern:theobj.name  do theobj = child
+									if matchpattern child.name pattern:theobj.name  do (
+										theobj = child
+									)
 								)
 							)
 
@@ -713,7 +717,7 @@ if gtaDynObject==undefined then(
 			Mass type:#Float  default:100.0 ui:spin_Mass
 			TurnMass type:#Float  default:150.0 ui:spin_TurnMass
 			AirResistance type:#Float  default:0.99 ui:spinAirRes
-			Elasticity type:#Float  default:0.03 ui:spinElas
+			Elasticity type:#Float  default:0.1 ui:spinElas
 			PercSubmerged type:#Float  default:50.0 ui:spinPerSubmrgd
 			Uproot type:#Float  default:20.0 ui:spinUproot
 			CDMult type:#Float  default:2.0 ui:spinCdMult

@@ -186,18 +186,22 @@ struct Btlc_Collision
 		)
 	),
 	
-	fn OptimizeColMesh obj = 
+	fn OptimizeColMesh obj tresh:undefined = 
 	(
 		optimizer = optimize()
 		addModifier obj optimizer
 
-		optimizer.facethreshold1 = 2.0
+		optimizer.facethreshold1 = 1.2
 		optimizer.edgethreshold1 = 1.1
-		if (matchPattern obj.name pattern:"*road*") or (matchPattern obj.name pattern:"*freeway*")  or (matchPattern obj.name pattern:"*highway*") then 
+		if (tresh != undefined) or (matchPattern obj.name pattern:"*road*") or (matchPattern obj.name pattern:"*freeway*")  or (matchPattern obj.name pattern:"*highway*") \
+		 or (matchPattern obj.name pattern:"*coastrd*")  or (matchPattern obj.name pattern:"*overpass*") or  (matchPattern obj.name pattern:"*flyover*") then 
 		(
-			optimizer.facethreshold1 = 1.2
-			optimizer.edgethreshold1 = 1.0
+			optimizer.facethreshold1 = 0.5
+			optimizer.edgethreshold1 = 0.4
+
+			if  (tresh != undefined) do optimizer.facethreshold1 = tresh
 		)
+
 
 		maxOps.CollapseNode obj 1
 	),
@@ -300,7 +304,7 @@ struct Btlc_Collision
 		(
 			try 
 			(
-				thresh = 0.02 -- weld threshold
+				thresh = 0.08 -- weld threshold
 				allVerts = #{1..(obj.numVerts)} -- get all verts list
 				meshop.weldVertsByThreshold obj allVerts thresh -- Weld
 				meshop.deleteIsoVerts obj
@@ -345,7 +349,7 @@ struct Btlc_Collision
 	),
 
 	-- Generates Collisionmeshes from the main Mesh
-	function GenerateColMeshes MyObjs = 
+	function GenerateColMeshes MyObjs tresh:undefined = 
 	(
 		with redraw off
 		(
@@ -356,15 +360,17 @@ struct Btlc_Collision
 					thecopy = copy obj
 					thecopy.name = obj.name + "_COL" 
 					thecopy.parent = obj
-					
+					--btlcVertexPaint.unifyVC thecopy -1 
+					--btlcVertexPaint.unifyVC thecopy 0  
 					ConvertMeshtoCol thecopy 
 				/*	if (custattributes.get thecopy ColMesh)==undefined then 
 					(
 						custattributes.add thecopy ColMesh
 						thecopy.wirecolor =  color 50 210 250
 					) */
+					
 					StdMattoColMat thecopy
-					OptimizeColMesh thecopy 
+					OptimizeColMesh thecopy tresh:tresh
 					CleanColMesh thecopy 
 					CleanColMesh thecopy 
 				)
@@ -373,6 +379,8 @@ struct Btlc_Collision
 		)
 		redrawviews()
 	),
+
+
 
 	fn writeCols f cols version = 
 	(

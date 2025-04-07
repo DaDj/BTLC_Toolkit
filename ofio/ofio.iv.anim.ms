@@ -1159,8 +1159,8 @@ struct ofio_iv_anim (
                 (
                     case ofutils.lowercase(block.name) of
                     (	
-                        "uv0": texture.coords.u_offset = value[3]
-                        "uv1": texture.coords.v_offset = value[3]
+                        "uv0": texture.coords.u_offset =   floor( value[3]*1000)/1000
+                        "uv1": texture.coords.v_offset = floor( value[3]*1000)/1000
                         default: throw ("uknown uv block " + block.name)
                     )
                 )					
