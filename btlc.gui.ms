@@ -67,8 +67,6 @@ function btlc_GUICityConvert =
 			)
 		)
 		on btn_SACityPartDir rightclick do try (shellLaunch btlcConfig.CurrentExpoSaPAth "") catch()
-
-		
 	)
 
 	rollout MYconvert "CityConvert" width:210 height:400
@@ -145,14 +143,29 @@ function btlc_GUICityConvert =
 			
 			button btn_CrtSelCol "Selected to Col" width:110 height:25 align:#center tooltip:"Create Collision for selected"  
 
-		--	button btn_GenerateData "Gen Data" width:110 height:25 align:#center tooltip:"Create external Data again" 
+			button btn_GenerateData "Gen Data" width:110 height:25 align:#center tooltip:"Create external Data again" across:5 
+
+			button btn_Paintselected "Paint Selected" width:110 height:25 align:#center tooltip:"Create external Data again" across:5 
 		)
 
 		group "Misc."
 		(
 			button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:25 align:#left tooltip:"Export the models" across:5
 			button btn_Cleanup "Cleanup Files" width:110 height:25 align:#left tooltip:"Cleanup external Files" 
+			button btn_FixTextures "Fix TexturePaths" width:110 height:35 align:#center tooltip:"Export the models" 
 			
+		)
+
+	
+		on btn_FixTextures pressed do 
+		(
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =  btlcConfig.CurrentExpoSaPAth
+			BTLCCityConvert.InitTexDb()
+			BtlcTextDB.FixTexturesforAllObjs()
+			--BtlcTextDB.ReApplyTextures()
+			gc();	
 		)
 
 		on btn_ExportCollision pressed do 
@@ -198,6 +211,14 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
 			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
 			BTLCCityConvert.PaintLights()
+		)
+
+		on btn_Paintselected pressd do 
+		(
+			Obj =selection[1]
+			setuserprop Obj "BTLC_PrelightApplied" 0
+			btlcVertexPaint.PrelightModel Obj
+			btlcVertexPaint.PaintWorldLights Obj 
 		)
 
 		on btn_CrtCol pressed do 

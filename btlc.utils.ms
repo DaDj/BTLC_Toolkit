@@ -140,10 +140,14 @@ struct btlc_utils
 
 	fn WeldVertices obj thresh  = 
 	(
-				--thresh = 0.01 -- weld threshold
-				allVerts = #{1..(obj.numVerts)} -- get all verts list
-				meshop.weldVertsByThreshold obj allVerts thresh -- Weld
-				meshop.deleteIsoVerts obj
+		if classof obj == Editable_mesh do 
+		(
+		--thresh = 0.01 -- weld threshold
+		allVerts = #{1..(obj.numVerts)} -- get all verts list
+		meshop.weldVertsByThreshold obj allVerts thresh -- Weld
+		meshop.deleteIsoVerts obj
+		)
+			
 	),
 
 	fn GetModelsinScene = 

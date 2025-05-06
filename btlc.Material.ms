@@ -56,7 +56,61 @@ struct Btlc_TextureDB  --Setup after OPL reader read all used files
       TexNameList[i] = toLower TexNameList[i] 
       i += 1
     )
+  ),
+
+  fn ReApplyTextures Mat =
+  (
+    if classof Mat == RW_Mtl do 
+    (
+      TheName =  getFilenameFile Mat.texture.filename	
+		  idx = finditem BtlcTextDB.TexNameList TheName
+		  
+      if idx == 0  then 
+      ( 
+        print "Not Found:"  
+        print TheName
+      )
+      else 
+      (
+        if TheName != "null" do  FilePath = BtlcTextDB.TexturesList[idx]
+        Mat.texture.filename = Filepath
+      )
+  
+       if Mat.enEnv == true and Mat.matfxeffect == 3 do 
+      (
+        TheTexName = getFilenameFile Mat.envmap.filename
+        idxEnv = finditem BtlcTextDB.TexNameList TheTexName
+
+        if idx == 0  then 
+        ( 
+          print "Not Found:"  
+          print TheName
+        )
+        else 
+        (
+          FilePath = BtlcTextDB.TexturesList[idxEnv]
+          Mat.envmap.filename = FilePath
+        )
+      )
+    )
+  ),
+
+  fn FixTexturesforAllObjs =
+  (
+    for obj in objects do 
+    (
+      mat = obj.material
+      if mat != undefined and isKindOf mat Multimaterial and isKindOf obj editable_mesh then
+      (
+        for TheMat in mat do ReApplyTextures TheMat
+      )
+      else if mat != undefined and classof mat == RW_Mtl do 
+      (
+        ReApplyTextures Mat
+      )
+    )
   )
+
 )
 BtlcTextDB = Btlc_TextureDB();
 

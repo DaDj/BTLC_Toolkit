@@ -1865,6 +1865,7 @@ struct ofio_iv_odr (
 						if obj != undefined and Load_Bones == false then 
 						(
 							btlcMaterial.ReshuffleByShader obj.objs[1]
+							btlcUtil.WeldVertices obj.objs[1] 0.001
 							btlcVertexPaint.PrelightModel obj.objs[1]
 							btlcVertexPaint.MoveAlphaChannel obj.objs[1]
 						)

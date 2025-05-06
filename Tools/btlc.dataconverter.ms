@@ -87,8 +87,9 @@ struct btlc_MapDataConverter
 )
 btlcDataConverter = btlc_MapDataConverter();
 
---btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\manhat"  "F:\Modding\BTLC\02_GameData\proplacer\out" "Manhat"
-
+--btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\manhat"  "F:\Modding\BTLC\02_GameData\proplacer\out" "PrpsMh"
+--btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\brook"  "F:\Modding\BTLC\02_GameData\proplacer\out" "PrpsBrook"
+--btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\queens"  "F:\Modding\BTLC\02_GameData\proplacer\out" "PrpsQns"
 /*
 function ConvertIDE SrcPath DestPath StartID= 
 (

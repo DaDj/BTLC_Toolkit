@@ -5,7 +5,7 @@ struct Btlc_Collision
 	(
 		COL_MATERIALS = #("grass","pavement","road","metal","dirt","glass","path","water","window","wood", \
 		"rustedmtl","railing","chrome","meshfencing","mesh","fence","soil","dc_pavement_plainvent01","rubble","alley", \
-		"sidewalk")
+		"sidewalk","dc_curb_metaldam01","dc_curb_metalsmall01","dc_curb_metalsmall02")
 		COL_MATERIALS_ID = #(11,4,1,167,26,45,5,39,45,43,167,167,167,55,164,55,26)
 		
 		GRASS_ID = 80 --11
@@ -49,6 +49,9 @@ struct Btlc_Collision
 				if i == COL_MATERIALS[19] do MyID = RUBBLE_ID --rubble
 				if i == COL_MATERIALS[20] do MyID = Alley_ID --Alleyrubbish
 				if i == COL_MATERIALS[21] do  MyID =  PAVEMENT_ID --sidewalk
+				if i == COL_MATERIALS[22] do  MyID =  PAVEMENT_ID --sidewalk
+				if i == COL_MATERIALS[23] do  MyID =  PAVEMENT_ID --sidewalk
+				if i == COL_MATERIALS[24] do  MyID =  PAVEMENT_ID --sidewalk
 			)
 		)
 		MyID
@@ -191,13 +194,13 @@ struct Btlc_Collision
 		optimizer = optimize()
 		addModifier obj optimizer
 
-		optimizer.facethreshold1 = 1.2
-		optimizer.edgethreshold1 = 1.1
+		optimizer.facethreshold1 = 1.0
+		optimizer.edgethreshold1 = 1.0
 		if (tresh != undefined) or (matchPattern obj.name pattern:"*road*") or (matchPattern obj.name pattern:"*freeway*")  or (matchPattern obj.name pattern:"*highway*") \
 		 or (matchPattern obj.name pattern:"*coastrd*")  or (matchPattern obj.name pattern:"*overpass*") or  (matchPattern obj.name pattern:"*flyover*") then 
 		(
-			optimizer.facethreshold1 = 0.5
-			optimizer.edgethreshold1 = 0.4
+			optimizer.facethreshold1 = 0.4
+			optimizer.edgethreshold1 = 0.3
 
 			if  (tresh != undefined) do optimizer.facethreshold1 = tresh
 		)
@@ -252,23 +255,23 @@ struct Btlc_Collision
 			polyOp.setEdgeSelection newCollisionMesh edgeArray
 			newCollisionMesh.Remove selLevel:#Edge
 			
-			local finalVertArray = #()
-			
-			-- loop through the verts connected to the edges we removed and check to see if they are now connected to
-			-- less than 3 edges and append them to the finalVertArray if they are
-			for vert in vertArray do
-			(
-				local edges = (polyOp.getEdgesUsingVert newCollisionMesh vert) as array
-				
-				if edges.count < 3 then
-				(
-					append finalVertArray vert
-				)
-			)
-			
-			-- select the vertices we want to remove and remove them
-			polyOp.setVertSelection newCollisionMesh finalVertArray
-			newCollisionMesh.Remove selLevel:#Vertex
+		-- 			local finalVertArray = #()
+		-- 			
+		-- 			-- loop through the verts connected to the edges we removed and check to see if they are now connected to
+		-- 			-- less than 3 edges and append them to the finalVertArray if they are
+		-- 			for vert in vertArray do
+		-- 			(
+		-- 				local edges = (polyOp.getEdgesUsingVert newCollisionMesh vert) as array
+		-- 				
+		-- 				if edges.count < 3 then
+		-- 				(
+		-- 					append finalVertArray vert
+		-- 				)
+		-- 			)
+		-- 			
+		-- 			-- select the vertices we want to remove and remove them
+		-- 			polyOp.setVertSelection newCollisionMesh finalVertArray
+		-- 			newCollisionMesh.Remove selLevel:#Vertex
 
 			converttomesh newCollisionMesh
 		)
@@ -304,7 +307,7 @@ struct Btlc_Collision
 		(
 			try 
 			(
-				thresh = 0.08 -- weld threshold
+				thresh = 0.09 -- weld threshold
 				allVerts = #{1..(obj.numVerts)} -- get all verts list
 				meshop.weldVertsByThreshold obj allVerts thresh -- Weld
 				meshop.deleteIsoVerts obj
@@ -312,8 +315,8 @@ struct Btlc_Collision
 				f2 = #{}
 				fnarrow = #{}
 				for i = 1 to obj.numfaces do (
-					if abs (meshop.getFaceArea obj i) < 0.002 then append f i
-					if (fn_getNarrowFace obj i 178) == true then  append f2 i
+					if abs (meshop.getFaceArea obj i) < 0.003 then append f i
+					if (fn_getNarrowFace obj i 176) == true then  append f2 i
 				)
 				if not f.isEmpty then (
 					meshop.deleteFaces obj f
@@ -362,6 +365,10 @@ struct Btlc_Collision
 					thecopy.parent = obj
 					--btlcVertexPaint.unifyVC thecopy -1 
 					--btlcVertexPaint.unifyVC thecopy 0  
+
+					thresh = 0.08 -- weld threshold
+				allVerts = #{1..(thecopy.numVerts)} -- get all verts list
+				meshop.weldVertsByThreshold thecopy allVerts thresh -- Weld
 					ConvertMeshtoCol thecopy 
 				/*	if (custattributes.get thecopy ColMesh)==undefined then 
 					(
@@ -373,6 +380,7 @@ struct Btlc_Collision
 					OptimizeColMesh thecopy tresh:tresh
 					CleanColMesh thecopy 
 					CleanColMesh thecopy 
+					CleanColMesh thecopy 
 				)
 			)
 			gc()
@@ -380,7 +388,10 @@ struct Btlc_Collision
 		redrawviews()
 	),
 
-
+	fn GenerateFaceGroups MyObj GroupSize = 
+	(
+		
+	),
 
 	fn writeCols f cols version = 
 	(

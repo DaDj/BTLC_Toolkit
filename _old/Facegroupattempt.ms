@@ -32,34 +32,10 @@ function sortFaces TheObjFace obj=
 obj = selection[1]
 TheObjFace = obj.Faces
 
-NumGroups = TheObjFace.count/80
+NumGroups = TheObjFace.count/50
 
 TheObjFace = obj.Faces
 MySortedone = TheObjFace
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
-MySortedone = sortFaces MySortedone obj
 MySortedone = sortFaces MySortedone obj
 
 for i_groups =  1 to NumGroups do 

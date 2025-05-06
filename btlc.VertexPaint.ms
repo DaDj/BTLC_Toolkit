@@ -27,25 +27,6 @@ struct btlc_VertexPaint
 
 	),
 
-	-- Checks if verts are below 65k Vertices limit and fits them if needed
-	fn OptimzeMapChannels Obj = 
-	(	
-		--btlcUtil.WeldVertices Obj 0.01	
-
-		if ( meshop.getNumMapVerts Obj -1 ) > 45000 do 
-		(
-			ReduceMapVerts Obj -1 0.009  --high threshold to weld more colors together
-			if ( meshop.getNumMapVerts Obj -1 ) > 45000 do unifyVC Obj -1
-		)
-
-		if ( meshop.getNumMapVerts Obj 0 ) > 45000 do 
-		(
-			ReduceMapVerts Obj 0 0.009 --high threshold to weld more colors together
-			if ( meshop.getNumMapVerts Obj 0 ) > 45000 do unifyVC Obj 0
-		)
-		--unifyVC Obj -2 -- always reduce the alphamap. duh
-	),
-	
 	fn ReduceMapVerts TheMesh mapChannel ColorTresh = 
 	(		
 		for vertId = 1 to meshop.getNumVerts TheMesh do
@@ -89,6 +70,36 @@ struct btlc_VertexPaint
 		)
 		meshop.deleteIsoMapVertsAll TheMesh
 	),
+	-- Checks if verts are below 65k Vertices limit and fits them if needed
+	fn OptimzeMapChannels Obj = 
+	(	
+
+		if classof Obj == Editable_mesh do
+		(
+
+			if ( meshop.getNumMapVerts Obj -1 ) > 50000 do 
+			(
+				ReduceMapVerts Obj -1 0.009  --high threshold to weld more colors together
+				if ( meshop.getNumMapVerts Obj -1 ) > 0 do unifyVC Obj -1
+			)
+	
+			if ( meshop.getNumMapVerts Obj 0 ) > 50000 do 
+			(
+				ReduceMapVerts Obj 0 0.009 --high threshold to weld more colors together
+				if ( meshop.getNumMapVerts Obj 0 ) > 50000 do unifyVC Obj 0
+			)
+	
+			if ( meshop.getNumMapVerts Obj -2 ) > 50000 do 
+			(
+				ReduceMapVerts Obj -2 0.0005 --high threshold to weld more colors together
+			)
+		)
+		--btlcUtil.WeldVertices Obj 0.01	
+
+		--unifyVC Obj -2 -- always reduce the alphamap. duh
+	),
+	
+
 
 	fn ReduceMapVertsObjects Objs = 
 	(
@@ -96,11 +107,14 @@ struct btlc_VertexPaint
 			btlcUtil.ReduceVertsforAllModels()
 			end = timeStamp();
 			format "Processing took % seconds\n" ((end - start) / 1000.0) */
-		for Obj in Objs do
+		for Obj in Objs where classof Obj == Editable_mesh do
 		(
+
 			btlcUtil.WeldVertices Obj 0.01
 			ReduceMapVerts Obj -1 0.002
 			ReduceMapVerts Obj 0 0.002
+			ReduceMapVerts Obj -2 0.002
+			--unifyVC Obj -2 --Always reduce Alpha channel
 		)
 	),
 
@@ -208,6 +222,8 @@ struct btlc_VertexPaint
 		for i = 1 to vcfaces do
 			meshop.setMapFace obj CHVertex_Alpha i( meshop.getMapFace obj ChVertexAlpha3dsmax i )
 		update obj
+		ReduceMapVerts Obj -2 0.002
+		--unifyVC Obj -2 --Always reduce Alpha channel
 	),
 
 	fn PaintWindMatiID Obj MtlID = 
@@ -221,3 +237,4 @@ struct btlc_VertexPaint
 	)
 )
 btlcVertexPaint = btlc_VertexPaint()
+--btlcVertexPaint.ReduceMapVerts selection[1] 0 0.000001

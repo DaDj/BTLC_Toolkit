@@ -815,6 +815,19 @@ function btlc_GUIModelConvert =
 			btlcModelConvert.InitTexDb()
 			gc();	
 		)
+
+		button btn_FixTextures "Fix TexturePaths" width:110 height:35 align:#center tooltip:"Export the models" 
+		on btn_FixTextures pressed do 
+		(
+			btlcModelConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			btlcModelConvert.ImportPath =  btlcConfig.CurrentModelConvPath
+			btlcModelConvert.ExportPath =  btlcConfig.CurrentModelConvPathSA
+			btlcModelConvert.InitTexDb()
+			BtlcTextDB.FixTexturesforAllObjs();
+			--BtlcTextDB.ReApplyTextures()
+			gc();	
+		)
+
 		button btn_ideredo "Convert IDE" width:110 height:35 align:#center tooltip:"Gen IDE" 
 		on btn_ideredo pressed do 
 		(

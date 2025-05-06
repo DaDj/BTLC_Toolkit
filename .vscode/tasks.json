@@ -6,10 +6,10 @@
        "label": "MXSPyCOM execute Script",
        "type": "shell",
        // Add MXSPyCOM.exe to PATH or use file root, i.e: "C:/MXSPyCOM/MXSPyCOM.exe"
-       "command":"C:\\Users\\patgr\\AppData\\Local\\Autodesk\\3dsMax\\2024 - 64bit\\ENU\\scripts\\BTLC\\MXSPyCOM.exe",
+       "command":"E:\\Modding\\GTA_Modding\\codingenv\\maxscript\\BTLC\\MXSPyCOM.exe",
        "args": [
            "-f",
-          "C:\\Users\\patgr\\AppData\\Local\\Autodesk\\3dsMax\\2024 - 64bit\\ENU\\scripts\\BTLC\\${relativeFile}"
+          "E:\\Modding\\GTA_Modding\\codingenv\\maxscript\\BTLC\\${relativeFile}"
        ],
        
        "group": "test",
