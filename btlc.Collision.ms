@@ -97,7 +97,8 @@ struct Btlc_Collision
 		"njdockrustnjdockrust_a","njdocks_treadnjdocks_tread","pipedriptpipedripa","shrubred2shrubreda","swnjbuntingswnjbuntinga","swnjrustmtl1_resizeet_rust",\
 		"weedylong_4weedylong_4a","am_ap_leafedge256_d","am_glue_dirt","am_ap_terminal_wall_glue","am_glue_grassdirtgrasstest","am_rust1","ap_flyus_numbers","bkn_gunk_overlay_slime",\
 		"bxrd_dirt2bxrd_dirt2_a","bxrd_dirtbxrd_dirt_a","bxw_coastgrass","et_ap_tyre01et_ap_tyre01a","et_nums1et_nums1_a","jacob_scum","mo_fdlc_signmo_fdlc_sign_a",\
-		"nj5_pipewire1nj5_pipewire1","og_glue_01og_glue_01_a","rustdrip","startplay_bxstartplay_a_bx","wii_brdg_glu","wii_puddle","wii_tank_numbers")
+		"nj5_pipewire1nj5_pipewire1","og_glue_01og_glue_01_a","rustdrip","startplay_bxstartplay_a_bx","wii_brdg_glu","wii_puddle","wii_tank_numbers","nj01_manhole01","nj01_roadmarkings02nj01_ro",\
+		"abs-flr-mxabs-flr-mx-a","dc_yellowhashlines_01dc_ye")
 		
 		local notFound = true
 		for i in MatsForbidden while notFound  do
@@ -125,8 +126,24 @@ struct Btlc_Collision
 				if ((findstring Shader.MyShaderName "decal") != undefined) then
 				(					
 					deleteMeshFacesByMatID_Mesh node MtlID
+					--print  Shader.MyShaderName
 					isgone = true
 				)
+
+				if ((findstring Shader.MyShaderName "gta_decal_glue.sps") != undefined) then
+				(					
+					deleteMeshFacesByMatID_Mesh node MtlID
+					--print "gta_decal_glue"
+					isgone = true
+				)
+
+				if ((findstring Shader.MyShaderName "gta_terrain_va_3lyr") != undefined) then
+				(					
+					deleteMeshFacesByMatID_Mesh node MtlID
+					isgone = true
+				)
+
+				
 	
 				if ((findstring Shader.MyShaderName "gta_wire") != undefined) then
 				(					
@@ -162,7 +179,7 @@ struct Btlc_Collision
 	),
 
 	-- Convert  Materials to CollisionMaterial
-	fn StdMattoColMat TheObj = 
+	fn StdMattoColMat TheObj deleteforbidden:true = 
 	(
 		if 	(IsKindOf TheObj Editable_Mesh) and (((custattributes.get TheObj ColMesh)!=undefined) or (isProperty TheObj #isShadow) != undefined)  then 
 		(
@@ -174,14 +191,27 @@ struct Btlc_Collision
 				for MtlID = 1 to TheObj.Material.MaterialList.Count do 
 				(
 					TheObj.Material.MaterialList[MtlID].name =  TheObj.Material.names[MtlID]
-					isgone =  DeleteForbiddenCollison TheObj MtlID TheObj.Material.MaterialList[MtlID] 
+					--texture_path = (filterString i.Material.MaterialList[MtlID].diffuseMap.filename	"\\")
+						-- texture_name = substring 	texture_path[texture_path.count] 1 26
+					
+					isgone = false
+					if deleteforbidden != false do 
+					(
+						isgone =  DeleteForbiddenCollison TheObj MtlID TheObj.Material.MaterialList[MtlID] 
+					)
+					
+				
 					
 					if isgone == false do TheObj.Material.MaterialList[MtlID]  = ConvertMaterialtoCol TheObj.Material.MaterialList[MtlID] 
 				)
 			)
 			if (classof TheObj.Material) == RW_Mtl do 
 			(
-				isgone = DeleteForbiddenCollison TheObj 1 TheObj.Material  
+				isgone = false
+				if deleteforbidden != false do 
+				(
+					isgone = DeleteForbiddenCollison TheObj 1 TheObj.Material  
+				)
 				TheObj.Material  = copy TheObj.Material  
 				if isgone == false  do TheObj.Material  = ConvertMaterialtoCol TheObj.Material 
 			)
@@ -194,8 +224,8 @@ struct Btlc_Collision
 		optimizer = optimize()
 		addModifier obj optimizer
 
-		optimizer.facethreshold1 = 1.0
-		optimizer.edgethreshold1 = 1.0
+		optimizer.facethreshold1 = 1.1
+		optimizer.edgethreshold1 = 1.1
 		if (tresh != undefined) or (matchPattern obj.name pattern:"*road*") or (matchPattern obj.name pattern:"*freeway*")  or (matchPattern obj.name pattern:"*highway*") \
 		 or (matchPattern obj.name pattern:"*coastrd*")  or (matchPattern obj.name pattern:"*overpass*") or  (matchPattern obj.name pattern:"*flyover*") then 
 		(
@@ -307,7 +337,7 @@ struct Btlc_Collision
 		(
 			try 
 			(
-				thresh = 0.09 -- weld threshold
+				thresh = 0.015 -- weld threshold
 				allVerts = #{1..(obj.numVerts)} -- get all verts list
 				meshop.weldVertsByThreshold obj allVerts thresh -- Weld
 				meshop.deleteIsoVerts obj
@@ -315,7 +345,7 @@ struct Btlc_Collision
 				f2 = #{}
 				fnarrow = #{}
 				for i = 1 to obj.numfaces do (
-					if abs (meshop.getFaceArea obj i) < 0.003 then append f i
+					if abs (meshop.getFaceArea obj i) < 0.002 then append f i
 					if (fn_getNarrowFace obj i 176) == true then  append f2 i
 				)
 				if not f.isEmpty then (
@@ -352,7 +382,7 @@ struct Btlc_Collision
 	),
 
 	-- Generates Collisionmeshes from the main Mesh
-	function GenerateColMeshes MyObjs tresh:undefined = 
+	function GenerateColMeshes MyObjs tresh:undefined delforbid:true = 
 	(
 		with redraw off
 		(
@@ -366,7 +396,7 @@ struct Btlc_Collision
 					--btlcVertexPaint.unifyVC thecopy -1 
 					--btlcVertexPaint.unifyVC thecopy 0  
 
-					thresh = 0.08 -- weld threshold
+					thresh = 0.015 -- weld threshold
 				allVerts = #{1..(thecopy.numVerts)} -- get all verts list
 				meshop.weldVertsByThreshold thecopy allVerts thresh -- Weld
 					ConvertMeshtoCol thecopy 
@@ -376,21 +406,16 @@ struct Btlc_Collision
 						thecopy.wirecolor =  color 50 210 250
 					) */
 					
-					StdMattoColMat thecopy
+					StdMattoColMat thecopy deleteforbidden:delforbid
 					OptimizeColMesh thecopy tresh:tresh
 					CleanColMesh thecopy 
 					CleanColMesh thecopy 
-					CleanColMesh thecopy 
+					--CleanColMesh thecopy 
 				)
 			)
 			gc()
 		)
 		redrawviews()
-	),
-
-	fn GenerateFaceGroups MyObj GroupSize = 
-	(
-		
 	),
 
 	fn writeCols f cols version = 

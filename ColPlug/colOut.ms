@@ -43,13 +43,11 @@ fn hasPadding m =
 )
 
 fn writeColMesh f m isShadow = (
-	--for vert in m.verts do writeFixPointVertex f 128 (vert.pos)
-	---	for vert in V = in coordsys local (getVert m i) do writeFixPointVertex f 128 (vert.pos)
-	
 	NVerts =  m.NumVerts
-	for i = 1 to NVerts do (
-	V = in coordsys local (getVert m i)
-	writeFixPointVertex f 128 (V)
+	for i = 1 to NVerts do 
+	(
+		V = in coordsys local (getVert m i)
+		writeFixPointVertex f 128 (V)
 	)
  
 	
@@ -75,13 +73,9 @@ fn writeColMesh f m isShadow = (
 				   mat = 0
 				  
 				WriteByte f mat
-				--WriteByte f 254 -- we should Get face brightness from vertex paint instead
-
-				--Get brightness with by vertex color of face
 				ch_Day = 0 -- (0 - vertex color)
 				ch_Night = -1 --  (-1 - vert illum)
 
-			
 				try 
 				(
 					MyMapFace = meshop.getMapFace m ch_Day i  
@@ -96,9 +90,6 @@ fn writeColMesh f m isShadow = (
 							MyDayBrightness = MyDayBrightness + THECOLOUR.value 
 						)
 						MyDayBrightness = MyDayBrightness /3;
-					
-					--	MyDayBrightness = 1;
-					
 					
 					try 
 					(
@@ -122,12 +113,9 @@ fn writeColMesh f m isShadow = (
 				catch 
 				(
 					WriteByte f 254 
-				)
-		
+				)		
 
-			/*	thing = 0 https://gtaforums.com/topic/989107-sa-about-collision-lightning/
-				thing = bit.set thing 1 true
-				thing = bit.set thing 8 true */
+			/*	thing = 0 https://gtaforums.com/topic/989107-sa-about-collision-lightning/ */
 			)
 	)
 )
@@ -291,6 +279,17 @@ fn writeCol f col version =
 
 	if(m != undefined) do 
 	(		
+
+		if (getNumVerts m) > 32000 do 
+		(
+			format "ColWarning: Too many vertices in mesh! Model: % \n" m.name
+		)
+		if (getNumFaces m) > 32000 do 
+		(
+			format "ColWarning: Too many faces in mesh! Model: % \n" m.name
+		)
+			
+	
 		mbounds=#()
 		mbounds[1]=m.min - m.pos
 		mbounds[2]=m.max - m.pos
@@ -299,22 +298,21 @@ fn writeCol f col version =
 		if abs(mbounds[1].x) > 255 or  abs(mbounds[1].y) > 255  or  abs(mbounds[1].z) > 255 do SizeLimit = true
 		if abs(mbounds[2].x) > 255 or  abs(mbounds[2].y) > 255  or  abs(mbounds[1].z) > 255 do SizeLimit = true
 		
-		
 		if SizeLimit == true do 
 		(
 			for v = getNumVerts m to 1 by -1 do--loop through all vertices
 			(
-					vert = getVert m v --get the v-th vertex
-					vbounds=#()
-					vbounds[1]=vert - m.pos
-					if abs(vbounds[1].x) > 255 or  abs(vbounds[1].y) > 255  or  abs(vbounds[1].z) > 255 do  
-					(
-						deleteVert m v
-						update m
-					)
+				vert = getVert m v --get the v-th vertex
+				vbounds=#()
+				vbounds[1]=vert - m.pos
+				if abs(vbounds[1].x) > 255 or  abs(vbounds[1].y) > 255  or  abs(vbounds[1].z) > 255 do  
+				(
+					deleteVert m v
+					update m
+				)
 			)
 
-			format "ColWarning: Too Big --> We trimmed the mesh! Model: % Min: % Max: % \n" col.name  bounds[1] bounds[2]
+			format "ColWarning: Too Big -->  trimmed  mesh! Model: % Min: % Max: % \n" col.name  bounds[1] bounds[2]
 		)
 	)
 	

@@ -81,15 +81,17 @@ struct btlc_MapDataConverter
 	fn PropPlace IdePath OPLPath DestPath Name= 
 	(
 		scriptPath = (GetDir #userScripts )
-		Program =  scriptPath + "\\BTLC\\Tools\\GTAConverter.exe"
+		Program =  scriptPath + "\\BTLC\\Tools\\GTAConverter_legacy.exe"
 		Dos_Command.run Program arg_array:#("-PropPlace",   IdePath,  OPLPath, DestPath, Name)
 	)
 )
 btlcDataConverter = btlc_MapDataConverter();
 
---btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\manhat"  "F:\Modding\BTLC\02_GameData\proplacer\out" "PrpsMh"
---btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\brook"  "F:\Modding\BTLC\02_GameData\proplacer\out" "PrpsBrook"
---btlcDataConverter.PropPlace "F:\Modding\BTLC\02_GameData\proplacer\currentides" "F:\Modding\BTLC\02_GameData\proplacer\allopl\queens"  "F:\Modding\BTLC\02_GameData\proplacer\out" "PrpsQns"
+--btlcDataConverter.PropPlace "E:\Modding\BTLC\02_GameData\proplacer\currentides" "E:\Modding\BTLC\02_GameData\proplacer\allopl\manhat"  "E:\Modding\BTLC\02_GameData\proplacer\out" "PrpsMh"
+--btlcDataConverter.PropPlace "E:\Modding\BTLC\02_GameData\proplacer\currentides" "E:\Modding\BTLC\02_GameData\proplacer\allopl\brook"  "E:\Modding\BTLC\02_GameData\proplacer\out" "PrpsBrook"
+--btlcDataConverter.PropPlace "E:\Modding\BTLC\02_GameData\proplacer\currentides" "E:\Modding\BTLC\02_GameData\proplacer\allopl\queens"  "E:\Modding\BTLC\02_GameData\proplacer\out" "PrpsQns"
+--btlcDataConverter.PropPlace "E:\Modding\BTLC\02_GameData\proplacer\currentides" "E:\Modding\BTLC\02_GameData\proplacer\allopl\bronx"  "E:\Modding\BTLC\02_GameData\proplacer\out" "PrpsBrnx"
+--btlcDataConverter.PropPlace "E:\Modding\BTLC\02_GameData\proplacer\currentides" "E:\Modding\BTLC\02_GameData\proplacer\allopl\jersey"  "E:\Modding\BTLC\02_GameData\proplacer\out" "PrpsNj"
 /*
 function ConvertIDE SrcPath DestPath StartID= 
 (

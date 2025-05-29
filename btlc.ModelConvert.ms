@@ -500,27 +500,29 @@ struct  Btlc_ModelConvert
 
 		posX = 0;
 		posY = 0;
-		try 
-		(
+	
 			for AModel in TheModels do 
-			(
-				local dr = ofio_iv_odr()
-				dr.read(AModel)
-				ThisObj =  dr.build AdvCutName:true
-
-				ThisObj.pos = [(posX*10), (posY * 10), 0]
-				posX = posX + 1;
-				if posX == 11 do 
+			(	try 
 				(
-					posX = 0;
-					posY = posY + 1
+					local dr = ofio_iv_odr()
+					dr.read(AModel)
+					ThisObj =  dr.build AdvCutName:true
+
+					ThisObj.pos = [(posX*10), (posY * 10), 0]
+					posX = posX + 1;
+					if posX == 11 do 
+					(
+						posX = 0;
+						posY = posY + 1
+					)	
+				)
+				catch 
+				(
+					print "Error while importing .odr files."
+					print AModel
 				)
 			)
-		)
-		catch 
-		(
-			print "Error while importing .odr files."
-		)
+	
 	),
 
 	fn ImportObd = 

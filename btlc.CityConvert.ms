@@ -124,7 +124,7 @@ struct Btlc_ConvertCity
             bIsLOd = getUserProp  i  "type" 
         if i.parent == undefined  do  append MyObjs i
         )
-        btlcCol.GenerateColMeshes MyObjs
+        btlcCol.GenerateColMeshes MyObjs delforbid:true
         gc()
     ),
 

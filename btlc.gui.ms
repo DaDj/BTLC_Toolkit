@@ -230,7 +230,7 @@ function btlc_GUICityConvert =
 		(
 			for obj in selection do 
 			(
-				btlcCol.GenerateColMeshes obj tresh:0.3 
+				btlcCol.GenerateColMeshes obj tresh:0.3 delforbid:false
 			)
 			
 		)
