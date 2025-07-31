@@ -716,7 +716,7 @@ function btlc_GUIModelConvert =
 
 	rollout ModelConvert "ModelConvert" width:210 height:450
 	(	
-		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
+		spinner  strtid "Start ID:" range:[200,50000,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
 		
 		on strtid changed val  do 
 		(

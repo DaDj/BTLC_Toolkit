@@ -71,7 +71,7 @@ function btlc_GUICityConvert =
 
 	rollout MYconvert "CityConvert" width:210 height:400
 	(	
-		spinner  strtid "Start ID:" range:[200,19999,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
+		spinner  strtid "Start ID:" range:[200,50000,(btlcConfig.CurrentID as float)] type:#integer width:70 enabled: true offset:[0,8] align:#left
 
 		on strtid changed val  do 
 		(
@@ -144,15 +144,18 @@ function btlc_GUICityConvert =
 			button btn_CrtSelCol "Selected to Col" width:110 height:25 align:#center tooltip:"Create Collision for selected"  
 
 			button btn_GenerateData "Gen Data" width:110 height:25 align:#center tooltip:"Create external Data again" across:5 
+			button btn_GenPlacement "Gen Opl only" width:110 height:25 align:#center tooltip:"Create external placement data only. Doens't impact Models/IDE" 
 
-			button btn_Paintselected "Paint Selected" width:110 height:25 align:#center tooltip:"Create external Data again" across:5 
+			button btn_Paintselected "Paint Selected" width:110 height:25 align:#center tooltip:"Create external Data again" 
+			button btn_Paintselected2 "" width:110 height:25 align:#center tooltip:"Create external Data again" 
+			button btn_Paintselected3 "" width:110 height:25 align:#center tooltip:"Create external Data again" 
 		)
 
 		group "Misc."
 		(
 			button btn_ReinitTxdDb "ReInit Texture DB" width:110 height:25 align:#left tooltip:"Export the models" across:5
 			button btn_Cleanup "Cleanup Files" width:110 height:25 align:#left tooltip:"Cleanup external Files" 
-			button btn_FixTextures "Fix TexturePaths" width:110 height:35 align:#center tooltip:"Export the models" 
+			button btn_FixTextures "Fix TexturePaths" width:110 height:25 align:#center tooltip:"Export the models" 
 			
 		)
 
@@ -252,6 +255,15 @@ function btlc_GUICityConvert =
 			BTLCCityConvert.StartId = 	btlcConfig.CurrentID ;
 			BTLCCityConvert.GenMyData();
 			strtid.value = btlcConfig.CurrentID;
+		)
+
+
+		on btn_GenPlacement pressed do 
+		(
+			BTLCCityConvert.GenericTxdPath =  btlcConfig.GenericTexDir
+			BTLCCityConvert.ImportCityPath =  btlcConfig.CurrentCityPart
+			BTLCCityConvert.ExportCityPath =    btlcConfig.CurrentExpoSaPAth
+			BTLCCityConvert.RedoPlacement();
 		)
 	)
 

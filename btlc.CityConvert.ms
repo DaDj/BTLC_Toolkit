@@ -111,7 +111,30 @@ struct Btlc_ConvertCity
         /*Copy Textures*/
         btlcDataConverter.CopyTextures ("\"" + ImportCityPath + "\\wtd" + "\"") ("\"" +ExportCityPath + "\\txd" + "\"");
         format "finished Copy textures \n"
+        btlcIDEUtils.SetAlphaFlags (ExportCityPath  + ".ide") -- Find Decal Flags etc
         btlcConfig.UpdateCurrentID (ExportCityPath + ".ide")
+    ),
+
+
+    fn RedoPlacement = 
+    (
+       
+
+        SrcPath = ImportCityPath
+        DestPath = ExportCityPath
+        scriptPath = (GetDir #userScripts )
+		local Program =  scriptPath + "\\BTLC\\Tools\\GTAConverter.exe"
+		local Dirname = (pathConfig.stripPathToLeaf SrcPath)
+		local IdeFile = "\"" + DestPath +  ".ide" + "\""
+        print IdeFile
+		local ObjFile = "\"" +  SrcPath +  @"\Object.objs" + "\""
+		local OPLPath =  "\"" + (SrcPath) + "\\wpl" + "\""
+		local MainWPL = "\"" + (pathConfig.removePathLeaf SrcPath) + "\\" + Dirname + ".opl" + "\""
+		local MdlPath = "\"" + SrcPath + "\\wdr" + "\""
+		local OutputDir = "\"" + DestPath  + "\""
+		 print OutputDir
+		Dos_Command.run Program arg_array:#("-MapConvert", IdeFile, ObjFile, OPLPath, MainWPL,  MdlPath, OutputDir)
+        CleanupFiles()
     ),
 	
 	fn GenerateCollsion = 

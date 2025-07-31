@@ -535,14 +535,14 @@ struct btlc_IDETools
 	fn findDecalsObjs ObjList = 
 	(
 		DecalObjs = #()
-
+		
 		for TheObj in ObjList do 
 		(	
 			isDecalByName = false;
 			isDecalByMats = false;
 			isDecalMaybe = false;
 	
-			if (isCol TheObj) or (classof TheObj != Editable_mesh) do return();
+			if (isCol TheObj) or (classof TheObj != Editable_mesh) do continue();
 
 			if (matchPattern TheObj.name pattern:"*glue*") \
 			or (matchPattern TheObj.name pattern:"*decal*") do 
@@ -572,8 +572,6 @@ struct btlc_IDETools
 		
 
 			if isDecalByName or isDecalByMats do append DecalObjs TheObj
-		
-
 			--if isDecalByName do print("ByName: " + TheObj.name)
 			--if isDecalByMats do print("ByMaterial: " + TheObj.name)
 			if isDecalMaybe do print("Maybe: " + TheObj.name)
@@ -607,7 +605,7 @@ struct btlc_IDETools
 		Myobjlist = #()
 		for aModel in objects where aModel.parent == undefined do append Myobjlist aModel
 		Decalobjs = findDecalsObjs Myobjlist
-		print Decalobjs.count
+		--print Decalobjs.count
 		TheIde = ChangeFlagsInIde TheIde Decalobjs 132
 		TheIde.thePath = TheIde.thePath 
 		TheIde.Save() -- Overwrites the original .ide later

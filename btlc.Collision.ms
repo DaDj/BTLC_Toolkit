@@ -137,11 +137,11 @@ struct Btlc_Collision
 					isgone = true
 				)
 
-				if ((findstring Shader.MyShaderName "gta_terrain_va_3lyr") != undefined) then
-				(					
-					deleteMeshFacesByMatID_Mesh node MtlID
-					isgone = true
-				)
+				-- if ((findstring Shader.MyShaderName "gta_terrain_va_3lyr") != undefined) then
+				-- (					
+				-- 	deleteMeshFacesByMatID_Mesh node MtlID
+				-- 	isgone = true
+				-- )
 
 				
 	
